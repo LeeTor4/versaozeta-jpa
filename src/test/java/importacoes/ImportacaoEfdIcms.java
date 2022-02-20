@@ -3,8 +3,6 @@ package importacoes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.zeta.dao.LoteImportacaoSpedFiscalDao;
 import com.zeta.dao.MetadadosDB;
@@ -22,7 +20,7 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
 		
-		String ano = "2019";
+		String ano = "2021";
 		String emp = "SELLENE";
 		String estab = "MEGADIET";
 		String cnpj  = "05329222000419";
@@ -100,28 +98,17 @@ public class ImportacaoEfdIcms {
 				0L, 0L );
 		
 		
-		ExecutorService ex = null;
+		
 		LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
 		ImportaEfdIcms importa = new ImportaEfdIcms();	
-		LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(ex,leitor, x.toString(), 1L, 2L);
+		LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
 			
-		
-		try {
-			if(!loteDao.listaTodos().contains(loteImportacao)){
-				loteDao.adiciona(loteImportacao);		
-				
-			}else {
-				System.out.println("Lote já importado!!!");
-			}
-		
-		} catch (Exception e) {
-
-		}finally {
-			if(ex != null) {
-				ex.shutdown();
-			}
+		if(!loteDao.listaTodos().contains(loteImportacao)){
+			loteDao.adiciona(loteImportacao);		
+			
+		}else {
+			System.out.println("Lote já importado!!!");
 		}
-
 				
 		//cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
 		

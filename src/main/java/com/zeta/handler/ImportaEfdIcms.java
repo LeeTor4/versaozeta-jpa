@@ -41,7 +41,7 @@ public class ImportaEfdIcms {
 	private Set<String> listaProdutos = new LinkedHashSet<String>();
 	private List<ItemTotalizadoPorLote> itensTotalizados = new ArrayList<ItemTotalizadoPorLote>();
 	
-	public LoteImportacaoSpedFiscal getLoteImportacao(ExecutorService ex,LeitorEfdIcms leitor, String file,Long idEmp, Long idEst) {
+	public LoteImportacaoSpedFiscal getLoteImportacao(LeitorEfdIcms leitor, String file,Long idEmp, Long idEst) {
 		LoteImportacaoSpedFiscal importacao = new LoteImportacaoSpedFiscal();
 
 		for (Reg0000 lote : leitor.getRegs0000()) {
@@ -62,7 +62,7 @@ public class ImportaEfdIcms {
 			importacao.setSuframa(lote.getSuframa());
 			importacao.setIndPerfil(lote.getIndPerfil());
 			importacao.setIndAtiv(lote.getIndAtiv());
-			importacao.setHistItens(getHistoricoItensGeral(ex,leitor, file, idEmp, idEst));
+			importacao.setHistItens(getHistoricoItensGeral(leitor, file, idEmp, idEst));
 	
 		}
 
@@ -70,12 +70,12 @@ public class ImportaEfdIcms {
 		return importacao;
 	}
 	
-	private List<HistoricoItens> getHistoricoItensGeral(ExecutorService ex,LeitorEfdIcms leitor, String file, Long idEmp,
+	private List<HistoricoItens> getHistoricoItensGeral(LeitorEfdIcms leitor, String file, Long idEmp,
 			Long idEst){
 		
 		List<HistoricoItens> historicoItensDocTerceiros = getHistoricoItensDocTerceiros(leitor, idEmp, idEst);
-		List<HistoricoItens> historicoItensDocProprios = getHistoricoItensDocProprios(ex,leitor, file, idEmp, idEst);
-		List<HistoricoItens> historicoItensECFs = getHistoricoItensECFs(ex,leitor, idEmp, idEst);
+		List<HistoricoItens> historicoItensDocProprios = getHistoricoItensDocProprios(leitor, file, idEmp, idEst);
+		List<HistoricoItens> historicoItensECFs = getHistoricoItensECFs(leitor, idEmp, idEst);
 		historicoItensDocProprios.addAll(historicoItensECFs);
 		historicoItensDocTerceiros.addAll(historicoItensDocProprios);
 		
@@ -93,40 +93,85 @@ public class ImportaEfdIcms {
 		}
 		return retorno;
 	}
-	private List<HistoricoItens> getHistoricoItensECFs(ExecutorService ex,LeitorEfdIcms leitor, Long idEmp,
+	private List<HistoricoItens> getHistoricoItensECFs(LeitorEfdIcms leitor, Long idEmp,
 			Long idEst){
 		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
-
-		for (int i = 0; i < leitor.getRegsC400().size(); i++) {
-			leituraEcf_ate_dia_10(ex, leitor, idEmp, idEst,i,1,10, retorno);
-			leituraEcf_entre_dia_10_a_20(ex, leitor, idEmp, idEst,i,11,20, retorno);
- 			leituraEcf_entre_dia_20_a_31(ex, leitor, idEmp, idEst,i,11,32, retorno);
+		ExecutorService ex1 = null;
+		ExecutorService ex2 = null;
+		ExecutorService ex3 = null;
+		try {
+			ex1 = Executors.newCachedThreadPool();
+			ex2 = Executors.newCachedThreadPool();
+			ex3 = Executors.newCachedThreadPool();
+			for (int i = 0; i < leitor.getRegsC400().size(); i++) {
+				leituraEcf_ate_dia_10(ex1, leitor, idEmp, idEst,i,1,10, retorno);
+				leituraEcf_entre_dia_10_a_20(ex2, leitor, idEmp, idEst,i,11,20, retorno);
+     			leituraEcf_entre_dia_20_a_31(ex3, leitor, idEmp, idEst,i,11,32, retorno);
+			}
+			ex1.awaitTermination(5, TimeUnit.SECONDS);
+			ex2.awaitTermination(5, TimeUnit.SECONDS);
+			ex3.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}finally {
+			if(ex1 != null) {
+				ex1.shutdown();
+			}
+			if(ex2 != null) {
+				ex2.shutdown();
+			}
+			if(ex3 != null) {
+				ex3.shutdown();
+			}
 		}
 		
 		return retorno;
 	}
-	private List<HistoricoItens> getHistoricoItensDocProprios(ExecutorService ex,LeitorEfdIcms leitor,String file, Long idEmp,
+	private List<HistoricoItens> getHistoricoItensDocProprios(LeitorEfdIcms leitor,String file, Long idEmp,
 			Long idEst){
 		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
 		ParseDocXML parseDocXML = new ParseDocXML();
 		File f = new File(file);
+		ExecutorService ex1 = null;
+		ExecutorService ex2 = null;
+		ExecutorService ex3 = null;
 		try {
+			ex1 = Executors.newCachedThreadPool();
+			ex2 = Executors.newCachedThreadPool();
+			ex3 = Executors.newCachedThreadPool();
 			for (DocumentoFiscalEltronico doc : parseDocXML.validaTipoDeParseNFE(f)) {  
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,1,10,idEmp ,idEst , retorno);
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,11,20, idEmp ,idEst ,retorno);
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,21,32,idEmp ,idEst ,  retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex1,1,10,idEmp ,idEst , retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex2,11,20, idEmp ,idEst ,retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex3,21,32,idEmp ,idEst ,  retorno);
 			}
+			
+			ex1.awaitTermination(5, TimeUnit.SECONDS);
+			ex2.awaitTermination(5, TimeUnit.SECONDS);
+			ex3.awaitTermination(5, TimeUnit.SECONDS);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
 			e.printStackTrace();
-		} 
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}finally {
+			if(ex1 != null) {
+				ex1.shutdown();
+			}
+			if(ex2 != null) {
+				ex2.shutdown();
+			}
+			if(ex3 != null) {
+				ex3.shutdown();
+			}
+		}
 		return retorno;
 	}
 	
 	private void leituraEcf_ate_dia_10(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
 			Long idEst,int i, int pDia,int uDia,List<HistoricoItens>  retorno) {
-		 ex = Executors.newSingleThreadExecutor();
+		
 		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
 			
 			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() >= pDia
@@ -162,7 +207,7 @@ public class ImportaEfdIcms {
 
 	private void leituraEcf_entre_dia_10_a_20(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
 			Long idEst,int i,int pDia,int uDia,List<HistoricoItens>  retorno) {
-		 ex = Executors.newSingleThreadExecutor();
+		
 		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
 			
 			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
@@ -199,7 +244,7 @@ public class ImportaEfdIcms {
 	
 	private void leituraEcf_entre_dia_20_a_31(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
 			Long idEst,int i,int pDia,int uDia,List<HistoricoItens>  retorno) {
-		 ex = Executors.newSingleThreadExecutor();
+		
 		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
 			
 			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
@@ -235,9 +280,8 @@ public class ImportaEfdIcms {
 	
 	private void leituraXmlProprios(DocumentoFiscalEltronico doc,LeitorEfdIcms leitor, ParseDocXML parseDocXML, File f,
 			ExecutorService ex, int pDia,int uDia, Long idEmp,Long idEst,List<HistoricoItens> retorno) {
-	    ex = Executors.newSingleThreadExecutor();
 		if (doc.getIdent().getModeloDoc().equals("59")) {
-			 
+			
 			for (RegC860 regC860 : leitor.getRegsC860()) {
 				
 				if (regC860.getDtEmissao().getDayOfMonth() >= pDia && regC860.getDtEmissao().getDayOfMonth() < uDia) {
