@@ -1,0 +1,594 @@
+package com.zeta.handler;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBException;
+
+import com.leetor4.handler.ParseDocXML;
+import com.leetor4.model.nfe.DocumentoFiscalEltronico;
+import com.leetor4.model.nfe.Produtos;
+import com.zeta.dao.EquipamentoEcfDao;
+import com.zeta.dao.ProdutoDao;
+import com.zeta.model.HistoricoItens;
+import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.LoteImportacaoSpedFiscal;
+import com.zeta.model.Produto;
+import com.zeta.util.UtilsEConverters;
+
+import modulos.efdicms.entidades.Reg0000;
+import modulos.efdicms.entidades.RegC100;
+import modulos.efdicms.entidades.RegC170;
+import modulos.efdicms.entidades.RegC860;
+import modulos.efdicms.manager.LeitorEfdIcms;
+
+public class ImportaEfdIcms {
+
+	private ProdutoDao prodDao = new ProdutoDao();
+	private List<Produto> produtos = new ArrayList<Produto>();
+	private Set<String> listaProdutos = new LinkedHashSet<String>();
+	private List<ItemTotalizadoPorLote> itensTotalizados = new ArrayList<ItemTotalizadoPorLote>();
+	
+	public LoteImportacaoSpedFiscal getLoteImportacao(ExecutorService ex,LeitorEfdIcms leitor, String file,Long idEmp, Long idEst) {
+		LoteImportacaoSpedFiscal importacao = new LoteImportacaoSpedFiscal();
+
+		for (Reg0000 lote : leitor.getRegs0000()) {
+			
+			importacao.setIdEmp(idEmp);
+			importacao.setIdEst(idEst);
+			importacao.setCodVersao(lote.getCodVer());
+			importacao.setCodFinalidade(lote.getCodFin());
+			importacao.setDtIni(lote.getDtIni());
+			importacao.setDtFin(lote.getDtFin());
+			importacao.setNome(lote.getNome());
+			importacao.setCnpj(lote.getCnpj());
+			importacao.setCpf(lote.getCpf());
+			importacao.setUf(lote.getUf());
+			importacao.setIe(lote.getIe());
+			importacao.setCodMun(lote.getCodMun());
+			importacao.setIM(lote.getIm());
+			importacao.setSuframa(lote.getSuframa());
+			importacao.setIndPerfil(lote.getIndPerfil());
+			importacao.setIndAtiv(lote.getIndAtiv());
+			importacao.setHistItens(getHistoricoItensGeral(ex,leitor, file, idEmp, idEst));
+	
+		}
+
+		
+		return importacao;
+	}
+	
+	private List<HistoricoItens> getHistoricoItensGeral(ExecutorService ex,LeitorEfdIcms leitor, String file, Long idEmp,
+			Long idEst){
+		
+		List<HistoricoItens> historicoItensDocTerceiros = getHistoricoItensDocTerceiros(leitor, idEmp, idEst);
+		List<HistoricoItens> historicoItensDocProprios = getHistoricoItensDocProprios(ex,leitor, file, idEmp, idEst);
+		List<HistoricoItens> historicoItensECFs = getHistoricoItensECFs(ex,leitor, idEmp, idEst);
+		historicoItensDocProprios.addAll(historicoItensECFs);
+		historicoItensDocTerceiros.addAll(historicoItensDocProprios);
+		
+		return historicoItensDocTerceiros;
+	}
+	private List<HistoricoItens> getHistoricoItensDocTerceiros(LeitorEfdIcms leitor,Long idEmp,
+			Long idEst){
+		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
+		for (RegC100 nota : leitor.getRegsC100()) {
+			for (RegC170 pNF : nota.getProdutosNota()) {
+				if (insereNotasTerceiros(leitor, nota, pNF).getChaveDoc() != null) {
+					retorno.add(insereNotasTerceiros(leitor, nota, pNF));
+				}
+			}
+		}
+		return retorno;
+	}
+	private List<HistoricoItens> getHistoricoItensECFs(ExecutorService ex,LeitorEfdIcms leitor, Long idEmp,
+			Long idEst){
+		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
+
+		for (int i = 0; i < leitor.getRegsC400().size(); i++) {
+			leituraEcf_ate_dia_10(ex, leitor, idEmp, idEst,i,1,10, retorno);
+			leituraEcf_entre_dia_10_a_20(ex, leitor, idEmp, idEst,i,11,20, retorno);
+ 			leituraEcf_entre_dia_20_a_31(ex, leitor, idEmp, idEst,i,11,32, retorno);
+		}
+		
+		return retorno;
+	}
+	private List<HistoricoItens> getHistoricoItensDocProprios(ExecutorService ex,LeitorEfdIcms leitor,String file, Long idEmp,
+			Long idEst){
+		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
+		ParseDocXML parseDocXML = new ParseDocXML();
+		File f = new File(file);
+		try {
+			for (DocumentoFiscalEltronico doc : parseDocXML.validaTipoDeParseNFE(f)) {  
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,1,10,idEmp ,idEst , retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,11,20, idEmp ,idEst ,retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex,21,32,idEmp ,idEst ,  retorno);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} 
+		return retorno;
+	}
+	
+	private void leituraEcf_ate_dia_10(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
+			Long idEst,int i, int pDia,int uDia,List<HistoricoItens>  retorno) {
+		 ex = Executors.newSingleThreadExecutor();
+		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
+			
+			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() >= pDia
+					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() < uDia) {
+				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
+					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+							.getRegsC425().size(); m++) {
+
+						if (insereReducoes(leitor,i, z, l, m) != null) {
+							
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,pDia,uDia);
+							Future<HistoricoItens> submit = ex.submit(hist);
+							try {
+								retorno.add(submit.get());
+							    //System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|" + leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
+
+							} catch (InterruptedException e) {
+								
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								
+								e.printStackTrace();
+							}
+						}
+	
+					}
+				}
+			}
+
+		}
+		
+	}
+
+	private void leituraEcf_entre_dia_10_a_20(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
+			Long idEst,int i,int pDia,int uDia,List<HistoricoItens>  retorno) {
+		 ex = Executors.newSingleThreadExecutor();
+		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
+			
+			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
+					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() <= uDia) {
+				
+				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
+					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+							.getRegsC425().size(); m++) {
+	
+						if (insereReducoes(leitor,i, z, l, m) != null) {
+							
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m, pDia,uDia);
+							Future<HistoricoItens> submit = ex.submit(hist);
+							try {
+								retorno.add(submit.get());
+							    System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|" + leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
+
+							} catch (InterruptedException e) {
+								
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								
+								e.printStackTrace();
+							}
+						}
+	
+					}
+				}
+			}
+
+		}
+		
+	}
+	
+	private void leituraEcf_entre_dia_20_a_31(ExecutorService ex, LeitorEfdIcms leitor,Long idEmp,
+			Long idEst,int i,int pDia,int uDia,List<HistoricoItens>  retorno) {
+		 ex = Executors.newSingleThreadExecutor();
+		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
+			
+			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
+					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() <= uDia) {
+				
+				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
+					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+							.getRegsC425().size(); m++) {
+	
+						if (insereReducoes(leitor, i, z, l, m) != null) {
+							
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,uDia,pDia);
+							Future<HistoricoItens> submit = ex.submit(hist);
+							try {
+								retorno.add(submit.get());
+
+							} catch (InterruptedException e) {
+								
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								
+								e.printStackTrace();
+							}
+						}
+	
+					}
+				}
+			}
+
+		}
+		
+	}
+	
+	private void leituraXmlProprios(DocumentoFiscalEltronico doc,LeitorEfdIcms leitor, ParseDocXML parseDocXML, File f,
+			ExecutorService ex, int pDia,int uDia, Long idEmp,Long idEst,List<HistoricoItens> retorno) {
+	    ex = Executors.newSingleThreadExecutor();
+		if (doc.getIdent().getModeloDoc().equals("59")) {
+			 
+			for (RegC860 regC860 : leitor.getRegsC860()) {
+				
+				if (regC860.getDtEmissao().getDayOfMonth() >= pDia && regC860.getDtEmissao().getDayOfMonth() < uDia) {
+					
+					if (regC860.getId() == idPaiEquipCFe(doc.getIdent().getNumDoc(), leitor)) {
+						
+						for (Produtos p : doc.getProds()) {
+							
+							if (insereHistCFes(leitor, regC860, f, p, doc).getDtDoc().getDayOfMonth() >=  pDia
+									&& insereHistCFes(leitor, regC860, f, p, doc).getDtDoc().getDayOfMonth() < uDia) {
+								CallableHistItensCFes hist = new CallableHistItensCFes(leitor, regC860, f, p, doc,pDia,uDia);
+								Future<HistoricoItens> submit = ex.submit(hist);
+								try {
+									retorno.add(submit.get());
+									System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|"
+											+ regC860.getNumSerieEquipSat());
+
+								} catch (InterruptedException e) {
+
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+
+									e.printStackTrace();
+								}
+							}
+							
+							if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
+								produtos.add(insereProdutosProprios(p, idEmp, idEst));
+							}
+							
+							
+						}
+					}
+				}
+			}
+			
+		}else if (doc.getIdent().getModeloDoc().equals("55")
+				&& UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()).getDayOfMonth() >= pDia
+				&& UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()).getDayOfMonth() < uDia) {
+			
+			for (Produtos p : doc.getProds()) {
+				if (insereNotasProprias(leitor, p, doc).getChaveDoc() != null) {
+					retorno.add(insereNotasProprias(leitor, p, doc));
+				}
+
+				if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
+					produtos.add(insereProdutosProprios(p, idEmp, idEst));
+				}				
+				//itensTotalizados.add(totalizador);
+			}
+
+		}
+		
+		
+	}
+	
+	public Long idPaiEquipCFe(String numDOc, LeitorEfdIcms leitor) {
+		Long id = 0L;
+		int num = Integer.valueOf(numDOc);
+		for (Long key : leitor.getMpC860().keySet()) {
+
+			if (num >= Integer.valueOf(leitor.getMpC860().get(key).getDocInicial())
+					&& num <= Integer.valueOf(leitor.getMpC860().get(key).getDocFinal())) {
+					id = leitor.getMpC860().get(key).getId();
+			}
+		}
+		return id;
+	}
+	
+	public  HistoricoItens insereReducoes(LeitorEfdIcms leitor, int i, int z, int l, int m) {
+		EquipamentoEcfDao dao = new EquipamentoEcfDao();
+		HistoricoItens retorno = new HistoricoItens();
+
+		retorno.setCodMod(leitor.getRegsC400().get(i).getCodModelo());
+		retorno.setEmpresa(leitor.getRegs0000().get(0).getCnpj());
+		retorno.setOperacao("S");
+		retorno.setCodSitDoc("");
+		retorno.setNumItem("");
+		retorno.setEcfCx(dao.buscaPorNumFab(leitor.getRegsC400().get(i).getNumSerieFabECF()).getNumECF());
+		retorno.setDtDoc(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc());
+		retorno.setCodItem(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getCodItem());
+		retorno.setQtde(BigDecimal.valueOf(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getQtd()));
+		retorno.setUnd(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getUnd());
+		retorno.setVlUnit(BigDecimal.valueOf(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getVlItem()/leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getQtd()));
+		retorno.setVlLiq(BigDecimal.valueOf(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getVlItem()));
+		retorno.setVlBruto(BigDecimal.valueOf(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getVlItem()));
+		retorno.setCfop(leitor.getMpC490().get(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getIdPaiRedZ()).getCfop());
+		retorno.setCst(leitor.getMpC490().get(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getIdPaiRedZ()).getCstIcms());
+		if(leitor.getMpProdTerc().get(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getCodItem()) != null) {
+			retorno.setDescricao(leitor.getMpProdTerc().get(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getCodItem()).getDescrItem());
+		}
+		retorno.setNumDoc(leitor.getRegsC400().get(i).getRegsC405().get(z).getNumCOOFin());
+		retorno.setAliqIcms(BigDecimal.valueOf(0.0));
+		retorno.setDesconto(BigDecimal.valueOf(0.0));
+		retorno.setChaveDoc("");
+		retorno.setNome("");
+		retorno.setCpfCnpj("");
+										
+		return retorno;
+	}
+	
+   public HistoricoItens insereHistCFes(LeitorEfdIcms leitor,RegC860 regC860,File file,Produtos p,DocumentoFiscalEltronico doc) {
+		
+		HistoricoItens retorno = new HistoricoItens();			
+		retorno.setEmpresa(leitor.getRegs0000().get(0).getCnpj());
+		retorno.setOperacao("S");
+		retorno.setEcfCx(regC860.getNumSerieEquipSat());
+		retorno.setDtDoc(regC860.getDtEmissao());
+		retorno.setCodItem(p.getCodItem());
+		retorno.setQtde(BigDecimal.valueOf(Double.valueOf(p.getQtdComercial())));
+		retorno.setUnd(p.getVlUnComerial());		
+		retorno.setVlUnit(BigDecimal.valueOf(Double.valueOf(p.getVlUnComerial())));		
+		retorno.setVlBruto(BigDecimal.valueOf(Double.valueOf(p.getVlProduto())));		
+		if(p.getvDesc() != null) {
+			retorno.setDesconto(BigDecimal.valueOf(Double.valueOf(p.getvDesc())));
+		}else {
+			retorno.setDesconto(BigDecimal.valueOf(0.0));
+		}		
+		if(p.getVlItem() != null) {
+			retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlItem())));	
+		}		
+		retorno.setCfop(p.getCfop());
+		retorno.setCst(p.getOrig().concat(p.getCst()));
+		retorno.setCodSitDoc("");
+		if(p.getAliqIcms() != null) {
+			retorno.setAliqIcms(BigDecimal.valueOf(Double.valueOf(p.getAliqIcms())));
+		}else {
+			
+			retorno.setAliqIcms(BigDecimal.valueOf(0.0));
+		}		
+		retorno.setCodMod(regC860.getCodModDocFiscal());
+		retorno.setDescricao(p.getDescricao());
+		retorno.setNumDoc(doc.getIdent().getNumDoc());
+		retorno.setNumItem(p.getNumItem());
+		retorno.setChaveDoc(doc.getIdent().getChaveeletronica());
+		retorno.setNome(doc.getDestinatario().getNome());		
+		String cnpjCpf = "";
+		if(doc.getDestinatario().getCnpj() != null) {
+			cnpjCpf += doc.getDestinatario().getCnpj();
+		}		
+		if(doc.getDestinatario().getCpf() != null) {
+			cnpjCpf += doc.getDestinatario().getCnpj();
+		}		
+		if(cnpjCpf != null) {
+			retorno.setCpfCnpj(cnpjCpf);
+		}		
+		return retorno;
+	}
+   
+	private HistoricoItens insereNotasTerceiros(LeitorEfdIcms leitor,RegC100 nota,RegC170 pNF) {
+		
+	    HistoricoItens retorno = new HistoricoItens();
+		retorno.setEmpresa(leitor.getRegs0000().get(0).getCnpj());
+
+		if (nota.getIndOper().equals("0")) {
+			retorno.setOperacao("E");
+		} else {
+			retorno.setOperacao("S");
+		}
+		retorno.setEcfCx("");
+		retorno.setDtDoc(nota.getDtDoc());
+		retorno.setNumItem(pNF.getNumItem());
+		retorno.setCodItem(pNF.getCodItem());
+		retorno.setQtde(BigDecimal.valueOf(pNF.getQtd()));
+		retorno.setUnd(pNF.getUnid());
+		
+		
+		retorno.setVlUnit(BigDecimal.valueOf(pNF.getVlItem()/pNF.getQtd()));
+		retorno.setVlBruto(BigDecimal.valueOf(pNF.getVlItem()));
+		
+		//Verificar esse set do Desconto
+		retorno.setDesconto(BigDecimal.valueOf(0.0));
+		
+		retorno.setVlLiq(BigDecimal.valueOf(pNF.getVlItem()));
+		
+		retorno.setCfop(pNF.getCfop());
+		retorno.setCst(pNF.getCstIcms());
+		
+		if((pNF.getAliqIcms() != null)) {
+			retorno.setAliqIcms(BigDecimal.valueOf(pNF.getAliqIcms()));
+		}else {
+			retorno.setAliqIcms(BigDecimal.valueOf(0.0));
+		}
+		
+		retorno.setCodSitDoc(nota.getCodSit());
+		retorno.setCodMod(nota.getCodMod());
+		
+		if(leitor.getMpProdTerc().get(pNF.getCodItem()) != null) {
+			retorno.setDescricao(leitor.getMpProdTerc().get(pNF.getCodItem()).getDescrItem());
+		}
+		
+		
+		retorno.setNumDoc(nota.getNumDoc());
+		retorno.setChaveDoc(nota.getChvNfe());
+		
+		if(leitor.getMpParticipante().get(nota.getCodPart()) != null) {
+			retorno.setNome(leitor.getMpParticipante().get(nota.getCodPart()).getNome());
+		}
+		
+		String doc = "";
+		
+        if(leitor.getMpParticipante().get(nota.getCodPart()) != null) {
+        	doc += leitor.getMpParticipante().get(nota.getCodPart()).getCnpj();            	
+		}
+		
+        if(leitor.getMpParticipante().get(nota.getCodPart()) != null) {
+        	doc += leitor.getMpParticipante().get(nota.getCodPart()).getCpf();           	
+		}
+        
+        if(doc != null) {
+        	retorno.setCpfCnpj(doc);
+        }
+
+	 return retorno;	
+
+   }
+	
+	public HistoricoItens insereNotasProprias(LeitorEfdIcms leitor,Produtos p, DocumentoFiscalEltronico doc) {
+		 HistoricoItens retorno = new HistoricoItens();
+		  
+	 if(leitor.getMpNFporChave().get(doc.getIdent().getChaveeletronica()) != null) {
+		 
+		 if (!leitor.getMpNFporChave().get(doc.getIdent().getChaveeletronica()).getCodSit().equals("02")) {
+				
+			 if (doc.getIdent().getModeloDoc().equals("55")) {
+				 
+			 if(leitor.getMpNFporChave().get(doc.getIdent().getChaveeletronica()) != null){
+
+						if (leitor.getMpNFporChave().get(doc.getIdent().getChaveeletronica()) != null) {
+							retorno.setCodSitDoc(
+									leitor.getMpNFporChave().get(doc.getIdent().getChaveeletronica()).getCodSit());							
+						}
+						retorno.setEmpresa(leitor.getRegs0000().get(0).getCnpj());
+						if (p.getCfop().startsWith("1") || p.getCfop().startsWith("2")) {
+							retorno.setOperacao("E");
+						} else {
+							retorno.setOperacao("S");
+						}
+						retorno.setEcfCx("");
+						retorno.setDtDoc(UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()));
+						retorno.setNumItem(p.getNumItem());
+						retorno.setCodItem(p.getCodItem());
+						retorno.setQtde(BigDecimal.valueOf(Double.valueOf(p.getQtdComercial())));
+						retorno.setUnd(p.getUndComercial());
+						retorno.setVlUnit(BigDecimal.valueOf(Double.valueOf(p.getVlUnComerial())));
+						retorno.setVlBruto(BigDecimal.valueOf(Double.valueOf(p.getVlProduto())));
+						retorno.setDesconto(null);
+						if (p.getVlItem() != null) {
+							retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlItem())));
+						}else {
+							retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlProduto())));
+						}
+						retorno.setCfop(p.getCfop());
+						if (p.getOrig() != null && p.getCst() != null) {
+							retorno.setCst(p.getOrig().concat(p.getCst()));
+						}
+						if ((p.getAliqIcms() != null)) {
+							retorno.setAliqIcms(BigDecimal.valueOf(Double.valueOf(p.getAliqIcms())));
+						} else {
+							retorno.setAliqIcms(BigDecimal.valueOf(0.0));
+						}
+						retorno.setCodMod(doc.getIdent().getModeloDoc());
+						retorno.setDescricao(p.getDescricao());
+						retorno.setNumDoc(doc.getIdent().getNumDoc());
+						retorno.setChaveDoc(doc.getIdent().getChaveeletronica());
+						retorno.setNome(doc.getDestinatario().getNome());
+						String cpfCnpj = "";
+						if(doc.getDestinatario().getCnpj() != null) {
+							 cpfCnpj += doc.getDestinatario().getCnpj();
+						}
+						if(doc.getDestinatario().getCpf() != null) {
+							 cpfCnpj += doc.getDestinatario().getCpf();
+						}
+						if(cpfCnpj != null) {
+							retorno.setCpfCnpj(cpfCnpj);
+						}
+						
+
+					}
+				 }
+			 }
+	 }
+		return retorno;
+	}
+	
+	 public Produto insereProdutosProprios(com.leetor4.model.nfe.Produtos prod , Long idEmp, Long idEst) {
+	    	Produto p = new Produto();
+	 
+			p.setIdEmp(idEmp);
+			p.setIdEst(idEst);
+			p.setCodUtilizEstab(prod.getCodItem());
+			p.setDescricao(prod.getDescricao());
+			p.setUnidadedeMedidaPadrao(prod.getUndComercial());
+			p.setNcm(prod.getNcm());
+			p.setCodigodeBarras(prod.getCodEanTrib());
+
+			listaProdutos.add(prod.getCodItem());
+							
+	    	return p;
+	 }
+	 
+	 
+		public Map<String, List<ItemTotalizadoPorLote>> mapaProdutosTotalizados(){
+			Map<String, List<ItemTotalizadoPorLote>> prodTotalizadosQtde = new HashMap<String, List<ItemTotalizadoPorLote>>();
+	    	
+	    	for(ItemTotalizadoPorLote totalizadorProd : itensTotalizados){
+	    		String codigo = totalizadorProd.getCodItem();
+	    		List<ItemTotalizadoPorLote> prodEncontrado = prodTotalizadosQtde.get(codigo);
+	    		if(prodEncontrado == null) { 
+	    			prodEncontrado = new ArrayList<ItemTotalizadoPorLote>();
+	    			prodEncontrado.add(totalizadorProd);
+	    			prodTotalizadosQtde.put(codigo, prodEncontrado);
+	    			continue;
+	    		}
+	    		prodEncontrado.add(totalizadorProd);
+	    	}
+	    	
+	    	return prodTotalizadosQtde;
+		}
+		
+		public ItemTotalizadoPorLote totais(String key,Map<String, List<ItemTotalizadoPorLote>> prodTotalizadosQtde) {
+			Double qtde = 0.0;
+			Double vl = 0.0;
+			int cont = 0;
+			ItemTotalizadoPorLote retorno = new ItemTotalizadoPorLote();
+			for(ItemTotalizadoPorLote z : prodTotalizadosQtde.get(key)){
+				cont++;
+				qtde += z.getVlTotQtde();
+				vl   += z.getVlTotItem();				
+			}
+			retorno.setFrequencia(cont);
+			retorno.setCodItem(key);
+			retorno.setVlTotQtde(qtde);
+			retorno.setVlTotItem(vl);
+			return retorno;
+		}
+		 
+		public List<ItemTotalizadoPorLote> itensTotalizadosPorLote(){
+			List<ItemTotalizadoPorLote> retorno = new ArrayList<ItemTotalizadoPorLote>();
+			for(String key :  mapaProdutosTotalizados().keySet()){ 
+				ItemTotalizadoPorLote obj = new ItemTotalizadoPorLote();
+				obj.setOperacao(totais(key, mapaProdutosTotalizados()).getOperacao());
+				obj.setAno(totais(key, mapaProdutosTotalizados()).getAno());
+				obj.setMes(totais(key, mapaProdutosTotalizados()).getMes());
+				obj.setFrequencia(totais(key, mapaProdutosTotalizados()).getFrequencia());
+				obj.setCodItem(totais(key, mapaProdutosTotalizados()).getCodItem());
+				obj.setVlTotQtde(totais(key, mapaProdutosTotalizados()).getVlTotQtde());
+				obj.setVlTotItem(totais(key, mapaProdutosTotalizados()).getVlTotItem());
+				
+				retorno.add(obj);
+			}
+			return retorno;
+		}
+}
