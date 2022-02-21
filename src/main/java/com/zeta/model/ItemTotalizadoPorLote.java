@@ -17,8 +17,8 @@ public class ItemTotalizadoPorLote {
 	@Column(name = "lote_id")
 	private Long        idLote;
 	private String        cnpj;
-	private int            ano;
-	private int            mes;
+	private String         ano;
+	private String         mes;
 	private String    operacao;
 	private int    frequencia;
 	private String     codItem;
@@ -30,14 +30,10 @@ public class ItemTotalizadoPorLote {
 	}
 	
 	
-	public ItemTotalizadoPorLote(String cnpj, int ano, int mes, String operacao, int frequencia,
+	public ItemTotalizadoPorLote(String operacao,
 			String codItem, Double vlTotQtde, Double vlTotItem) {
-	
-		this.cnpj = cnpj;
-		this.ano = ano;
-		this.mes = mes;
+
 		this.operacao = operacao;
-		this.frequencia = frequencia;
 		this.codItem = codItem;
 		this.vlTotQtde = vlTotQtde;
 		this.vlTotItem = vlTotItem;
@@ -62,16 +58,16 @@ public class ItemTotalizadoPorLote {
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
-	public int getAno() {
+	public String getAno() {
 		return ano;
 	}
-	public void setAno(int ano) {
+	public void setAno(String ano) {
 		this.ano = ano;
 	}
-	public int getMes() {
+	public String getMes() {
 		return mes;
 	}
-	public void setMes(int mes) {
+	public void setMes(String mes) {
 		this.mes = mes;
 	}
 	public String getOperacao() {

@@ -3,12 +3,15 @@ package importacoes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.zeta.dao.LoteImportacaoSpedFiscalDao;
 import com.zeta.dao.MetadadosDB;
+import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
 import com.zeta.handler.ImportaEfdIcms;
 import com.zeta.model.LoteImportacaoSpedFiscal;
+import com.zeta.model.Produto;
 
 import modulos.efdicms.manager.LeitorEfdIcms;
 
@@ -100,12 +103,29 @@ public class ImportacaoEfdIcms {
 		
 		
 		LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
+		ProdutoDao daoProd = new ProdutoDao();
 		ImportaEfdIcms importa = new ImportaEfdIcms();	
 		LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
 			
+		List<Produto> produtosSped = importa.getProdutosSped(leitor,1L,2L);
+		produtosSped.addAll(importa.getProdutos());
+		List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
+		
 		if(!loteDao.listaTodos().contains(loteImportacao)){
-			loteDao.adiciona(loteImportacao);		
-			
+			for(Produto prod :  collectProdutos){					
+				if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
+					 daoProd.adiciona(prod);
+					 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
+				}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,2L,prod.getCodUtilizEstab())) == false
+						&&  daoProd.produtoJoinOutUnidadeMedida(1L,2L,prod.getCodUtilizEstab()).contains("NULL") == true){
+					
+					Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
+			    	daoProd.remove(buscaPorCodigo);
+			    	daoProd.atualiza(prod);
+			    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
+				}
+			}
+			loteDao.adiciona(loteImportacao);	
 		}else {
 			System.out.println("Lote já importado!!!");
 		}

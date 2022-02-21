@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -25,10 +26,15 @@ import com.zeta.dao.ProdutoDao;
 import com.zeta.model.HistoricoItens;
 import com.zeta.model.ItemTotalizadoPorLote;
 import com.zeta.model.LoteImportacaoSpedFiscal;
+import com.zeta.model.OutrasUnid;
+import com.zeta.model.Participante;
 import com.zeta.model.Produto;
 import com.zeta.util.UtilsEConverters;
 
 import modulos.efdicms.entidades.Reg0000;
+import modulos.efdicms.entidades.Reg0150;
+import modulos.efdicms.entidades.Reg0200;
+import modulos.efdicms.entidades.Reg0220;
 import modulos.efdicms.entidades.RegC100;
 import modulos.efdicms.entidades.RegC170;
 import modulos.efdicms.entidades.RegC860;
@@ -39,7 +45,8 @@ public class ImportaEfdIcms {
 	private ProdutoDao prodDao = new ProdutoDao();
 	private List<Produto> produtos = new ArrayList<Produto>();
 	private Set<String> listaProdutos = new LinkedHashSet<String>();
-	private List<ItemTotalizadoPorLote> itensTotalizados = new ArrayList<ItemTotalizadoPorLote>();
+	private List<ItemTotalizadoPorLote> itensTotalizadosSaidas = new ArrayList<ItemTotalizadoPorLote>();
+	private List<ItemTotalizadoPorLote> itensTotalizadosEntradas = new ArrayList<ItemTotalizadoPorLote>();
 	
 	public LoteImportacaoSpedFiscal getLoteImportacao(LeitorEfdIcms leitor, String file,Long idEmp, Long idEst) {
 		LoteImportacaoSpedFiscal importacao = new LoteImportacaoSpedFiscal();
@@ -63,11 +70,58 @@ public class ImportaEfdIcms {
 			importacao.setIndPerfil(lote.getIndPerfil());
 			importacao.setIndAtiv(lote.getIndAtiv());
 			importacao.setHistItens(getHistoricoItensGeral(leitor, file, idEmp, idEst));
+			importacao.setSaldoPorLote(totalizadoresGeral(
+					itensTotalizadosPorLoteEntrada(String.valueOf(lote.getDtIni().getYear()), 
+							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj()),
+					itensTotalizadosPorLoteSaida(String.valueOf(lote.getDtIni().getYear()), 
+							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj())));
 	
 		}
 
 		
 		return importacao;
+	}
+	
+	public List<Participante> getParticipantes(LeitorEfdIcms leitor, Long idEmp, Long idEst){
+		List<Participante> retorno = new ArrayList<Participante>();
+		for(Reg0150 part : leitor.getRegs0150()){
+			Participante participante = new Participante();
+			
+			participante.setCodPart(part.getCodPart());
+			
+			
+			retorno.add(participante);
+		}
+		
+		return retorno;
+	}
+	public List<Produto> getProdutosSped(LeitorEfdIcms leitor, Long idEmp, Long idEst) {
+		
+		List<Produto> retorno = new ArrayList<Produto>();
+        for(Reg0200 prod :  leitor.getRegs0200()){
+        	Produto p = new Produto();      	 
+			p.setIdEmp(idEmp);
+			p.setCodUtilizEstab(prod.getCodItem());
+			p.setDescricao(prod.getDescrItem());
+			p.setUnidadedeMedidaPadrao(prod.getUnidInv());
+			p.setNcm(prod.getCodNcm());
+			p.setCodigodeBarras(prod.getCodBarra());
+			
+			for(Reg0220 out : prod.getOutrasUndMedidas()){
+				OutrasUnid outUnd = new OutrasUnid();
+			    outUnd.setIdPaiEmp(idEmp);
+			    outUnd.setIdPaiEst(idEst);
+			    
+			    //outUnd.setIdPai(idPaiReg0200(prod.getCodItem(),idEmp,idEst));
+			    outUnd.setCodProd(prod.getCodItem());
+			    outUnd.setUndMed(out.getUndConv());
+			    outUnd.setUndEquivPadrao(out.getFatConv());
+			    
+			    p.adicionaOutrasUnd(outUnd);
+			}
+				retorno.add(p);	
+        }
+        return retorno;
 	}
 	
 	private List<HistoricoItens> getHistoricoItensGeral(LeitorEfdIcms leitor, String file, Long idEmp,
@@ -88,6 +142,14 @@ public class ImportaEfdIcms {
 			for (RegC170 pNF : nota.getProdutosNota()) {
 				if (insereNotasTerceiros(leitor, nota, pNF).getChaveDoc() != null) {
 					retorno.add(insereNotasTerceiros(leitor, nota, pNF));
+					
+					//Rever esse metodo para extrair daqui
+					if((pNF.getCfop().startsWith("1") && !pNF.getCfop().equals("1556")
+							&& !pNF.getCfop().equals("1551")) || (pNF.getCfop().startsWith("2") && !pNF.getCfop().equals("2556") && !pNF.getCfop().equals("2551"))){
+						itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",pNF.getCodItem(),pNF.getQtd(), 
+								pNF.getVlItem()));
+					}
+
 				}
 			}
 		}
@@ -104,9 +166,9 @@ public class ImportaEfdIcms {
 			ex2 = Executors.newCachedThreadPool();
 			ex3 = Executors.newCachedThreadPool();
 			for (int i = 0; i < leitor.getRegsC400().size(); i++) {
-				leituraEcf_ate_dia_10(ex1, leitor, idEmp, idEst,i,1,10, retorno);
-				leituraEcf_entre_dia_10_a_20(ex2, leitor, idEmp, idEst,i,11,20, retorno);
-     			leituraEcf_entre_dia_20_a_31(ex3, leitor, idEmp, idEst,i,11,32, retorno);
+				leituraEcf_ate_dia_10(ex1, leitor, idEmp, idEst,i,1,11, retorno);
+				leituraEcf_entre_dia_10_a_20(ex2, leitor, idEmp, idEst,i,11,21, retorno);
+     			leituraEcf_entre_dia_20_a_31(ex3, leitor, idEmp, idEst,i,21,32, retorno);
 			}
 			ex1.awaitTermination(5, TimeUnit.SECONDS);
 			ex2.awaitTermination(5, TimeUnit.SECONDS);
@@ -140,8 +202,8 @@ public class ImportaEfdIcms {
 			ex2 = Executors.newCachedThreadPool();
 			ex3 = Executors.newCachedThreadPool();
 			for (DocumentoFiscalEltronico doc : parseDocXML.validaTipoDeParseNFE(f)) {  
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex1,1,10,idEmp ,idEst , retorno);
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex2,11,20, idEmp ,idEst ,retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex1,1,11,idEmp ,idEst , retorno);
+				leituraXmlProprios(doc, leitor, parseDocXML, f, ex2,11,21, idEmp ,idEst ,retorno);
 				leituraXmlProprios(doc, leitor, parseDocXML, f, ex3,21,32,idEmp ,idEst ,  retorno);
 			}
 			
@@ -179,7 +241,7 @@ public class ImportaEfdIcms {
 				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
 							.getRegsC425().size(); m++) {
-
+                        
 						if (insereReducoes(leitor,i, z, l, m) != null) {
 							
 							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,pDia,uDia);
@@ -196,7 +258,15 @@ public class ImportaEfdIcms {
 								e.printStackTrace();
 							}
 						}
-	
+						
+						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getCodItem(),
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getQtd(), 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getVlItem()));
+						   
 					}
 				}
 			}
@@ -233,7 +303,13 @@ public class ImportaEfdIcms {
 								e.printStackTrace();
 							}
 						}
-	
+						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getCodItem(),
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getQtd(), 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getVlItem()));
 					}
 				}
 			}
@@ -269,7 +345,13 @@ public class ImportaEfdIcms {
 								e.printStackTrace();
 							}
 						}
-	
+						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getCodItem(),
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getQtd(), 
+								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+								.getRegsC425().get(i).getVlItem()));
 					}
 				}
 			}
@@ -311,8 +393,9 @@ public class ImportaEfdIcms {
 							if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
 								produtos.add(insereProdutosProprios(p, idEmp, idEst));
 							}
-							
-							
+							//Observar se é o valor do Produto ou do Item
+							itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
+									Double.valueOf(p.getVlItem())));
 						}
 					}
 				}
@@ -321,7 +404,8 @@ public class ImportaEfdIcms {
 		}else if (doc.getIdent().getModeloDoc().equals("55")
 				&& UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()).getDayOfMonth() >= pDia
 				&& UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()).getDayOfMonth() < uDia) {
-			
+			Double desc;
+			Double vlItem = 0.0;
 			for (Produtos p : doc.getProds()) {
 				if (insereNotasProprias(leitor, p, doc).getChaveDoc() != null) {
 					retorno.add(insereNotasProprias(leitor, p, doc));
@@ -329,8 +413,31 @@ public class ImportaEfdIcms {
 
 				if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
 					produtos.add(insereProdutosProprios(p, idEmp, idEst));
-				}				
+				}	
+				
+				//Rever esse trecho e extrair o metodo
+
+				if(p.getvDesc() != null) {
+					desc = Double.valueOf(p.getvDesc());
+				}else {
+					desc = 0.0;
+				}
+				if (p.getVlItem() != null || p.getVlProduto() != null) {
+					vlItem = Double.valueOf(p.getVlProduto()) - desc;
+							
+				}
 				//itensTotalizados.add(totalizador);
+				if((p.getCfop().startsWith("5") && !p.getCfop().equals("5929")) || (p.getCfop().startsWith("6") && !p.getCfop().equals("6929"))){
+										
+						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
+								vlItem));
+				
+				}else if((p.getCfop().startsWith("1") && !p.getCfop().equals("1556")
+						&& !p.getCfop().equals("1551")) || (p.getCfop().startsWith("2") && !p.getCfop().equals("2556") && !p.getCfop().equals("2551"))){
+						itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
+								vlItem));
+				}
+				
 			}
 
 		}
@@ -528,12 +635,23 @@ public class ImportaEfdIcms {
 						retorno.setUnd(p.getUndComercial());
 						retorno.setVlUnit(BigDecimal.valueOf(Double.valueOf(p.getVlUnComerial())));
 						retorno.setVlBruto(BigDecimal.valueOf(Double.valueOf(p.getVlProduto())));
-						retorno.setDesconto(null);
-						if (p.getVlItem() != null) {
-							retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlItem())));
+						
+						if(p.getvDesc() != null) {
+							retorno.setDesconto(BigDecimal.valueOf(Double.valueOf(p.getvDesc())));
 						}else {
-							retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlProduto())));
+							retorno.setDesconto(BigDecimal.ZERO);
 						}
+						
+						
+						
+						if (p.getVlItem() != null || p.getVlProduto() != null) {
+							retorno.setVlLiq(BigDecimal.valueOf(Double.valueOf(p.getVlProduto()))
+									.subtract(retorno.getDesconto()));
+						}
+						
+						
+						
+						
 						retorno.setCfop(p.getCfop());
 						if (p.getOrig() != null && p.getCst() != null) {
 							retorno.setCst(p.getOrig().concat(p.getCst()));
@@ -571,7 +689,6 @@ public class ImportaEfdIcms {
 	    	Produto p = new Produto();
 	 
 			p.setIdEmp(idEmp);
-			p.setIdEst(idEst);
 			p.setCodUtilizEstab(prod.getCodItem());
 			p.setDescricao(prod.getDescricao());
 			p.setUnidadedeMedidaPadrao(prod.getUndComercial());
@@ -584,10 +701,10 @@ public class ImportaEfdIcms {
 	 }
 	 
 	 
-		public Map<String, List<ItemTotalizadoPorLote>> mapaProdutosTotalizados(){
+		public Map<String, List<ItemTotalizadoPorLote>> mapaProdutosTotalizadosSaidas(){
 			Map<String, List<ItemTotalizadoPorLote>> prodTotalizadosQtde = new HashMap<String, List<ItemTotalizadoPorLote>>();
 	    	
-	    	for(ItemTotalizadoPorLote totalizadorProd : itensTotalizados){
+	    	for(ItemTotalizadoPorLote totalizadorProd : itensTotalizadosSaidas){
 	    		String codigo = totalizadorProd.getCodItem();
 	    		List<ItemTotalizadoPorLote> prodEncontrado = prodTotalizadosQtde.get(codigo);
 	    		if(prodEncontrado == null) { 
@@ -602,6 +719,60 @@ public class ImportaEfdIcms {
 	    	return prodTotalizadosQtde;
 		}
 		
+		public Map<String, List<ItemTotalizadoPorLote>> mapaProdutosTotalizadosEntradas(){
+			Map<String, List<ItemTotalizadoPorLote>> prodTotalizadosQtde = new HashMap<String, List<ItemTotalizadoPorLote>>();
+	    	
+	    	for(ItemTotalizadoPorLote totalizadorProd : itensTotalizadosEntradas){
+	    		String codigo = totalizadorProd.getCodItem();
+	    		List<ItemTotalizadoPorLote> prodEncontrado = prodTotalizadosQtde.get(codigo);
+	    		if(prodEncontrado == null) { 
+	    			prodEncontrado = new ArrayList<ItemTotalizadoPorLote>();
+	    			prodEncontrado.add(totalizadorProd);
+	    			prodTotalizadosQtde.put(codigo, prodEncontrado);
+	    			continue;
+	    		}
+	    		prodEncontrado.add(totalizadorProd);
+	    	}
+	    	
+	    	return prodTotalizadosQtde;
+		}
+		
+		public List<ItemTotalizadoPorLote> itensTotalizadosPorLoteEntrada(String ano, String mes, String cnpj){
+			List<ItemTotalizadoPorLote> retorno = new ArrayList<ItemTotalizadoPorLote>();
+			for(String key :  mapaProdutosTotalizadosEntradas().keySet()){ 
+				ItemTotalizadoPorLote obj = new ItemTotalizadoPorLote();
+				obj.setOperacao(totais(key, mapaProdutosTotalizadosEntradas()).getOperacao());
+				obj.setAno(ano);
+				obj.setCnpj(cnpj);			
+				obj.setMes(mes);
+				obj.setFrequencia(totais(key, mapaProdutosTotalizadosEntradas()).getFrequencia());
+				obj.setCodItem(totais(key, mapaProdutosTotalizadosEntradas()).getCodItem());
+				obj.setVlTotQtde(totais(key, mapaProdutosTotalizadosEntradas()).getVlTotQtde());
+				obj.setVlTotItem(totais(key, mapaProdutosTotalizadosEntradas()).getVlTotItem());
+				
+				retorno.add(obj);
+			}
+			return retorno;
+		}
+		public List<ItemTotalizadoPorLote> itensTotalizadosPorLoteSaida(String ano, String mes, String cnpj){
+			List<ItemTotalizadoPorLote> retorno = new ArrayList<ItemTotalizadoPorLote>();
+			for(String key :  mapaProdutosTotalizadosSaidas().keySet()){ 
+				ItemTotalizadoPorLote obj = new ItemTotalizadoPorLote();
+								
+				obj.setOperacao(totais(key, mapaProdutosTotalizadosSaidas()).getOperacao());
+				obj.setAno(ano);
+				obj.setCnpj(cnpj);			
+				obj.setMes(mes);
+				obj.setFrequencia(totais(key, mapaProdutosTotalizadosSaidas()).getFrequencia());
+				obj.setCodItem(totais(key, mapaProdutosTotalizadosSaidas()).getCodItem());
+				obj.setVlTotQtde(totais(key, mapaProdutosTotalizadosSaidas()).getVlTotQtde());
+				obj.setVlTotItem(totais(key, mapaProdutosTotalizadosSaidas()).getVlTotItem());
+				
+				retorno.add(obj);
+			}
+			return retorno;
+		}
+		
 		public ItemTotalizadoPorLote totais(String key,Map<String, List<ItemTotalizadoPorLote>> prodTotalizadosQtde) {
 			Double qtde = 0.0;
 			Double vl = 0.0;
@@ -610,8 +781,10 @@ public class ImportaEfdIcms {
 			for(ItemTotalizadoPorLote z : prodTotalizadosQtde.get(key)){
 				cont++;
 				qtde += z.getVlTotQtde();
-				vl   += z.getVlTotItem();				
+				vl   += z.getVlTotItem();
+				retorno.setOperacao(z.getOperacao());
 			}
+			
 			retorno.setFrequencia(cont);
 			retorno.setCodItem(key);
 			retorno.setVlTotQtde(qtde);
@@ -619,20 +792,27 @@ public class ImportaEfdIcms {
 			return retorno;
 		}
 		 
-		public List<ItemTotalizadoPorLote> itensTotalizadosPorLote(){
-			List<ItemTotalizadoPorLote> retorno = new ArrayList<ItemTotalizadoPorLote>();
-			for(String key :  mapaProdutosTotalizados().keySet()){ 
-				ItemTotalizadoPorLote obj = new ItemTotalizadoPorLote();
-				obj.setOperacao(totais(key, mapaProdutosTotalizados()).getOperacao());
-				obj.setAno(totais(key, mapaProdutosTotalizados()).getAno());
-				obj.setMes(totais(key, mapaProdutosTotalizados()).getMes());
-				obj.setFrequencia(totais(key, mapaProdutosTotalizados()).getFrequencia());
-				obj.setCodItem(totais(key, mapaProdutosTotalizados()).getCodItem());
-				obj.setVlTotQtde(totais(key, mapaProdutosTotalizados()).getVlTotQtde());
-				obj.setVlTotItem(totais(key, mapaProdutosTotalizados()).getVlTotItem());
-				
-				retorno.add(obj);
-			}
+		public List<ItemTotalizadoPorLote> totalizadoresGeral(List<ItemTotalizadoPorLote> itensTotalizadosPorLoteEntrada,List<ItemTotalizadoPorLote> itensTotalizadosPorLoteSaida){
+			List<ItemTotalizadoPorLote> retorno = new ArrayList<ItemTotalizadoPorLote>();			
+			retorno.addAll(itensTotalizadosPorLoteEntrada);
+			retorno.addAll(itensTotalizadosPorLoteSaida);
 			return retorno;
 		}
+		
+		public List<Produto> getProdutos() {
+			  List<Produto> novoRetorno = produtos.stream().distinct().collect(Collectors.toList());
+			return novoRetorno;
+		}
+		
+		public String linha(Produto prod) {
+			String lin = prod.getCodUtilizEstab();
+			for(OutrasUnid out : prod.getOutrasUnds()){
+			
+				    lin += "|";
+					lin += out.getUndEquivPadrao();
+			}
+			
+			return lin;
+		}
+
 }

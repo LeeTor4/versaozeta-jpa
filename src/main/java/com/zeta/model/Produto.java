@@ -37,7 +37,6 @@ public class Produto implements Serializable{
 	@Column(name="est_id")
 	private Long idPai;
 	private Long idEmp;
-	private Long idEst;
 	private String descricao;
 	private String codUtilizEstab; 
 	private String ncm;
@@ -75,12 +74,6 @@ public class Produto implements Serializable{
 	}
 	public void setIdEmp(Long idEmp) {
 		this.idEmp = idEmp;
-	}
-	public Long getIdEst() {
-		return idEst;
-	}
-	public void setIdEst(Long idEst) {
-		this.idEst = idEst;
 	}
 	public String getDescricao() {
 		return descricao;

@@ -51,6 +51,11 @@ public class Estabelecimento implements Serializable{
 	@OneToMany(cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="est_id")
+	private List<Participante> participante = new ArrayList<Participante>();
+	
+	@OneToMany(cascade = CascadeType.ALL)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JoinColumn(name="est_id")
 	private List<Produto> produtos = new ArrayList<Produto>();
 	
 	
@@ -146,6 +151,19 @@ public class Estabelecimento implements Serializable{
 	public void adicionaEquipEcf(EquipamentoECF equipsEcf) {
 		this.equipsEcf.add(equipsEcf);
 	}
+	
+	public List<Participante> getParticipante() {
+		return participante;
+	}
+
+	public void setParticipante(List<Participante> participantes) {
+		this.participante = participantes;
+	}
+
+	public void adicionaParticipante(Participante participante) {
+		this.participante.add(participante);
+	}
+	
 	public List<Produto> getProduto() {
 		return produtos;
 	}
