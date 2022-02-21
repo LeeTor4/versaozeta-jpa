@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 import com.zeta.dao.LoteImportacaoSpedFiscalDao;
 import com.zeta.dao.MetadadosDB;
+import com.zeta.dao.ParticipanteDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
 import com.zeta.handler.ImportaEfdIcms;
 import com.zeta.model.LoteImportacaoSpedFiscal;
+import com.zeta.model.Participante;
 import com.zeta.model.Produto;
 
 import modulos.efdicms.manager.LeitorEfdIcms;
@@ -23,10 +25,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
 		
-		String ano = "2021";
+		String ano = "2017";
 		String emp = "SELLENE";
-		String estab = "MEGADIET";
-		String cnpj  = "05329222000419";
+		String estab = "MEGAFARMA";
+		String cnpj  = "05329222000668";
 		
 		String anomes1 = ano.concat("01").concat(".txt");
 		String anomes2 = ano.concat("02").concat(".txt");
@@ -103,21 +105,29 @@ public class ImportacaoEfdIcms {
 		
 		
 		LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
+		ParticipanteDao daoPart = new ParticipanteDao();
 		ProdutoDao daoProd = new ProdutoDao();
 		ImportaEfdIcms importa = new ImportaEfdIcms();	
-		LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
+		LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 6L);
 			
-		List<Produto> produtosSped = importa.getProdutosSped(leitor,1L,2L);
+		List<Participante> participantes = importa.getParticipantes(leitor,1L, 6L);
+		List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 6L);
 		produtosSped.addAll(importa.getProdutos());
 		List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
 		
 		if(!loteDao.listaTodos().contains(loteImportacao)){
+			
+			for(Participante part : participantes){
+				if(!daoPart.listaTodos().contains(part)) {
+					daoPart.adiciona(part);
+				}
+			}
 			for(Produto prod :  collectProdutos){					
 				if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
 					 daoProd.adiciona(prod);
 					 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
-				}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,2L,prod.getCodUtilizEstab())) == false
-						&&  daoProd.produtoJoinOutUnidadeMedida(1L,2L,prod.getCodUtilizEstab()).contains("NULL") == true){
+				}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L, 6L,prod.getCodUtilizEstab())) == false
+						&&  daoProd.produtoJoinOutUnidadeMedida(1L, 6L,prod.getCodUtilizEstab()).contains("NULL") == true){
 					
 					Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
 			    	daoProd.remove(buscaPorCodigo);

@@ -87,7 +87,19 @@ public class ImportaEfdIcms {
 		for(Reg0150 part : leitor.getRegs0150()){
 			Participante participante = new Participante();
 			
+			participante.setIdPai(idEst);
 			participante.setCodPart(part.getCodPart());
+			participante.setNome(part.getNome());
+			participante.setCnpj(part.getCnpj());
+			participante.setCpf(part.getCpf());
+			participante.setSuframa(part.getSuframa());
+			participante.setEndereco(part.getEndereco());
+			participante.setNum(part.getNum());
+			participante.setBairro(part.getBairro());
+			participante.setCompl(part.getCompl());
+			participante.setCodMun(part.getCodMun());
+			participante.setIe(part.getIe());
+			participante.setCodPais(part.getCodPais());
 			
 			
 			retorno.add(participante);
@@ -293,7 +305,7 @@ public class ImportaEfdIcms {
 							Future<HistoricoItens> submit = ex.submit(hist);
 							try {
 								retorno.add(submit.get());
-							    System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|" + leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
+							    //System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|" + leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
 
 							} catch (InterruptedException e) {
 								
