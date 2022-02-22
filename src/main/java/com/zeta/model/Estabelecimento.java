@@ -55,7 +55,7 @@ public class Estabelecimento implements Serializable{
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="est_id")
+	@JoinColumn(name="idEmp")
 	private List<Produto> produtos = new ArrayList<Produto>();
 	
 	

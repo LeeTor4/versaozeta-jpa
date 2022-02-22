@@ -2,16 +2,24 @@ package importacoes;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.zeta.dao.ProdutoDao;
+import com.zeta.handler.ImportaEfdIcms;
+import com.zeta.model.Participante;
+import com.zeta.model.Produto;
+
+import modulos.efdicms.entidades.Reg0200;
 import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class LeituraSped {
 
 	public static void main(String[] args) {
-		String ano = "2019";
+		String ano = "2017";
 		String emp = "SELLENE";
-		String estab = "MEGADIET";
-		String cnpj  = "05329222000419";
+		String estab = "MEGAFARMA";
+		String cnpj  = "05329222000680";
 		
 		String anomes1 = ano.concat("01").concat(".txt");
 		String anomes2 = ano.concat("02").concat(".txt");
@@ -69,18 +77,28 @@ public class LeituraSped {
 	    Path p = p1;
 		Path x = xP1;
 	
-		
+		ImportaEfdIcms importa = new ImportaEfdIcms();	
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
 		
 		leitor.leitorSpedFiscal(p,0L,
 				0L,0L,0L,
 				0L, 0L );
 		
-		for (int i = 0; i < leitor.getRegsC400().size(); i++) {
-			for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
-				System.out.println(leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
+		ProdutoDao daoProd = new ProdutoDao();
+		List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 6L);
+		produtosSped.addAll(importa.getProdutos());
+		List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
+		for(Produto prod :  collectProdutos){		
+			if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
+				 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
+			}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
+					&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
+				
+		    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
 			}
-	    }
+		}
+		
+		
 		
 	}
 

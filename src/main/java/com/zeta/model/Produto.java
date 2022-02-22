@@ -34,8 +34,7 @@ public class Produto implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="est_id")
-	private Long idPai;
+	@Column(name="idEmp")
 	private Long idEmp;
 	private String descricao;
 	private String codUtilizEstab; 
@@ -62,13 +61,6 @@ public class Produto implements Serializable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getIdPai() {
-		return idPai;
-	}
-	public void setIdPai(Long idPai) {
-		this.idPai = idPai;
-	}
-	
 	public Long getIdEmp() {
 		return idEmp;
 	}

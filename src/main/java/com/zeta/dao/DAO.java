@@ -57,7 +57,7 @@ public class DAO<T> {
 		em.getTransaction().begin();
 		em.persist(t);		
 		em.getTransaction().commit();
-		em.close();
+		
    }
 
 	public void remove(T t) {
@@ -70,7 +70,7 @@ public class DAO<T> {
 		em.getTransaction().begin();
 		em.merge(t);
 		em.getTransaction().commit();
-		em.close();
+		
 	}
 
 	public List<T> listaTodos() {
@@ -88,7 +88,7 @@ public class DAO<T> {
 		
 		T instancia = em.find(classe, id);
 		
-		em.close();
+		
 		return instancia;
 		
 	}
@@ -99,7 +99,7 @@ public class DAO<T> {
 				.getSingleResult();
 		
 		
-		em.close();
+		
 
 		return (int) result;
 	}
@@ -112,7 +112,9 @@ public class DAO<T> {
 		List<T> lista = em.createQuery(query).setFirstResult(firstResult)
 				.setMaxResults(maxResults).getResultList();
 
-		em.close();
 		return lista;
 	}
+	
+	
+	
 }

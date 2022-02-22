@@ -1,5 +1,7 @@
 package com.zeta.model;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -99,6 +101,26 @@ public class ItemTotalizadoPorLote {
 	}
 	public void setVlTotItem(Double vlTotItem) {
 		this.vlTotItem = vlTotItem;
+	}
+
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ano, cnpj, codItem);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemTotalizadoPorLote other = (ItemTotalizadoPorLote) obj;
+		return Objects.equals(ano, other.ano) && Objects.equals(cnpj, other.cnpj)
+				&& Objects.equals(codItem, other.codItem);
 	}
 	
 	

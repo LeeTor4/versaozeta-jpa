@@ -16,4 +16,8 @@ public class JPAUtil {
 		
 		return emf.createEntityManager();
 	}
+	
+	public static void fecha() {
+		emf.close();
+	}
 }

@@ -77,10 +77,9 @@ public class ProdutoDao {
 		 return retorno;
 	}
 	
-	public String produtoJoinOutUnidadeMedida(Long id_pai_emp,Long id_pai_est, String codUtilizEstab) {
+	public String produtoJoinOutUnidadeMedida(Long id_pai_emp, String codUtilizEstab) {
 		  String out = "";
-		 String jpql = "select p, out from Produto p left join p.outrasUnds out where p.idEmp = " + "'"+ id_pai_emp + "'"+ " and p.idEst= " + "'" + id_pai_est + "'"
-				+ "and p.codUtilizEstab = " +"'"+ codUtilizEstab  +"'";
+		 String jpql = "select p, out from Produto p left join p.outrasUnds out where p.idEmp = " + "'"+ id_pai_emp + "'" + "and p.codUtilizEstab = " +"'"+ codUtilizEstab  +"'";
 		 
 		 TypedQuery<Object[]> typedQuery = em.createQuery(jpql, Object[].class);
 	        List<Object[]> lista = typedQuery.getResultList();

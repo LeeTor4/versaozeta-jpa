@@ -40,4 +40,8 @@ public class LoteImportacaoSpedFiscalDao {
 	public int contaTodos() {
 		return dao.contaTodos();
 	}
+	
+	public void closeEntity() {
+		JPAUtil.fecha();
+	}
 }

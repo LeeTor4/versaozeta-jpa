@@ -812,7 +812,7 @@ public class ImportaEfdIcms {
 		}
 		
 		public List<Produto> getProdutos() {
-			  List<Produto> novoRetorno = produtos.stream().distinct().collect(Collectors.toList());
+			List<Produto> novoRetorno = produtos.stream().distinct().collect(Collectors.toList());
 			return novoRetorno;
 		}
 		
