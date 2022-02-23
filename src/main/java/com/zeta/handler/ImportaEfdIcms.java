@@ -175,27 +175,17 @@ public class ImportaEfdIcms {
 		ExecutorService ex3 = null;
 		try {
 			ex1 = Executors.newCachedThreadPool();
-			ex2 = Executors.newCachedThreadPool();
-			ex3 = Executors.newCachedThreadPool();
 			for (int i = 0; i < leitor.getRegsC400().size(); i++) {
-				leituraEcf_ate_dia_10(ex1, leitor, idEmp, idEst,i,1,11, retorno);
-				leituraEcf_entre_dia_10_a_20(ex2, leitor, idEmp, idEst,i,11,21, retorno);
-     			leituraEcf_entre_dia_20_a_31(ex3, leitor, idEmp, idEst,i,21,32, retorno);
+				leituraEcf_ate_dia_10(ex1, leitor, idEmp, idEst,i,1,32, retorno);
+				//leituraEcf_entre_dia_10_a_20(ex2, leitor, idEmp, idEst,i,11,32, retorno);
+     			//leituraEcf_entre_dia_20_a_31(ex3, leitor, idEmp, idEst,i,21,32, retorno);
 			}
 			ex1.awaitTermination(5, TimeUnit.SECONDS);
-			ex2.awaitTermination(5, TimeUnit.SECONDS);
-			ex3.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}finally {
 			if(ex1 != null) {
 				ex1.shutdown();
-			}
-			if(ex2 != null) {
-				ex2.shutdown();
-			}
-			if(ex3 != null) {
-				ex3.shutdown();
 			}
 		}
 		
@@ -259,6 +249,13 @@ public class ImportaEfdIcms {
 							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,pDia,uDia);
 							Future<HistoricoItens> submit = ex.submit(hist);
 							try {
+								
+								itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
+										submit.get().getCodItem(),
+										submit.get().getQtde().doubleValue(), 
+										submit.get().getVlLiq().doubleValue()));
+								
+	
 								retorno.add(submit.get());
 							    //System.out.println(submit.get().getDtDoc().getDayOfMonth() + "|" + leitor.getRegsC400().get(i).getRegsC405().get(z).getPosicaoRDZ());
 
@@ -271,13 +268,7 @@ public class ImportaEfdIcms {
 							}
 						}
 						
-						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getCodItem(),
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getQtd(), 
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getVlItem()));
+						
 						   
 					}
 				}
@@ -292,8 +283,8 @@ public class ImportaEfdIcms {
 		
 		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
 			
-			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
-					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() <= uDia) {
+			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() >= pDia
+					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() < uDia) {
 				
 				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
@@ -315,13 +306,14 @@ public class ImportaEfdIcms {
 								e.printStackTrace();
 							}
 						}
+						
 						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S", 
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getCodItem(),
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getQtd(), 
-								leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
-								.getRegsC425().get(i).getVlItem()));
+									leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+									.getRegsC425().get(i).getCodItem(),
+									leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+									.getRegsC425().get(i).getQtd(), 
+									leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
+									.getRegsC425().get(i).getVlItem()));
 					}
 				}
 			}
@@ -335,8 +327,8 @@ public class ImportaEfdIcms {
 		
 		for (int z = 0; z < leitor.getRegsC400().get(i).getRegsC405().size(); z++) {
 			
-			if(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() > pDia
-					&& leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() <= uDia) {
+			if((leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() >= pDia)
+					&& (leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc().getDayOfMonth() < uDia)) {
 				
 				for (int l = 0; l < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().size(); l++) {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)

@@ -85,8 +85,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p4;
-		Path x = xP4;
+	    Path p = p12;
+		Path x = xP12;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -141,13 +141,8 @@ public class ImportacaoEfdIcms {
 		
 			
 		
-
-		
-		
-		
-		
-		//CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
-		//cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
+		   //CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
+		   //cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
 		
 		//Verificar as emissões próprias no arquivei das entradas
 		//cruzamentos.cruzamentosNotasSpedFiscalComXMLTerceiros(x.toString(), leitor);

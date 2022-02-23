@@ -20,26 +20,15 @@ public class LeituraSaldos {
 										            .collect(Collectors.toList());
 		System.out.println(lista); 
 		
-		 for(ItemTotalizadoPorLote tots : lista){	
-			 
-			 Double qtdeEntJan =  dao.listaTodos().stream()
-					                 .filter(op -> op.getOperacao().equals("E"))
-									 .filter(c -> c.getCodItem().equals(tots.getCodItem()))
-									 .filter(mes -> mes.getMes().equals("1"))
-									 .mapToDouble(ItemTotalizadoPorLote::getVlTotQtde)
-									 .sum();
-		     
-			  
-			 Double qtdeSaiJan =  dao.listaTodos().stream()
-					                  .filter(op -> op.getOperacao().equals("S"))
-					                  .filter(c -> c.getCodItem().equals(tots.getCodItem()))
-					                  .filter(mes -> mes.getMes().equals("1"))
-									  .mapToDouble(ItemTotalizadoPorLote::getVlTotQtde)
-									  .sum();
-			 
-			 System.out.println(tots.getCodItem() + "|" + qtdeEntJan+ "|" + qtdeSaiJan);
-			
-		 }
+		Double qtdeEntJan = dao.buscarTotalizadorComFiltros("22998", "1", "E").getVlTotQtde();
+		Double vlEntJan   = dao.buscarTotalizadorComFiltros("22998", "1", "E").getVlTotItem();
+		Double qtdeSaiJan = 0.0;				
+		//Double vlSaiJan   = dao.buscarTotalizadorComFiltros("22998", "1", "S").getVlTotItem();
+
+		if(dao.buscarTotalizadorComFiltros("22998", "1", "S") != null) {
+			qtdeSaiJan = dao.buscarTotalizadorComFiltros("22998", "1", "S").getVlTotQtde();		
+		}
+		System.out.println(qtdeEntJan + "|" + vlEntJan + "|" + qtdeSaiJan );
 		 
 		
 	}

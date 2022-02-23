@@ -13,13 +13,14 @@ public class ItemTotalizadoPorLoteDao {
 	 
 	 private DAO<ItemTotalizadoPorLote> dao;
 	 
-	 public ItemTotalizadoPorLoteDao() {
+	   public ItemTotalizadoPorLoteDao() {
 		 this.dao = new DAO<ItemTotalizadoPorLote>(em, ItemTotalizadoPorLote.class);
-	}
+	   }
 	 
-	 public void adiciona(ItemTotalizadoPorLote t) {
+	    public void adiciona(ItemTotalizadoPorLote t) {
 			//dao.adiciona(t);
 			dao.adicionarBatch(t);
+
 		}
 
 		public void remove(ItemTotalizadoPorLote t) {
@@ -42,8 +43,22 @@ public class ItemTotalizadoPorLoteDao {
 			return dao.contaTodos();
 		}
 		
-		public void closeEm() {
-			JPAUtil.fecha();
+		public ItemTotalizadoPorLote buscarTotalizadorComFiltros(String codItem, String mes, String operacao) {
+			
+			String jpql = "SELECT tot FROM ItemTotalizadoPorLote tot WHERE tot.codItem = :codItem AND tot.mes = :mes AND tot.operacao = :operacao";
+			ItemTotalizadoPorLote singleResult = null;
+			try {
+				singleResult = (ItemTotalizadoPorLote) em.createQuery(jpql)
+						.setParameter("codItem", codItem)
+						.setParameter("mes", mes)
+						.setParameter("operacao", operacao)
+						.getSingleResult();
+			} catch (Exception e) {
+				System.out.println(e.getMessage() + " Não existe essa operação para esse item");
+			}
+			
+			return singleResult;
 		}
 		
+				
 }
