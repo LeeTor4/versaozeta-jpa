@@ -18,6 +18,9 @@ public class JPAUtil {
 	}
 	
 	public static void fecha() {
-		emf.close();
+		if(emf != null) {
+			emf.close();	
+		}
+		
 	}
 }
