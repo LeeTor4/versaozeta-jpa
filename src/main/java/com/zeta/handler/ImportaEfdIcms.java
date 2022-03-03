@@ -24,7 +24,9 @@ import com.leetor4.model.nfe.Produtos;
 import com.zeta.dao.EquipamentoEcfDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.model.HistoricoItens;
+import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItensInventario;
 import com.zeta.model.LoteImportacaoSpedFiscal;
 import com.zeta.model.OutrasUnid;
 import com.zeta.model.Participante;
@@ -38,6 +40,8 @@ import modulos.efdicms.entidades.Reg0220;
 import modulos.efdicms.entidades.RegC100;
 import modulos.efdicms.entidades.RegC170;
 import modulos.efdicms.entidades.RegC860;
+import modulos.efdicms.entidades.RegH005;
+import modulos.efdicms.entidades.RegH010;
 import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class ImportaEfdIcms {
@@ -75,7 +79,7 @@ public class ImportaEfdIcms {
 							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj()),
 					itensTotalizadosPorLoteSaida(String.valueOf(lote.getDtIni().getYear()), 
 							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj())));
-	
+			importacao.setInvDec(getInvDeclarado(leitor, idEmp, idEst));
 		}
 
 		
@@ -817,6 +821,35 @@ public class ImportaEfdIcms {
 			}
 			
 			return lin;
+		}
+		
+		public List<InventarioDeclarado> getInvDeclarado(LeitorEfdIcms leitor, Long idEmp, Long idEst){
+			List<InventarioDeclarado> retorno = new ArrayList<InventarioDeclarado>();
+			for(RegH005 inv : leitor.getRegsH005()){
+				InventarioDeclarado invDec = new InventarioDeclarado();
+				invDec.setIdEmp(idEmp);
+				invDec.setIdEst(idEst);
+				invDec.setMotivoInventario(inv.getMotivoInventario());
+				invDec.setDataInv(inv.getDataInv());
+				invDec.setVlTotal(inv.getVlTotEstoque());
+				for(RegH010 itens :  inv.getRegsH010()){
+					ItensInventario itensInv = new ItensInventario();
+					itensInv.setCodItem(itens.getCodItem());
+					itensInv.setQtde(itens.getQtde());
+					itensInv.setVlUnit(itens.getVlUnit());
+					itensInv.setVlItem(itens.getVlItem());
+					itensInv.setCodCta(itens.getCodCtda());
+					itensInv.setUnd(itens.getUnd());
+					itensInv.setCodPart(itens.getCodPart());
+					itensInv.setTxtCompl(itens.getTxtCompl());
+					
+					invDec.adicionaItemInv(itensInv);
+				}
+				
+				retorno.add(invDec);
+			}
+			
+			return retorno;
 		}
 
 }

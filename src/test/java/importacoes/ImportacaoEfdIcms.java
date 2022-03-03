@@ -12,6 +12,7 @@ import com.zeta.dao.ParticipanteDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
 import com.zeta.handler.ExportaQuantitativoEstoque;
+import com.zeta.handler.ExportaQuantitativoEstoque;
 import com.zeta.handler.ImportaEfdIcms;
 import com.zeta.model.LoteImportacaoSpedFiscal;
 import com.zeta.model.Participante;
@@ -28,10 +29,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano = "2017";
+		String ano = "2018";
 		String emp = "SELLENE";
-		String estab = "MEGAFARMA";
-		String cnpj  = "05329222000680";
+		String estab = "SAO_MATEUS";
+		String cnpj  = "05329222000761";
 		
 		String anomes1 = ano.concat("01").concat(".txt");
 		String anomes2 = ano.concat("02").concat(".txt");
@@ -60,7 +61,7 @@ public class ImportacaoEfdIcms {
 	    Path p4 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes4));
 	    
 	    Path xP5 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\XML").concat("\\").concat("Proprios").concat("\\").concat("\\mai"));
-	    Path p5 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes5));
+	    Path p5  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes5));
 	    
 	    Path xP6 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\XML").concat("\\").concat("Proprios").concat("\\").concat("\\jun"));
 	    Path p6 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes6));
@@ -86,8 +87,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p4;
-		Path x = xP4;
+	    Path p = p2;
+		Path x = xP2;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -109,15 +110,12 @@ public class ImportacaoEfdIcms {
 			ParticipanteDao daoPart = new ParticipanteDao();
 			ProdutoDao daoProd = new ProdutoDao();
 			ImportaEfdIcms importa = new ImportaEfdIcms();	
-			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 6L);
+			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 3L);
 				
-			List<Participante> participantes = importa.getParticipantes(leitor,1L, 6L);
-			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 6L);
+			List<Participante> participantes = importa.getParticipantes(leitor,1L, 3L);
+			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 3L);
 			produtosSped.addAll(importa.getProdutos());
 			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
-			
-			
-			
 				if(!loteDao.listaTodos().contains(loteImportacao)){			
 					for(Participante part : participantes){
 						if(!daoPart.listaTodos().contains(part)) {
@@ -142,8 +140,8 @@ public class ImportacaoEfdIcms {
 				System.out.println("Lote já importado!!!");
 			}
 
-			//CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
-			//cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
+//			CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
+//			cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
 			
 			//Verificar as emissões próprias no arquivei das entradas
 			//cruzamentos.cruzamentosNotasSpedFiscalComXMLTerceiros(x.toString(), leitor);
@@ -151,17 +149,12 @@ public class ImportacaoEfdIcms {
 //			ExportaQuantitativoEstoque exp = new ExportaQuantitativoEstoque();
 //			String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 //			exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
 			JPAUtil.fecha();
 		}
-
-		
-			
-		
-
-		
 
 
 	}

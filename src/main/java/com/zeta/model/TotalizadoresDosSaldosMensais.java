@@ -81,6 +81,9 @@ public class TotalizadoresDosSaldosMensais {
 	private Double qtdeSaiDez = 0.00;
 	private Double vrSaiDez = 0.00;
 	private Double saldoDez = 0.00;
+	
+	
+	
 	public String getCodItem() {
 		return codItem;
 	}

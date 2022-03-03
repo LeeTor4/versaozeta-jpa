@@ -65,6 +65,11 @@ public class LoteImportacaoSpedFiscal implements Serializable{
 	@JoinColumn(name="lote_id")
 	private List<ItemTotalizadoPorLote> saldoPorLote = new ArrayList<ItemTotalizadoPorLote>();
 	
+	@OneToMany(cascade = CascadeType.ALL)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JoinColumn(name="lote_id")
+	private List<InventarioDeclarado> invDec = new ArrayList<InventarioDeclarado>();
+	
 	public LoteImportacaoSpedFiscal() {
 
 	}
@@ -248,6 +253,17 @@ public class LoteImportacaoSpedFiscal implements Serializable{
 	
 	public void adicionaSaldoPorLote(ItemTotalizadoPorLote saldoPorLote) {
 	       this.saldoPorLote.add(saldoPorLote);
+	}
+
+	public void adicionaInvDeclarado(InventarioDeclarado inv) {
+		this.invDec.add(inv);
+	}
+	public List<InventarioDeclarado> getInvDec() {
+		return invDec;
+	}
+
+	public void setInvDec(List<InventarioDeclarado> invDec) {
+		this.invDec = invDec;
 	}
 
 	@Override

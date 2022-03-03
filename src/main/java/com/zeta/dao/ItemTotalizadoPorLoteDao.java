@@ -60,5 +60,5 @@ public class ItemTotalizadoPorLoteDao {
 			return singleResult;
 		}
 		
-				
+
 }

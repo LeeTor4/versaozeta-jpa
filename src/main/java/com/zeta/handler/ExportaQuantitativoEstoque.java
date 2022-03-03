@@ -3,8 +3,9 @@ package com.zeta.handler;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
@@ -19,9 +20,138 @@ public class ExportaQuantitativoEstoque {
 
 		ProdutoDao daoProd = new ProdutoDao();
 		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
-		List<ItemTotalizadoPorLote> listaProdutos = dao.listaTodos().stream().filter(cgc -> cgc.getCnpj().equals(cnpj))
+		List<ItemTotalizadoPorLote> listaProdutos = dao.listaTodos().stream()
+				.filter(cgc -> cgc.getCnpj().equals(cnpj))
 				.filter(year -> year.getAno().equals(ano)).distinct().collect(Collectors.toList());
 
+		List<ItemTotalizadoPorLote> listaEnt = dao.listaTodos().stream()
+												.filter(cgc -> cgc.getCnpj().equals(cnpj))
+												.filter(year -> year.getAno().equals(ano))
+												.filter(oper -> oper.getOperacao().equals("E"))
+												.collect(Collectors.toList());
+		
+		List<ItemTotalizadoPorLote> listaSai = dao.listaTodos().stream()
+												.filter(cgc -> cgc.getCnpj().equals(cnpj))
+												.filter(year -> year.getAno().equals(ano))
+												.filter(oper -> oper.getOperacao().equals("S"))
+												.collect(Collectors.toList());
+		
+		
+		Map<String , ItemTotalizadoPorLote>   mpEntJan = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiJan = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntFev = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiFev = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntMar = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiMar = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntAbr = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiAbr = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntMai = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiMai = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntJun = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiJun = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntJul = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiJul = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntAgo = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiAgo = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntSet = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiSet = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntOut = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiOut = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntNov = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiNov = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpEntDez = new HashMap<String , ItemTotalizadoPorLote>();
+		Map<String , ItemTotalizadoPorLote>   mpSaiDez = new HashMap<String , ItemTotalizadoPorLote>();
+		for(ItemTotalizadoPorLote e : listaEnt){
+			switch (e.getMes()) {
+			case "1":
+				mpEntJan.put(e.getCodItem(), e);
+				break;
+			case "2":
+				mpEntFev.put(e.getCodItem(), e);
+				break;
+			case "3":
+				mpEntMar.put(e.getCodItem(), e);
+				break;
+			case "4":
+				mpEntAbr.put(e.getCodItem(), e);
+				break;
+			case "5":
+				mpEntMai.put(e.getCodItem(), e);
+				break;
+			case "6":
+				mpEntJun.put(e.getCodItem(), e);
+				break;
+			case "7":
+				mpEntJul.put(e.getCodItem(), e);
+				break;
+			case "8":
+				mpEntAgo.put(e.getCodItem(), e);
+				break;
+			case "9":
+				mpEntSet.put(e.getCodItem(), e);
+				break;
+			case "10":
+				mpEntOut.put(e.getCodItem(), e);
+				break;
+			case "11":
+				mpEntNov.put(e.getCodItem(), e);
+				break;
+			case "12":
+				mpEntDez.put(e.getCodItem(), e);
+				break;
+			}
+		}
+		
+		
+		
+		
+		
+		for(ItemTotalizadoPorLote e : listaSai){
+			
+			switch (e.getMes()) {
+			case "1":
+				mpSaiJan.put(e.getCodItem(), e);
+				break;
+			case "2":
+				mpSaiFev.put(e.getCodItem(), e);
+				break;
+			case "3":
+				mpSaiMar.put(e.getCodItem(), e);
+				break;
+			case "4":
+				mpSaiAbr.put(e.getCodItem(), e);
+				break;
+			case "5":
+				mpSaiMai.put(e.getCodItem(), e);
+				break;
+			case "6":
+				mpSaiJun.put(e.getCodItem(), e);
+				break;
+			case "7":
+				mpSaiJul.put(e.getCodItem(), e);
+				break;
+			case "8":
+				mpSaiAgo.put(e.getCodItem(), e);
+				break;
+			case "9":
+				mpSaiSet.put(e.getCodItem(), e);
+				break;
+			case "10":
+				mpSaiOut.put(e.getCodItem(), e);
+				break;
+			case "11":
+				mpSaiNov.put(e.getCodItem(), e);
+				break;
+			case "12":
+				mpSaiDez.put(e.getCodItem(), e);
+				break;
+			}
+			
+		}
+		
+		
+		
+		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(file)));
 			String linha = " ";
@@ -31,23 +161,23 @@ public class ExportaQuantitativoEstoque {
 			writer.write(linha);
 			writer.newLine();
 
+		
+			
 			for (ItemTotalizadoPorLote lista : listaProdutos) {
 				TotalizadoresDosSaldosMensais saldos = new TotalizadoresDosSaldosMensais();
-
-				
+			
 				Double qtdeEntJan = 0.0;
 				Double vlEntJan   = 0.0;
 				Double qtdeSaiJan = 0.0;				
-				Double vlSaiJan   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "E") != null) {
-                	qtdeEntJan = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "E").getVlTotQtde();
-    				vlEntJan   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "S") != null) {
-                	 qtdeSaiJan = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "S").getVlTotQtde();				
-    			     vlSaiJan   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "1", "S").getVlTotItem();
-                }
-				
+				Double vlSaiJan   = 0.0;								
+                if(mpEntJan.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntJan = mpEntJan.get(lista.getCodItem()).getVlTotQtde();
+                	vlEntJan   = mpEntJan.get(lista.getCodItem()).getVlTotItem();	
+                }                
+                if(mpSaiJan.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiJan = mpSaiJan.get(lista.getCodItem()).getVlTotQtde();
+                	vlSaiJan   = mpSaiJan.get(lista.getCodItem()).getVlTotItem();                	
+                }				
 				saldos.setQtdeEntJan(qtdeEntJan);
 				saldos.setVrEntJan(vlEntJan);
 				saldos.setQtdeSaiJan(qtdeSaiJan);
@@ -58,36 +188,34 @@ public class ExportaQuantitativoEstoque {
 				Double vlEntFev   = 0.0;
 				Double qtdeSaiFev = 0.0;
 				Double vlSaiFev   = 0.0;
-
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "E") != null) {
-					   qtdeEntFev = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "E").getVlTotQtde();		
-					   vlEntFev   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "E").getVlTotItem();
-				}
-				
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "S") != null) {
-			           qtdeSaiFev = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "S").getVlTotQtde();
-				       vlSaiFev   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "2", "S").getVlTotItem();
-				}
-				
+                if(mpEntFev.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntFev = mpEntFev.get(lista.getCodItem()).getVlTotQtde();
+                	vlEntFev   = mpEntFev.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiFev.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiFev = mpSaiFev.get(lista.getCodItem()).getVlTotQtde();
+                	vlSaiFev   = mpSaiFev.get(lista.getCodItem()).getVlTotItem();                	
+                }
 				saldos.setQtdeEntFev(qtdeEntFev);
 				saldos.setVrEntFev(vlEntFev);
 				saldos.setQtdeSaiFev(qtdeSaiFev);
 				saldos.setVrSaiFev(vlSaiFev);
 
+				
 				Double qtdeEntMar = 0.0;	
 				Double vrEntMar   = 0.0;	
 				Double qtdeSaiMar = 0.0;	
 				Double vrSaiMar   = 0.0;	
-
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "E") != null) {
-					   qtdeEntMar = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "E").getVlTotQtde();	
-					   vrEntMar   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "E").getVlTotItem();	
-				}
-				
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "S") != null) {
-					   qtdeSaiMar = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "S").getVlTotQtde();	
-					   vrSaiMar   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "3", "S").getVlTotItem();	
-				}
+                if(mpEntMar.get(lista.getCodItem()) != null) {               	                	
+            		qtdeEntMar = mpEntMar.get(lista.getCodItem()).getVlTotQtde();
+            		vrEntMar   = mpEntMar.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiMar.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiMar = mpSaiMar.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiMar   = mpSaiMar.get(lista.getCodItem()).getVlTotItem();                	
+                }
 				saldos.setQtdeEntMar(qtdeEntMar);
 				saldos.setVrEntMar(vrEntMar);
 				saldos.setQtdeSaiMar(qtdeSaiMar);
@@ -97,16 +225,15 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntAbr   = 0.0;	
 				Double qtdeSaiAbr = 0.0;	
 				Double vrSaiAbr   = 0.0;	
-				
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "E") != null){
-				       qtdeEntAbr = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "E").getVlTotQtde();	
-			           vrEntAbr   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "E").getVlTotItem();	
-				}
-
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "S") != null) {
-					   qtdeSaiAbr = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "S").getVlTotQtde();	
-					   vrSaiAbr   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "4", "S").getVlTotItem();	
-				}
+                if(mpEntAbr.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntAbr = mpEntAbr.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntAbr   = mpEntAbr.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiAbr.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiAbr = mpSaiAbr.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiAbr   = mpSaiAbr.get(lista.getCodItem()).getVlTotItem();                	
+                }
 				saldos.setQtdeEntAbr(qtdeEntAbr);
 				saldos.setVrEntAbr(vrEntAbr);
 				saldos.setQtdeSaiAbr(qtdeSaiAbr);
@@ -116,16 +243,15 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntMai   = 0.0;	
 				Double qtdeSaiMai = 0.0;	
 				Double vrSaiMai   = 0.0;	
-
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "E") != null) {
-					       qtdeEntMai = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "E").getVlTotQtde();	
-					       vrEntMai   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "E").getVlTotItem();	
-				}
-				
-				if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "S") != null) {
-					       qtdeSaiMai = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "S").getVlTotQtde();	
-					       vrSaiMai   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "5", "S").getVlTotItem();	
-				}
+                if(mpEntMai.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntMai = mpEntMai.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntMai   = mpEntMai.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiMai.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiMai = mpSaiMai.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiMai   = mpSaiMai.get(lista.getCodItem()).getVlTotItem();                	
+                }
 				saldos.setQtdeEntMai(qtdeEntMai);
 				saldos.setVrEntMai(vrEntMai);
 				saldos.setQtdeSaiMai(qtdeSaiMai);
@@ -135,13 +261,14 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntJun   = 0.0;
 				Double qtdeSaiJun = 0.0;
 				Double vrSaiJun   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "E") != null) {
-                	 qtdeEntJun = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "E").getVlTotQtde();	
-    				 vrEntJun   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "S") != null) {
-                	 qtdeSaiJun = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "S").getVlTotQtde();
-    				 vrSaiJun   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "6", "S").getVlTotItem();
+                if(mpEntJun.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntJun = mpEntJun.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntJun   = mpEntJun.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiJun.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiJun = mpSaiJun.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiJun   = mpSaiJun.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntJun(qtdeEntJun);
 				saldos.setVrEntJun(vrEntJun);
@@ -152,13 +279,14 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntJul   =  0.0;	
 				Double qtdeSaiJul =  0.0;	
 				Double vrSaiJul   =  0.0;	
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "E") != null) {
-                           qtdeEntJul =  dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "E").getVlTotQtde();	
-    				       vrEntJul   =  dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "E").getVlTotItem();	
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "S") != null) {
-                	       qtdeSaiJul =  dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "S").getVlTotQtde();	
-    			           vrSaiJul   =  dao.buscarTotalizadorComFiltros(lista.getCodItem(), "7", "S").getVlTotItem();	
+                if(mpEntJul.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntJul = mpEntJul.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntJul   = mpEntJul.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiJul.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiJul = mpSaiJul.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiJul   = mpSaiJul.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntJul(qtdeEntJul);
 				saldos.setVrEntJul(vrEntJul);
@@ -169,13 +297,14 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntAgo   = 0.0;	
 				Double qtdeSaiAgo = 0.0;	
 				Double vrSaiAgo   = 0.0;	
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "E") != null) {
-                	   qtdeEntAgo = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "E").getVlTotQtde();	
-    				   vrEntAgo   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "E").getVlTotItem();	
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "S") != null) {
-                           qtdeSaiAgo = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "S").getVlTotQtde();	
-    				       vrSaiAgo   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "8", "S").getVlTotItem();	
+                if(mpEntAgo.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntAgo = mpEntAgo.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntAgo   = mpEntAgo.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiAgo.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiAgo = mpSaiAgo.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiAgo   = mpSaiAgo.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntAgo(qtdeEntAgo);
 				saldos.setVrEntAgo(vrEntAgo);
@@ -186,13 +315,14 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntSet   = 0.0;
 				Double qtdeSaiSet = 0.0;
 				Double vrSaiSet   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "E") != null) {
-                	   qtdeEntSet = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "E").getVlTotQtde();
-    				   vrEntSet   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "S") != null) {
-                	   qtdeSaiSet = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "S").getVlTotQtde();
-    				   vrSaiSet   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "9", "S").getVlTotItem();
+                if(mpEntSet.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntSet = mpEntSet.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntSet   = mpEntSet.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiSet.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiSet = mpSaiSet.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiSet   = mpSaiSet.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntSet(qtdeEntSet);
 				saldos.setVrEntSet(vrEntSet);
@@ -203,30 +333,33 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntOut   = 0.0;
 				Double qtdeSaiOut = 0.0;
 				Double vrSaiOut   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "E") != null) {
-                	   qtdeEntOut = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "E").getVlTotQtde();
-    				   vrEntOut   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "S") != null) {
-                	   qtdeSaiOut = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "S").getVlTotQtde();
-    				   vrSaiOut   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "10", "S").getVlTotItem();
+                if(mpEntOut.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntOut = mpEntOut.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntOut   = mpEntOut.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiOut.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiOut = mpSaiOut.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiOut   = mpSaiOut.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntOut(qtdeEntOut);
 				saldos.setVrEntOut(vrEntOut);
 				saldos.setQtdeSaiOut(qtdeSaiOut);
 				saldos.setVrSaiOut(vrSaiOut);
 
+				
 				Double qtdeEntNov = 0.0;
 				Double vrEntNov   = 0.0;
 				Double qtdeSaiNov = 0.0;
 				Double vrSaiNov   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "E") != null) {
-                       qtdeEntNov = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "E").getVlTotQtde();
-    			       vrEntNov   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "S") != null) {
-                	  qtdeSaiNov = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "S").getVlTotQtde();
-    				  vrSaiNov   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "11", "S").getVlTotItem();
+                if(mpEntNov.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntNov = mpEntNov.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntNov   = mpEntNov.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiNov.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiNov = mpSaiNov.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiNov   = mpSaiNov.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntNov(qtdeEntNov);
 				saldos.setVrEntNov(vrEntNov);
@@ -237,24 +370,51 @@ public class ExportaQuantitativoEstoque {
 				Double vrEntDez   = 0.0;
 				Double qtdeSaiDez = 0.0;
 				Double vrSaiDez   = 0.0;
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "E") != null) {
-                	   qtdeEntDez = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "E").getVlTotQtde();
-    				   vrEntDez   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "E").getVlTotItem();
-                }
-                if(dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "S") != null) {
-                	   qtdeSaiDez = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "S").getVlTotQtde();
-    				   vrSaiDez   = dao.buscarTotalizadorComFiltros(lista.getCodItem(), "12", "S").getVlTotItem();
+                if(mpEntDez.get(lista.getCodItem()) != null) {               	                	
+                	qtdeEntDez = mpEntDez.get(lista.getCodItem()).getVlTotQtde();
+                	vrEntDez   = mpEntDez.get(lista.getCodItem()).getVlTotItem();
+                	
+                }                
+                if(mpSaiDez.get(lista.getCodItem()) != null) {                	                
+                	qtdeSaiDez = mpSaiDez.get(lista.getCodItem()).getVlTotQtde();
+                	vrSaiDez   = mpSaiDez.get(lista.getCodItem()).getVlTotItem();                	
                 }
 				saldos.setQtdeEntDez(qtdeEntDez);
 				saldos.setVrEntDez(vrEntDez);
 				saldos.setQtdeSaiDez(qtdeSaiDez);
 				saldos.setVrSaiDez(vrSaiDez);
 
+				
+//				if( qtdeEntJan + qtdeSaiJan + 
+//					qtdeEntFev + qtdeSaiFev +
+//					qtdeEntMar + qtdeSaiMar +
+//					qtdeEntAbr + qtdeSaiAbr +
+//					qtdeEntMai + qtdeSaiMai +
+//					qtdeEntJun + qtdeSaiJun +
+//					qtdeEntJul + qtdeSaiJul +
+//					qtdeEntAgo + qtdeSaiAgo +
+//					qtdeEntSet + qtdeSaiSet +
+//					qtdeEntOut + qtdeSaiOut +
+//					qtdeEntNov + qtdeSaiNov +
+//					qtdeEntDez + qtdeSaiDez 
+//						> 0) {
+//					
+//					Produto prod = daoProd.buscaPorCodigo(lista.getCodItem());
+//					saldos.setCodItem(lista.getCodItem());
+//					saldos.setCodAntItem("");
+//					saldos.setDescricao(prod.getDescricao());
+//					saldos.setUnidMedida(prod.getUnidadedeMedidaPadrao());	
+//					linha = formatacaoPlanilha(saldos);
+//					writer.write(linha);
+//					writer.newLine();
+//				
+//				}
+				
 				Produto prod = daoProd.buscaPorCodigo(lista.getCodItem());
 				saldos.setCodItem(lista.getCodItem());
 				saldos.setCodAntItem("");
 				saldos.setDescricao(prod.getDescricao());
-				saldos.setUnidMedida(prod.getUnidadedeMedidaPadrao());
+				saldos.setUnidMedida(prod.getUnidadedeMedidaPadrao());	
 				linha = formatacaoPlanilha(saldos);
 				writer.write(linha);
 				writer.newLine();
@@ -272,7 +432,7 @@ public class ExportaQuantitativoEstoque {
 			writer.close();
 
 			System.out.println("Exportado com Sucesso!!!");
-		} catch (IOException e) {
+		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
