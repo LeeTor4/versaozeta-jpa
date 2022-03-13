@@ -17,8 +17,9 @@ public class CallableHistItensECFs implements Callable<HistoricoItens >{
 	private int m;
 	private int pDia;
 	private int uDia;
+	private Long idEst;
 	
-	public CallableHistItensECFs(LeitorEfdIcms leitor,int i, int z, int l, int m,int pDia, int uDia) {
+	public CallableHistItensECFs(LeitorEfdIcms leitor,int i, int z, int l, int m,Long idEst,int pDia, int uDia) {
 		
 		this.leitor = leitor;
 		this.i = i;
@@ -27,14 +28,15 @@ public class CallableHistItensECFs implements Callable<HistoricoItens >{
 		this.m = m;
 		this.pDia = pDia;
 		this.uDia = uDia;
+		this.idEst = idEst;
 	}
 	
 	@Override
 	public HistoricoItens call() throws Exception {
 		HistoricoItens retorno = null;
-		if(importacoes.insereReducoes(leitor,i, z, l, m).getDtDoc().getDayOfMonth() >= pDia
-				&& importacoes.insereReducoes(leitor,i, z, l, m).getDtDoc().getDayOfMonth() < uDia) {
-			 retorno = importacoes.insereReducoes(leitor,i, z, l, m);
+		if(importacoes.insereReducoes(leitor,i, z, l, m,idEst).getDtDoc().getDayOfMonth() >= pDia
+				&& importacoes.insereReducoes(leitor,i, z, l, m,idEst).getDtDoc().getDayOfMonth() < uDia) {
+			 retorno = importacoes.insereReducoes(leitor,i, z, l, m,idEst);
 		}
 		return retorno;
 	}

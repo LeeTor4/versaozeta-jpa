@@ -1,5 +1,6 @@
 package com.zeta.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -44,15 +45,16 @@ public class InventarioDeclaradoDao {
 		return dao.contaTodos();
 	}
 	
-	public InventarioDeclarado buscaPorAnoEmpresaEstab(int ano, Long idEmp, Long idEst) {
+	public List<InventarioDeclarado> buscaPorAnoEmpresaEstab(int ano, Long idEmp, Long idEst) {
 		EntityManager em = JPAUtil.getEntityManager();
 		String jpql = "SELECT invDec FROM InventarioDeclarado invDec where year(invDec.dataInv) = :pAno and invDec.idEmp = :pIdEmp and invDec.idEst = :pIdEst";
-		
 		TypedQuery<InventarioDeclarado>  query = em.createQuery(jpql,InventarioDeclarado.class);
 		query.setParameter("pAno", ano);
 		query.setParameter("pIdEmp",idEmp);
 		query.setParameter("pIdEst", idEst);
+
 		
-		return query.getSingleResult();
+		
+		return query.getResultList();
 	}
 }

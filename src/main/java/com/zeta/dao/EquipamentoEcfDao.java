@@ -43,11 +43,12 @@ private EntityManager em = JPAUtil.getEntityManager();
 		return dao.contaTodos();
 	}
 	
-	public EquipamentoECF buscaPorNumFab(String nome) {
+	public EquipamentoECF buscaPorNumFab(String nome, Long estab) {
 		
-		String jpql = ("select e from EquipamentoECF e where e.numSerieFabECF =  :pNome");
+		String jpql = ("select e from EquipamentoECF e where e.numSerieFabECF =  :pNome and e.idPai = :estab");
 		Query query = em.createQuery(jpql);
 		query.setParameter("pNome", nome);
+		query.setParameter("estab", estab);
 		EquipamentoECF equipamento = (EquipamentoECF) query.getSingleResult();
 		return equipamento;
 	}

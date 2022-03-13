@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -96,5 +97,23 @@ public class InventarioDeclarado implements Serializable{
 	public void setIdEst(Long idEst) {
 		this.idEst = idEst;
 	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(dataInv, idEmp, idEst);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		InventarioDeclarado other = (InventarioDeclarado) obj;
+		return Objects.equals(dataInv, other.dataInv) && Objects.equals(idEmp, other.idEmp)
+				&& Objects.equals(idEst, other.idEst);
+	}
+	
 	
 }

@@ -4,18 +4,23 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.InventarioDeclaradoDao;
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
-import com.zeta.model.EstoqueEFDIcms;
+import com.zeta.dao.ProdutoDao;
 import com.zeta.model.FichaFinanceiroPorItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItensInventario;
+import com.zeta.util.UtilsEConverters;
 
 public class ExportaTotalizadorFinanceiroAnual {
 	
@@ -35,50 +40,76 @@ public class ExportaTotalizadorFinanceiroAnual {
 	private Double custoUnit_OV = 0.00;
 	private Double vrTotal_OV = 0.00;
 	
-	
-	protected EstoqueEFDIcms invDeclarado(String codItem,Long idEmp, Long idEst,int ano) {
-		EstoqueEFDIcms apur = new EstoqueEFDIcms();
-		InventarioDeclaradoDao invDec  = new InventarioDeclaradoDao();
-		InventarioDeclarado buscaPorId = invDec.buscaPorAnoEmpresaEstab(ano, idEmp, idEst);
-		ItensInventarioDao     itemDao = new ItensInventarioDao();
-		apur.setCodItem(itemDao.buscaPorIdPai(buscaPorId.getId(), codItem).getCodItem());
-		apur.setQtde(itemDao.buscaPorIdPai(buscaPorId.getId(), codItem).getQtde());
-		apur.setVlUnit(itemDao.buscaPorIdPai(buscaPorId.getId(), codItem).getVlUnit());
-		apur.setVlItem(itemDao.buscaPorIdPai(buscaPorId.getId(), codItem).getVlItem());
-		
-		return apur;
-	}
-	
-	public void exportaTotalizadorFinanceiroEstoque(String caminho, int ano, String cnpj,Long idEmp, Long idEst) {
-		
-		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+	public List<CadastroItensPorMovimentacao> listaDeProdutos(ItemTotalizadoPorLoteDao dao,String ano, String cnpj, Long idEmp, Long idEst){
+		ProdutoDao prodDao = new ProdutoDao();
+		List<CadastroItensPorMovimentacao> retorno = new ArrayList<CadastroItensPorMovimentacao>();
+ 		Set<String> codigos = new HashSet<String>();
+		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
+		ItensInventarioDao itemInv = new ItensInventarioDao();
+		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(Integer.valueOf(ano), idEmp, idEst);
 		List<ItemTotalizadoPorLote> listaProdutos = dao.listaTodos().stream().filter(cgc -> cgc.getCnpj().equals(cnpj))
 				.filter(year -> year.getAno().equals(String.valueOf(ano))).distinct().collect(Collectors.toList());
 		
-		List<ItemTotalizadoPorLote> listaEnt = dao.listaTodos().stream()
-				.filter(cgc -> cgc.getCnpj().equals(cnpj))
-				.filter(year -> year.getAno().equals(String.valueOf(ano)))
-				.filter(oper -> oper.getOperacao().equals("E"))
-				.collect(Collectors.toList());
+		for(InventarioDeclarado busca  : inventarios){
+			if(busca.getVlTotal() > 0) {
+				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){					
+					codigos.add(UtilsEConverters.getRemoverZeroAEsquerda(item.getCodItem()));
+				}
+			}
+		}
+		
+		for(ItemTotalizadoPorLote itens : listaProdutos){
+			codigos.add(itens.getCodItem());
+		}
+		
+		for(String codigo : codigos){
+			CadastroItensPorMovimentacao obj = new CadastroItensPorMovimentacao();			
+			obj.setCodItem(codigo);
+			obj.setCodAntItem("");
+			obj.setDescricao(prodDao.buscaPorCodigo(codigo).getDescricao());
+			obj.setUndMed(prodDao.buscaPorCodigo(codigo).getUnidadedeMedidaPadrao());
+			retorno.add(obj);
+		}
+		return retorno;
+	}
+	
+	public Map<String,ItensInventario> listaInventario (String ano,Long  idEmp, Long idEst){
+		Map<String,ItensInventario> retorno = new HashMap<String, ItensInventario>();
+		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
+		ItensInventarioDao itemInv = new ItensInventarioDao();
+		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(Integer.valueOf(ano), idEmp, idEst);        
+		for(InventarioDeclarado busca  : inventarios){
+			if(busca.getVlTotal() > 0) {
+				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){
+					retorno.put(UtilsEConverters.getRemoverZeroAEsquerda(item.getCodItem()),item);
+				}
+			}
+		}
+		return retorno;
+	}
+	
+	
+	
+	public void exportaTotalizadorFinanceiroEstoque(String caminho, int ano, String cnpj, Long idEmp, Long idEst) {
 
-		List<ItemTotalizadoPorLote> listaSai = dao.listaTodos().stream()
+		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+		
+		
+		 Map<String, List<ItemTotalizadoPorLote>> listaEnt = dao.listaTodos().stream()
 						.filter(cgc -> cgc.getCnpj().equals(cnpj))
 						.filter(year -> year.getAno().equals(String.valueOf(ano)))
-						.filter(oper -> oper.getOperacao().equals("S"))
-						.collect(Collectors.toList());
-		
-		Map<String , ItemTotalizadoPorLote>   mpEnt = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSai = new HashMap<String , ItemTotalizadoPorLote>();
-		for(ItemTotalizadoPorLote e : listaEnt){
-			mpEnt.put(e.getCodItem(), e);
-		}
-		for(ItemTotalizadoPorLote e : listaSai){
-			mpSai.put(e.getCodItem(), e);
-		}
+						.filter(oper -> oper.getOperacao().equals("E"))
+						.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+
+		 Map<String, List<ItemTotalizadoPorLote>> listaSai = dao.listaTodos().stream()
+					.filter(cgc -> cgc.getCnpj().equals(cnpj))
+					.filter(year -> year.getAno().equals(String.valueOf(ano)))
+					.filter(oper -> oper.getOperacao().equals("S"))
+					.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(caminho)));
-		
 		
 			String linha = " ";
 
@@ -87,29 +118,81 @@ public class ExportaTotalizadorFinanceiroAnual {
 			writer.write(linha);
 			writer.newLine();
 		
-			for (ItemTotalizadoPorLote lista : listaProdutos) {
+			for (CadastroItensPorMovimentacao codigo : listaDeProdutos(dao, String.valueOf(ano), cnpj,idEmp,idEst)) {
 				FichaFinanceiroPorItens ficha = new FichaFinanceiroPorItens();
 				
-				ficha.setQtdeEi(invDeclarado(lista.getCodItem(),idEmp,idEst, ano-1).getQtde());
-				ficha.setVrUnitEi(invDeclarado(lista.getCodItem(),idEmp,idEst, ano-1).getVlUnit());
-				ficha.setVrItemEi(invDeclarado(lista.getCodItem(),idEmp,idEst, ano-1).getVlItem());
-				System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());
+								
+				if(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()) != null) {
+					ficha.setQtdeEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getQtde());
+					ficha.setVrUnitEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getVlUnit());
+					ficha.setVrItemEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getVlItem());
+					System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());
+				}else {
+					ficha.setQtdeEi(0.0);
+					ficha.setVrUnitEi(0.0);
+					ficha.setVrItemEi(0.0);
+					System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());
+				}
+				
 					
 				Double qtdeEnt1  = 0.0;
 				Double vlTotEnt1 = 0.0;
 			    Double vlUnitEnt = 0.0;
-				
+			    if(listaEnt.get(codigo.getCodItem()) !=null) {
+					for (ItemTotalizadoPorLote cod : listaEnt.get(codigo.getCodItem())) {
+						qtdeEnt1 += cod.getVlTotQtde();
+						vlTotEnt1 += cod.getVlTotItem();
+					}
+					vlUnitEnt = (vlTotEnt1 / qtdeEnt1);
+					ficha.setQtdeEnt(qtdeEnt1);
+					ficha.setVlUnitEnt(vlUnitEnt);
+					ficha.setVlItemEnt(vlTotEnt1);
+			    }		
+			    
+			    
 				Double qtdeSai1  = 0.0;
 				Double vlTotSai1 = 0.0;
 				Double vlUnitSai = 0.0;
+				if(listaSai.get(codigo.getCodItem()) != null){
+				    for(ItemTotalizadoPorLote cod : listaSai.get(codigo.getCodItem())){	 
+				    	qtdeSai1  += cod.getVlTotQtde();
+				    	vlTotSai1 += cod.getVlTotItem();			 
+				    }
+				    vlUnitSai = (vlTotSai1/qtdeSai1);
+					ficha.setQtdeSai(qtdeSai1);
+					ficha.setVlUnitSai(vlUnitSai);
+					ficha.setVlItemSai(vlTotSai1);
+				}
+
+				if(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()) != null) {
+					ficha.setQtdeEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getQtde());
+					ficha.setVrUnitEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getVlUnit());
+					ficha.setVrItemEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getVlItem());
+					System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());
+					
+				}else {
+					ficha.setQtdeEf(0.0);
+					ficha.setVrUnitEf(0.0);
+					ficha.setVrItemEf(0.0);
+					System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());
+				}
+
+				ficha.setCodItem(codigo.getCodItem());
+				ficha.setCodAntItem("");
+		        ficha.setDescricao(codigo.getDescricao());
+		        ficha.setUnd(codigo.getUndMed());
+
+		        linha = formatacaoPlanilha(ficha);
 				
-				
-				
+				writer.write(linha);
+				writer.newLine();
 				
 			}
 		
+			writer.close();
+			System.out.println("Exportado com Sucesso!!!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		
@@ -427,4 +510,39 @@ public class ExportaTotalizadorFinanceiroAnual {
 		return vrItemFinalInv + vlItemSaida;
 	}
 
+}
+
+class CadastroItensPorMovimentacao{
+	
+	private String codItem;
+	private String codAntItem;
+	private String descricao;
+	private String undMed;
+	
+	public String getCodItem() {
+		return codItem;
+	}
+	public void setCodItem(String codItem) {
+		this.codItem = codItem;
+	}
+	public String getCodAntItem() {
+		return codAntItem;
+	}
+	public void setCodAntItem(String codAntItem) {
+		this.codAntItem = codAntItem;
+	}
+	public String getDescricao() {
+		return descricao;
+	}
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+	public String getUndMed() {
+		return undMed;
+	}
+	public void setUndMed(String undMed) {
+		this.undMed = undMed;
+	}
+	
+	
 }

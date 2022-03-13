@@ -1,6 +1,7 @@
 package importacoes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.HistoricoItensDao;
@@ -36,16 +37,65 @@ public class LeituraSaldos {
 //		System.out.println(qtdeEntJan + "|" + vlEntJan + "|" + qtdeSaiJan );
 		 
 //		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
-//		InventarioDeclarado buscaPorId = invDec.buscaPorAnoEmpresaEstab(2018, 1L, 6L);
+//		InventarioDeclarado buscaPorId = invDec.buscaPorAnoEmpresaEstab(2020, 1L, 3L);
 //		ItensInventarioDao     itemDao = new ItensInventarioDao();		
-//		System.out.println(
-//				     itemDao.buscaPorIdPai(buscaPorId.getId(), "00001011").getCodItem()
-//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00001011").getQtde()
-//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00001011").getVlUnit()
-//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00001011").getUnd()
-//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00001011").getVlItem());
+//		if( itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339") != null){
+//			System.out.println(
+//				     itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339").getCodItem()
+//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339").getQtde()
+//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339").getVlUnit()
+//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339").getUnd()
+//				+"|"+itemDao.buscaPorIdPai(buscaPorId.getId(), "00023339").getVlItem()); 
+//		}
+
 		
 		
+		
+//		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+//
+//	    Map<String, List<ItemTotalizadoPorLote>> collect = dao.listaTodos().stream()
+//				.filter(cgc -> cgc.getCnpj().equals("05329222000761"))
+//				.filter(year -> year.getAno().equals("2017"))
+//				.filter(oper -> oper.getOperacao().equals("E"))
+//				.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+//	
+//	
+//	    
+//	    Double qtdeEnt1  = 0.0;
+//		Double vlTotEnt1 = 0.0;
+//	    Double vlUnitEnt = 0.0;  
+//	    for(ItemTotalizadoPorLote cod : collect.get("5805")){	    	
+//	    	qtdeEnt1  += cod.getVlTotQtde();
+//	    	vlTotEnt1 += cod.getVlTotItem();			 
+//	    }
+//	    vlUnitEnt = (vlTotEnt1/qtdeEnt1);
+//	    System.out.println("5805" + "|" + qtdeEnt1 + "|" + vlUnitEnt + "|" + vlTotEnt1);
+//		int cont = 0;
+//		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+//		List<ItemTotalizadoPorLote> listaProdutos = dao.buscarListaItensPorAno("2019","05329222000761");
+//		for (ItemTotalizadoPorLote lista : listaProdutos) {
+//			cont++;
+//			System.out.println(cont+"|"+lista.getCodItem());
+//		}
+		
+		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
+		ItensInventarioDao itemInv = new ItensInventarioDao();
+		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(2017, 1L, 3L);
+        
+		for(InventarioDeclarado busca  : inventarios){
+			if(busca.getVlTotal() > 0) {
+				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){
+					System.out.println(busca.getId()+"|"+busca.getIdEmp()+"|"+busca.getIdEst()
+		            +"|"+busca.getDataInv() +"|"+busca.getVlTotal() + "|" + item.getCodItem()
+		            + "|" + item.getUnd() 
+		            + "|" + item.getQtde()+ "|" + item.getVlUnit()+ "|" + item.getVlItem());	
+				}
+		    }
+		}
+		
+		
+	    
+
 	}
 
 }

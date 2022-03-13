@@ -248,9 +248,9 @@ public class ImportaEfdIcms {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
 							.getRegsC425().size(); m++) {
                         
-						if (insereReducoes(leitor,i, z, l, m) != null) {
+						if (insereReducoes(leitor,i, z, l, m,idEst) != null) {
 							
-							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,pDia,uDia);
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,idEst,pDia,uDia);
 							Future<HistoricoItens> submit = ex.submit(hist);
 							try {
 								
@@ -294,9 +294,9 @@ public class ImportaEfdIcms {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
 							.getRegsC425().size(); m++) {
 	
-						if (insereReducoes(leitor,i, z, l, m) != null) {
+						if (insereReducoes(leitor,i, z, l, m,idEst) != null) {
 							
-							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m, pDia,uDia);
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,idEst, pDia,uDia);
 							Future<HistoricoItens> submit = ex.submit(hist);
 							try {
 								retorno.add(submit.get());
@@ -338,9 +338,9 @@ public class ImportaEfdIcms {
 					for (int m = 0; m < leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l)
 							.getRegsC425().size(); m++) {
 	
-						if (insereReducoes(leitor, i, z, l, m) != null) {
+						if (insereReducoes(leitor, i, z, l, m,idEst) != null) {
 							
-							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,uDia,pDia);
+							CallableHistItensECFs hist = new CallableHistItensECFs(leitor, i, z, l, m,idEst,uDia,pDia);
 							Future<HistoricoItens> submit = ex.submit(hist);
 							try {
 								retorno.add(submit.get());
@@ -466,7 +466,7 @@ public class ImportaEfdIcms {
 		return id;
 	}
 	
-	public  HistoricoItens insereReducoes(LeitorEfdIcms leitor, int i, int z, int l, int m) {
+	public  HistoricoItens insereReducoes(LeitorEfdIcms leitor, int i, int z, int l, int m, Long idEst) {
 		EquipamentoEcfDao dao = new EquipamentoEcfDao();
 		HistoricoItens retorno = new HistoricoItens();
 
@@ -475,7 +475,7 @@ public class ImportaEfdIcms {
 		retorno.setOperacao("S");
 		retorno.setCodSitDoc("");
 		retorno.setNumItem("");
-		retorno.setEcfCx(dao.buscaPorNumFab(leitor.getRegsC400().get(i).getNumSerieFabECF()).getNumECF());
+		retorno.setEcfCx(dao.buscaPorNumFab(leitor.getRegsC400().get(i).getNumSerieFabECF(),idEst).getNumECF());
 		retorno.setDtDoc(leitor.getRegsC400().get(i).getRegsC405().get(z).getDtDoc());
 		retorno.setCodItem(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getCodItem());
 		retorno.setQtde(BigDecimal.valueOf(leitor.getRegsC400().get(i).getRegsC405().get(z).getRegsC420().get(l).getRegsC425().get(m).getQtd()));

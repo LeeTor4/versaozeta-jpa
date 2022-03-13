@@ -1,9 +1,9 @@
 package com.zeta.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.zeta.model.ItensInventario;
@@ -51,15 +51,24 @@ public class ItensInventarioDao {
 		return createQuery.getSingleResult();
 	}
 	
-	public ItensInventario buscaPorIdPai(Long idPai,String codItem) {
+	public List<ItensInventario> buscaPorIdPai(Long idPai) {
+		List<ItensInventario> retorno = new ArrayList<ItensInventario>();
 		EntityManager em = JPAUtil.getEntityManager();
-		String jpql = "SELECT inv FROM ItensInventario inv WHERE inv.idPai = :pidPai and inv.codItem = :pcodItem";
+		String jpql = "SELECT inv FROM ItensInventario inv WHERE inv.idPai = :pidPai";
+		TypedQuery<ItensInventario> createQuery = null;
+		try {
+			
+			createQuery = em.createQuery(jpql,ItensInventario.class);
+			createQuery.setParameter("pidPai", idPai);
+			retorno = createQuery.getResultList();
 		
-		TypedQuery<ItensInventario> createQuery = em.createQuery(jpql,ItensInventario.class);
-		createQuery.setParameter("pidPai", idPai);
-		createQuery.setParameter("pcodItem", codItem);
 		
-		return createQuery.getSingleResult();
+		} catch (Exception e) {
+			System.out.println(e.getMessage() + " Não existe essa operação para esse item");
+		}
+		
+		
+		return retorno;
 	}
 	
 	public int contaTodos() {

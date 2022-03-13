@@ -12,6 +12,7 @@ import com.zeta.dao.ParticipanteDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
 import com.zeta.handler.ExportaQuantitativoEstoque;
+import com.zeta.handler.ExportaTotalizadorFinanceiroAnual;
 import com.zeta.handler.ExportaQuantitativoEstoque;
 import com.zeta.handler.ImportaEfdIcms;
 import com.zeta.model.LoteImportacaoSpedFiscal;
@@ -29,20 +30,20 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano = "2018";
+		String ano = "2020";
 		String emp = "SELLENE";
-		String estab = "SAO_MATEUS";
-		String cnpj  = "05329222000761";
+		String estab = "HARMONY";
+		String cnpj  = "05329222000842";
 		
-		String anomes1 = ano.concat("01").concat(".txt");
-		String anomes2 = ano.concat("02").concat(".txt");
-		String anomes3 = ano.concat("03").concat(".txt");
-		String anomes4 = ano.concat("04").concat(".txt");
-		String anomes5 = ano.concat("05").concat(".txt");
-		String anomes6 = ano.concat("06").concat(".txt");
-		String anomes7 = ano.concat("07").concat(".txt");
-		String anomes8 = ano.concat("08").concat(".txt");
-		String anomes9 = ano.concat("09").concat(".txt");
+		String anomes1  = ano.concat("01").concat(".txt");
+		String anomes2  = ano.concat("02").concat(".txt");
+		String anomes3  = ano.concat("03").concat(".txt");
+		String anomes4  = ano.concat("04").concat(".txt");
+		String anomes5  = ano.concat("05").concat(".txt");
+		String anomes6  = ano.concat("06").concat(".txt");
+		String anomes7  = ano.concat("07").concat(".txt");
+		String anomes8  = ano.concat("08").concat(".txt");
+		String anomes9  = ano.concat("09").concat(".txt");
 		String anomes10 = ano.concat("10").concat(".txt");
 		String anomes11 = ano.concat("11").concat(".txt");
 		String anomes12 = ano.concat("12").concat(".txt");
@@ -87,8 +88,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p2;
-		Path x = xP2;
+	    Path p = p12;
+		Path x = xP12;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -106,39 +107,39 @@ public class ImportacaoEfdIcms {
 				0L,0L,0L,
 				0L, 0L );
 		try {
-			LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
-			ParticipanteDao daoPart = new ParticipanteDao();
-			ProdutoDao daoProd = new ProdutoDao();
-			ImportaEfdIcms importa = new ImportaEfdIcms();	
-			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 3L);
-				
-			List<Participante> participantes = importa.getParticipantes(leitor,1L, 3L);
-			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 3L);
-			produtosSped.addAll(importa.getProdutos());
-			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
-				if(!loteDao.listaTodos().contains(loteImportacao)){			
-					for(Participante part : participantes){
-						if(!daoPart.listaTodos().contains(part)) {
-							daoPart.adiciona(part);
-						}
-					}
-					for(Produto prod :  collectProdutos){					
-						if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
-							 daoProd.adiciona(prod);
-							 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
-						}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
-								&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
-							
-							Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
-					    	daoProd.remove(buscaPorCodigo);
-					    	daoProd.atualiza(prod);
-					    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
-						}
-					}
-					loteDao.adiciona(loteImportacao);	
-			}else {
-				System.out.println("Lote já importado!!!");
-			}
+//			LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
+//			ParticipanteDao daoPart = new ParticipanteDao();
+//			ProdutoDao daoProd = new ProdutoDao();
+//			ImportaEfdIcms importa = new ImportaEfdIcms();	
+//			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 4L);
+//				
+//			List<Participante> participantes = importa.getParticipantes(leitor,1L, 4L);
+//			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 4L);
+//			produtosSped.addAll(importa.getProdutos());
+//			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
+//				if(!loteDao.listaTodos().contains(loteImportacao)){			
+//					for(Participante part : participantes){
+//						if(!daoPart.listaTodos().contains(part)) {
+//							daoPart.adiciona(part);
+//						}
+//					}
+//					for(Produto prod :  collectProdutos){					
+//						if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
+//							 daoProd.adiciona(prod);
+//							 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
+//						}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
+//								&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
+//							
+//							Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
+//					    	daoProd.remove(buscaPorCodigo);
+//					    	daoProd.atualiza(prod);
+//					    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
+//						}
+//					}
+//					loteDao.adiciona(loteImportacao);	
+//			}else {
+//				System.out.println("Lote já importado!!!");
+//			}
 
 //			CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
 //			cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
@@ -146,9 +147,12 @@ public class ImportacaoEfdIcms {
 			//Verificar as emissões próprias no arquivei das entradas
 			//cruzamentos.cruzamentosNotasSpedFiscalComXMLTerceiros(x.toString(), leitor);
 			
-//			ExportaQuantitativoEstoque exp = new ExportaQuantitativoEstoque();
-//			String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
-//			exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			ExportaQuantitativoEstoque exp = new ExportaQuantitativoEstoque();
+			ExportaTotalizadorFinanceiroAnual expFin = new ExportaTotalizadorFinanceiroAnual();
+			String dirPlanilha    = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+			String dirPlanilhaFin = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_FINANCEIRO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+			//exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 4L);
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

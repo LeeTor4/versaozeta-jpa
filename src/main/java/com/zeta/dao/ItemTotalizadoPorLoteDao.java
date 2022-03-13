@@ -52,12 +52,23 @@ public class ItemTotalizadoPorLoteDao {
 						.setParameter("codItem", codItem)
 						.setParameter("mes", mes)
 						.setParameter("operacao", operacao)
-						.getSingleResult();
+						.getResultList();
 			} catch (Exception e) {
 				System.out.println(e.getMessage() + " Não existe essa operação para esse item");
 			}
 			
 			return singleResult;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public List<ItemTotalizadoPorLote> buscarListaItensPorAno(String ano, String cnpj) {
+		
+			String jpql = "SELECT tot FROM ItemTotalizadoPorLote tot WHERE tot.ano = :ano and tot.cnpj = :cnpj group by tot.codItem";
+			
+			return (List<ItemTotalizadoPorLote>) em.createQuery(jpql)
+					.setParameter("ano", ano)
+					.setParameter("cnpj", cnpj)
+					.getResultList();
 		}
 		
 
