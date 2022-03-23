@@ -8,6 +8,7 @@ import com.zeta.dao.HistoricoItensDao;
 import com.zeta.dao.InventarioDeclaradoDao;
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
+import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.ItemTotalizadoPorLote;
 import com.zeta.model.ItensInventario;
@@ -78,24 +79,35 @@ public class LeituraSaldos {
 //			System.out.println(cont+"|"+lista.getCodItem());
 //		}
 		
-		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
-		ItensInventarioDao itemInv = new ItensInventarioDao();
-		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(2017, 1L, 3L);
-        
-		for(InventarioDeclarado busca  : inventarios){
-			if(busca.getVlTotal() > 0) {
-				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){
-					System.out.println(busca.getId()+"|"+busca.getIdEmp()+"|"+busca.getIdEst()
-		            +"|"+busca.getDataInv() +"|"+busca.getVlTotal() + "|" + item.getCodItem()
-		            + "|" + item.getUnd() 
-		            + "|" + item.getQtde()+ "|" + item.getVlUnit()+ "|" + item.getVlItem());	
-				}
-		    }
-		}
+//		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
+//		ItensInventarioDao itemInv = new ItensInventarioDao();
+//		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(2017, 1L, 3L);
+//        
+//		for(InventarioDeclarado busca  : inventarios){
+//			if(busca.getVlTotal() > 0) {
+//				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){
+//					System.out.println(busca.getId()+"|"+busca.getIdEmp()+"|"+busca.getIdEst()
+//		            +"|"+busca.getDataInv() +"|"+busca.getVlTotal() + "|" + item.getCodItem()
+//		            + "|" + item.getUnd() 
+//		            + "|" + item.getQtde()+ "|" + item.getVlUnit()+ "|" + item.getVlItem());	
+//				}
+//		    }
+//		}
 		
 		
+//	    HistoricoItensDao dao = new HistoricoItensDao();
+//	    List<HistoricoItens> lista = dao.buscaHisItemPorCnpjCodigoAno("05329222000680", "8790", 2017);
+//	    for(HistoricoItens h : lista){
+//	    	System.out.println(h.getChaveDoc() + "|" + h.getCfop());
+//	    }
 	    
-
+		String dirPlanHistItem   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("fichas_estoques").concat("\\");
+		String dirListaProds                     = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("ListaCodItem2.csv");
+	    
+		
+		
+		System.out.println(dirListaProds);
+	
 	}
 
 }

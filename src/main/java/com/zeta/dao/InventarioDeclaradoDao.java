@@ -53,8 +53,6 @@ public class InventarioDeclaradoDao {
 		query.setParameter("pIdEmp",idEmp);
 		query.setParameter("pIdEst", idEst);
 
-		
-		
 		return query.getResultList();
 	}
 }

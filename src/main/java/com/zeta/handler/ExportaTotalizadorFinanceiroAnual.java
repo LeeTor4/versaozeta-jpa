@@ -96,10 +96,10 @@ public class ExportaTotalizadorFinanceiroAnual {
 		
 		
 		 Map<String, List<ItemTotalizadoPorLote>> listaEnt = dao.listaTodos().stream()
-						.filter(cgc -> cgc.getCnpj().equals(cnpj))
-						.filter(year -> year.getAno().equals(String.valueOf(ano)))
-						.filter(oper -> oper.getOperacao().equals("E"))
-						.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+					.filter(cgc -> cgc.getCnpj().equals(cnpj))
+					.filter(year -> year.getAno().equals(String.valueOf(ano)))
+					.filter(oper -> oper.getOperacao().equals("E"))
+					.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
 
 		 Map<String, List<ItemTotalizadoPorLote>> listaSai = dao.listaTodos().stream()
 					.filter(cgc -> cgc.getCnpj().equals(cnpj))

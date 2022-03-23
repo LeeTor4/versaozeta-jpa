@@ -3,6 +3,7 @@ package com.zeta.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import com.zeta.model.HistoricoItens;
 import com.zeta.util.JPAUtil;
@@ -43,4 +44,19 @@ public class HistoricoItensDao {
 	public int contaTodos() {
 		return dao.contaTodos();
 	}
+	
+	
+	public List<HistoricoItens> buscaHisItemPorCnpjCodigoAno(String cnpj, String codigo, int ano) {
+		
+		String jpql = "SELECT h FROM HistoricoItens h WHERE h.empresa = :cnpj AND h.codItem IN(:codigo,:codigo) AND YEAR(h.dtDoc)= :ano ORDER BY h.dtDoc,h.codItem,h.operacao";
+		
+		TypedQuery<HistoricoItens>  query = em.createQuery(jpql,HistoricoItens.class);
+		query.setParameter("cnpj", cnpj);
+		query.setParameter("codigo", codigo);
+		query.setParameter("ano", ano);
+		
+		return query.getResultList();
+	}
+	
+	
 }
