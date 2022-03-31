@@ -95,18 +95,32 @@ public class LeituraSaldos {
 //		}
 		
 		
-//	    HistoricoItensDao dao = new HistoricoItensDao();
+	    HistoricoItensDao dao = new HistoricoItensDao();
 //	    List<HistoricoItens> lista = dao.buscaHisItemPorCnpjCodigoAno("05329222000680", "8790", 2017);
 //	    for(HistoricoItens h : lista){
 //	    	System.out.println(h.getChaveDoc() + "|" + h.getCfop());
 //	    }
 	    
-		String dirPlanHistItem   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("fichas_estoques").concat("\\");
-		String dirListaProds                     = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("ListaCodItem2.csv");
 	    
-		
-		
-		System.out.println(dirListaProds);
+	    //"05329222000761", "23814", 2020
+//	   List<HistoricoItens> buscarUltimaCompra = dao.buscarUltimaCompra("05329222000761", "23814", 2020);
+//       System.out.println(buscarUltimaCompra.get(0).getDtDoc() +"|"+ buscarUltimaCompra.get(0).getCfop()
+//    		   +"|"+ buscarUltimaCompra.get(0).getCodItem() +"|"+ buscarUltimaCompra.get(0).getVlUnit());
+	    
+//       List<HistoricoItens> buscarUltimaTrans = dao.buscarUltimaTransferencia("05329222000761", "23814", 2020);
+//       System.out.println(buscarUltimaTrans.get(0).getDtDoc() +"|"+ buscarUltimaTrans.get(0).getCfop()
+//    		   +"|"+ buscarUltimaTrans.get(0).getCodItem() +"|"+ buscarUltimaTrans.get(0).getVlUnit()); 
+       
+       
+       
+       
+	    
+//		String dirPlanHistItem   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("fichas_estoques").concat("\\");
+//		String dirListaProds                     = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("ListaCodItem2.csv");
+//	    
+//		
+//		
+//		System.out.println(dirListaProds);
 	
 	}
 

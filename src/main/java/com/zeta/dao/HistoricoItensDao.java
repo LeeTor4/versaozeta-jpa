@@ -58,5 +58,27 @@ public class HistoricoItensDao {
 		return query.getResultList();
 	}
 	
+	public List<HistoricoItens> buscarUltimaCompra(String cnpj, String codigo, int ano) {
+		String jpql = "SELECT h FROM HistoricoItens h WHERE h.empresa = :cnpj AND h.codItem IN(:codigo,:codigo) and h.cfop in ('1102','1403','2102','2403') AND YEAR(h.dtDoc) < :ano ORDER BY h.dtDoc DESC";
 	
+		TypedQuery<HistoricoItens>  query = em.createQuery(jpql,HistoricoItens.class);
+		query.setParameter("cnpj", cnpj);
+		query.setParameter("codigo", codigo);
+		query.setParameter("ano", ano);
+		
+		return query.getResultList();
+	
+	}
+	
+	public List<HistoricoItens> buscarUltimaTransferencia(String cnpj, String codigo, int ano) {
+		String jpql = "SELECT h FROM HistoricoItens h WHERE h.empresa = :cnpj AND h.codItem IN(:codigo,:codigo) and h.cfop in ('1152','1409') AND YEAR(h.dtDoc) < :ano ORDER BY h.dtDoc DESC";
+	
+		TypedQuery<HistoricoItens>  query = em.createQuery(jpql,HistoricoItens.class);
+		query.setParameter("cnpj", cnpj);
+		query.setParameter("codigo", codigo);
+		query.setParameter("ano", ano);
+		
+		return query.getResultList();
+	
+	}
 }

@@ -20,7 +20,7 @@ import com.zeta.model.ItensInventario;
 import com.zeta.model.PlanilhaHistoricoItem;
 import com.zeta.util.UtilsEConverters;
 
-public class ExportaHisoricoItem {
+public class ExportaHistoricoItem {
 
 	private InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
 	
@@ -293,6 +293,8 @@ public class ExportaHisoricoItem {
 		    	}
 		    }
 	   }
+	   
+	   
 	public class ListaDeProdutosParaHistLote {
 		
 		private String codigo;

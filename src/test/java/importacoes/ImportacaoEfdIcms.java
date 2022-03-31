@@ -11,7 +11,7 @@ import com.zeta.dao.MetadadosDB;
 import com.zeta.dao.ParticipanteDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
-import com.zeta.handler.ExportaHisoricoItem;
+import com.zeta.handler.ExportaHistoricoItem;
 import com.zeta.handler.ExportaQuantitativoEstoque;
 import com.zeta.handler.ExportaTotalizadorFinanceiroAnual;
 import com.zeta.handler.ExportaQuantitativoEstoque;
@@ -31,10 +31,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano = "2019";
+		String ano = "2021";
 		String emp = "SELLENE";
-		String estab = "MEGAFARMA";
-		String cnpj  = "05329222000680";
+		String estab = "SAO_MATEUS";
+		String cnpj  = "05329222000761";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -150,16 +150,16 @@ public class ImportacaoEfdIcms {
 			
 			ExportaQuantitativoEstoque exp           = new ExportaQuantitativoEstoque();
 			ExportaTotalizadorFinanceiroAnual expFin = new ExportaTotalizadorFinanceiroAnual();
-			ExportaHisoricoItem expHist              = new ExportaHisoricoItem();
+			ExportaHistoricoItem expHist              = new ExportaHistoricoItem();
 			String dirPlanilha                       = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 			String dirPlanilhaFin                    = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_FINANCEIRO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 			String dirPlanHistItem                   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("fichas_estoques").concat("\\");
 			String dirListaProds                     = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("ListaCodItem2.csv");
-			//exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
 			//expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 4L);
 			
 		    //expHist.exportarHistoricoItem(dirPlanHistItem, ano, cnpj, "21422",1L,6L);
-		      expHist.exportarHistoricoItensComLista(dirListaProds, dirPlanHistItem,  ano, cnpj, 1L, 6L);
+		    //expHist.exportarHistoricoItensComLista(dirListaProds, dirPlanHistItem,  ano, cnpj, 1L, 6L);
 			
 			
 			
