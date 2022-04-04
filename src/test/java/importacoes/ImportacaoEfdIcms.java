@@ -13,6 +13,7 @@ import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
 import com.zeta.handler.ExportaHistoricoItem;
 import com.zeta.handler.ExportaQuantitativoEstoque;
+import com.zeta.handler.ExportaRelacaoInventario;
 import com.zeta.handler.ExportaTotalizadorFinanceiroAnual;
 import com.zeta.handler.ExportaQuantitativoEstoque;
 import com.zeta.handler.ImportaEfdIcms;
@@ -31,10 +32,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano = "2021";
+		String ano = "2017";
 		String emp = "SELLENE";
-		String estab = "SAO_MATEUS";
-		String cnpj  = "05329222000761";
+		String estab = "MEGAFARMA";
+		String cnpj  = "05329222000680";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -89,8 +90,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p1;
-		Path x = xP1;
+	    Path p = p12;
+		Path x = xP12;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -148,21 +149,29 @@ public class ImportacaoEfdIcms {
 			//Verificar as emissões próprias no arquivei das entradas
 			//cruzamentos.cruzamentosNotasSpedFiscalComXMLTerceiros(x.toString(), leitor);
 			
-			ExportaQuantitativoEstoque exp           = new ExportaQuantitativoEstoque();
-			ExportaTotalizadorFinanceiroAnual expFin = new ExportaTotalizadorFinanceiroAnual();
+			ExportaQuantitativoEstoque exp            = new ExportaQuantitativoEstoque();
+			ExportaTotalizadorFinanceiroAnual expFin  = new ExportaTotalizadorFinanceiroAnual();
 			ExportaHistoricoItem expHist              = new ExportaHistoricoItem();
-			String dirPlanilha                       = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
-			String dirPlanilhaFin                    = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_FINANCEIRO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
-			String dirPlanHistItem                   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("fichas_estoques").concat("\\");
-			String dirListaProds                     = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("ListaCodItem2.csv");
-			exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			ExportaRelacaoInventario  expRelInv       = new ExportaRelacaoInventario();
+			String dirPlanilha                        = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_ESTOQUE_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+			String dirPlanilhaFin                     = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\CONTROLE_FINANCEIRO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+			String dirPlanHistItem                    = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("fichas_estoques").concat("\\");
+			String dirListaProds                      = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("ListaCodItem2.csv");
+			
+			
+			
+			String dirSaldInvIni                      = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("INV_INI_2017.csv");
+			
+			String dirPlanInv                         = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\INVENTARIO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+			
+			//exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
 			//expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 4L);
 			
 		    //expHist.exportarHistoricoItem(dirPlanHistItem, ano, cnpj, "21422",1L,6L);
 		    //expHist.exportarHistoricoItensComLista(dirListaProds, dirPlanHistItem,  ano, cnpj, 1L, 6L);
 			
 			
-			
+			expRelInv.exportRelacaoInventario(dirSaldInvIni, dirPlanInv, cnpj, ano);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {

@@ -8,6 +8,8 @@ import com.zeta.dao.HistoricoItensDao;
 import com.zeta.dao.InventarioDeclaradoDao;
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
+import com.zeta.handler.ExportaRelacaoInventario;
+import com.zeta.handler.ExportaRelacaoInventario.SaldoInicialControleEstoque;
 import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.ItemTotalizadoPorLote;
@@ -103,16 +105,27 @@ public class LeituraSaldos {
 	    
 	    
 	    //"05329222000761", "23814", 2020
-//	   List<HistoricoItens> buscarUltimaCompra = dao.buscarUltimaCompra("05329222000761", "23814", 2020);
+//	   List<HistoricoItens> buscarUltimaCompra = dao.buscarUltimaCompra("05329222000680", "5518", 2017);
 //       System.out.println(buscarUltimaCompra.get(0).getDtDoc() +"|"+ buscarUltimaCompra.get(0).getCfop()
 //    		   +"|"+ buscarUltimaCompra.get(0).getCodItem() +"|"+ buscarUltimaCompra.get(0).getVlUnit());
 	    
-//       List<HistoricoItens> buscarUltimaTrans = dao.buscarUltimaTransferencia("05329222000761", "23814", 2020);
+//       List<HistoricoItens> buscarUltimaTrans = dao.buscarUltimaTransferencia("05329222000680", "24512", 2017);
 //       System.out.println(buscarUltimaTrans.get(0).getDtDoc() +"|"+ buscarUltimaTrans.get(0).getCfop()
 //    		   +"|"+ buscarUltimaTrans.get(0).getCodItem() +"|"+ buscarUltimaTrans.get(0).getVlUnit()); 
        
        
+        //dao.buscarUltimaTransferencia("05329222000680", "24512", 2017).getDescricao();
+	    if(dao.buscarUltimaCompra("05329222000680", "30786", 2017) != null){
+	    	 System.out.println( dao.buscarUltimaCompra("05329222000680", "30786", 2017).getCodItem() +"|"+
+	         		dao.buscarUltimaCompra("05329222000680", "30786", 2017).getDescricao());
+	    }else if(dao.buscarUltimaTransferencia("05329222000680", "30786", 2017) != null){
+	        System.out.println( dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getCodItem() +"|"+
+    		dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getDescricao());
+	    }
        
+        
+//        System.out.println( dao.buscarUltimaTransferencia("05329222000680", "24512", 2017).getCodItem() +"|"+
+//        		dao.buscarUltimaTransferencia("05329222000680", "24512", 2017).getDescricao());
        
 	    
 //		String dirPlanHistItem   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("fichas_estoques").concat("\\");
@@ -121,6 +134,18 @@ public class LeituraSaldos {
 //		
 //		
 //		System.out.println(dirListaProds);
+		
+		
+//		ExportaRelacaoInventario relInv = new ExportaRelacaoInventario();
+//		String dirListaProds  = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("MEGAFARMA").concat("\\").concat("INV_INI_2017.csv");
+//		List<SaldoInicialControleEstoque> importaListaProdutos = relInv.importaListaProdutos(dirListaProds);
+//		
+//	    for(SaldoInicialControleEstoque inv : importaListaProdutos){
+//	    	if( inv.getQtdeInicial() > 0) {
+//	    		System.out.println(inv.getAno() +"|" + inv.getCodItem()+"|" + inv.getQtdeInicial());
+//	    	}
+//	    	
+//	    }
 	
 	}
 
