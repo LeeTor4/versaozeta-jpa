@@ -414,7 +414,10 @@ public class ImportaEfdIcms {
 				&& UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()).getDayOfMonth() < uDia) {
 			Double desc;
 			Double vlItem = 0.0;
+			
 			for (Produtos p : doc.getProds()) {
+				
+				
 				if (insereNotasProprias(leitor, p, doc).getChaveDoc() != null) {
 					retorno.add(insereNotasProprias(leitor, p, doc));
 				}
