@@ -437,17 +437,27 @@ public class ImportaEfdIcms {
 					vlItem = Double.valueOf(p.getVlProduto()) - desc;
 							
 				}
-				//itensTotalizados.add(totalizador);
-				if((p.getCfop().startsWith("5") && !p.getCfop().equals("5929")) || (p.getCfop().startsWith("6") && !p.getCfop().equals("6929"))){
-										
-						itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
-								vlItem));
 				
-				}else if((p.getCfop().startsWith("1") && !p.getCfop().equals("1556")
-						&& !p.getCfop().equals("1551")) || (p.getCfop().startsWith("2") && !p.getCfop().equals("2556") && !p.getCfop().equals("2551"))){
-						itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
-								vlItem));
+				if(insereNotasProprias(leitor, p, doc).getCodSitDoc() != null) {
+					//Somente notas com a situação de documento regular
+					if(insereNotasProprias(leitor, p, doc).getCodSitDoc().equals("00")) {
+						
+						//itensTotalizados.add(totalizador);
+						if((p.getCfop().startsWith("5") && !p.getCfop().equals("5929")) || (p.getCfop().startsWith("6") && !p.getCfop().equals("6929"))){
+												
+								itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
+										vlItem));
+						
+						}else if((p.getCfop().startsWith("1") && !p.getCfop().equals("1556")
+								&& !p.getCfop().equals("1551")) || (p.getCfop().startsWith("2") && !p.getCfop().equals("2556") && !p.getCfop().equals("2551"))){
+								itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
+										vlItem));
+						}
+					}
+					
 				}
+
+
 				
 			}
 

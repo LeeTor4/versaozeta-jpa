@@ -54,27 +54,27 @@ public class LeituraSaldos {
 		
 		
 		
-//		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
-//
-//	    Map<String, List<ItemTotalizadoPorLote>> collect = dao.listaTodos().stream()
-//				.filter(cgc -> cgc.getCnpj().equals("05329222000761"))
-//				.filter(year -> year.getAno().equals("2017"))
-//				.filter(oper -> oper.getOperacao().equals("E"))
-//				.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
-//	
-//	
-//	    
-//	    Double qtdeEnt1  = 0.0;
-//		Double vlTotEnt1 = 0.0;
-//	    Double vlUnitEnt = 0.0;  
-//	    for(ItemTotalizadoPorLote cod : collect.get("5805")){	    	
-//	    	qtdeEnt1  += cod.getVlTotQtde();
-//	    	vlTotEnt1 += cod.getVlTotItem();			 
-//	    }
-//	    vlUnitEnt = (vlTotEnt1/qtdeEnt1);
-//	    System.out.println("5805" + "|" + qtdeEnt1 + "|" + vlUnitEnt + "|" + vlTotEnt1);
-//		int cont = 0;
-//		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+
+	    Map<String, List<ItemTotalizadoPorLote>> collect = dao.listaTodos().stream()
+				.filter(cgc -> cgc.getCnpj().equals("05329222000176"))
+				.filter(year -> year.getAno().equals("2015"))
+				.filter(oper -> oper.getOperacao().equals("S"))
+				.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+	
+	
+	    
+	    Double qtdeEnt1  = 0.0;
+		Double vlTotEnt1 = 0.0;
+	    Double vlUnitEnt = 0.0;  
+	    for(ItemTotalizadoPorLote cod : collect.get("5943")){	    	
+	    	qtdeEnt1  += cod.getVlTotQtde();
+	    	vlTotEnt1 += cod.getVlTotItem();			 
+	    }
+	    vlUnitEnt = (vlTotEnt1/qtdeEnt1);
+	    System.out.println("5943" + "|" + qtdeEnt1 + "|" + vlUnitEnt + "|" + vlTotEnt1);
+		int cont = 0;
+		
 //		List<ItemTotalizadoPorLote> listaProdutos = dao.buscarListaItensPorAno("2019","05329222000761");
 //		for (ItemTotalizadoPorLote lista : listaProdutos) {
 //			cont++;
@@ -97,7 +97,7 @@ public class LeituraSaldos {
 //		}
 		
 		
-	    HistoricoItensDao dao = new HistoricoItensDao();
+//	    HistoricoItensDao dao = new HistoricoItensDao();
 //	    List<HistoricoItens> lista = dao.buscaHisItemPorCnpjCodigoAno("05329222000680", "8790", 2017);
 //	    for(HistoricoItens h : lista){
 //	    	System.out.println(h.getChaveDoc() + "|" + h.getCfop());
@@ -115,13 +115,13 @@ public class LeituraSaldos {
        
        
         //dao.buscarUltimaTransferencia("05329222000680", "24512", 2017).getDescricao();
-	    if(dao.buscarUltimaCompra("05329222000680", "30786", 2017) != null){
-	    	 System.out.println( dao.buscarUltimaCompra("05329222000680", "30786", 2017).getCodItem() +"|"+
-	         		dao.buscarUltimaCompra("05329222000680", "30786", 2017).getDescricao());
-	    }else if(dao.buscarUltimaTransferencia("05329222000680", "30786", 2017) != null){
-	        System.out.println( dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getCodItem() +"|"+
-    		dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getDescricao());
-	    }
+//	    if(dao.buscarUltimaCompra("05329222000680", "30786", 2017) != null){
+//	    	 System.out.println( dao.buscarUltimaCompra("05329222000680", "30786", 2017).getCodItem() +"|"+
+//	         		dao.buscarUltimaCompra("05329222000680", "30786", 2017).getDescricao());
+//	    }else if(dao.buscarUltimaTransferencia("05329222000680", "30786", 2017) != null){
+//	        System.out.println( dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getCodItem() +"|"+
+//    		dao.buscarUltimaTransferencia("05329222000680", "30786", 2017).getDescricao());
+//	    }
        
         
 //        System.out.println( dao.buscarUltimaTransferencia("05329222000680", "24512", 2017).getCodItem() +"|"+

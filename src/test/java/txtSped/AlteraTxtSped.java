@@ -50,7 +50,7 @@ public class AlteraTxtSped {
     	String retorno = "";
     	for (int i = 0; i < lines.size(); i++) {
     		
-    		if (lines.get(i).contains(num)) {
+    		if (lines.get(i).contains(num.concat("|"))) {
     			
 				String[] campos = lines.get(i).split("\\|");
 
@@ -79,7 +79,9 @@ public class AlteraTxtSped {
 		String cnpj  = "05329222000176";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
+		String anomesV1  = ano.concat("01_V2").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
+		String anomesV2  = ano.concat("02_V2").concat(".txt");
 		String anomes3  = ano.concat("03").concat(".txt");
 		String anomesV3  = ano.concat("03_V2").concat(".txt");
 		String anomes4  = ano.concat("04").concat(".txt");
@@ -102,7 +104,9 @@ public class AlteraTxtSped {
 		String anomesV12 = ano.concat("12_V2").concat(".txt");
 		
 	    Path p1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes1));
+	    Path pV1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV1));
 	    Path p2 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes2));
+	    Path pV2 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV2));
 	    Path p3 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes3));
 	    Path pV3 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV3));
 	    Path p4 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes4));
@@ -165,25 +169,30 @@ public class AlteraTxtSped {
 //	   Files.write(p2, novasLinhas, StandardOpenOption.CREATE);
 
       
-       
+      
 		for (int i = 0; i < lines.size(); i++) {
 			novasLinhas.add(lines.get(i));
 			if (lines.get(i).contains("|00|001|")) {
 
 				String[] campoC100 = lines.get(i).split("\\|");
-
+				 String numDoc = "";
 				for (int c = 0; c < campoC100.length; c++) {
-
+					
+					if(c == 8) {
+						numDoc = campoC100[c];
+						
+					}
 					if (c == 9) {
+	
 						if (getNumeroChaves(csv.toString())
-								.get("|00|001|".concat(campoC100[c].substring(30, 34))) != null) {
-							// System.out.println(getNumeroChaves(p3.toString()).get("|00|001|".concat(campoC100[c].substring(30,34))).getChave());
-							// campoC100[c] =
-							// getNumeroChaves(p3.toString()).get("|00|001|".concat(campoC100[c].substring(30,34))).getChave();
+								.get("|00|001|".concat(numDoc)) != null) {
+//							 System.out.println(getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());
+//							 campoC100[c] =
+//							 getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave();
                            
 
-						    System.out.println(getLinha(lines, "|00|001|".concat(campoC100[c].substring(30,34)), getNumeroChaves(csv.toString()).get("|00|001|".concat(campoC100[c].substring(30,34))).getChave()));
-						    String novoConteudo = getLinha(lines, "|00|001|".concat(campoC100[c].substring(30,34)), getNumeroChaves(csv.toString()).get("|00|001|".concat(campoC100[c].substring(30,34))).getChave());	
+						    System.out.println(getLinha(lines, "|00|001|".concat(numDoc), getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave()));
+						    String novoConteudo = getLinha(lines, "|00|001|".concat(numDoc), getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());	
 						    novasLinhas.remove(i);
 						    novasLinhas.add(i, novoConteudo);
 						}

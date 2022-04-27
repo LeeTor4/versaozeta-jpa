@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,6 +93,306 @@ public class ExportaTotalizadorFinanceiroAnual {
 	
 	
 	
+	public static List<FichaFinanceiroPorItens> leituraTotalizadorFinanceiro(Path path) {
+		List<FichaFinanceiroPorItens> retorno = new ArrayList<FichaFinanceiroPorItens>();
+		try {
+			List<String> lines = Files.readAllLines(path, StandardCharsets.ISO_8859_1).stream().skip(1).collect(Collectors.toList());
+           
+			for (int i = 0; i < lines.size(); i++) {
+				
+				String[] campos = lines.get(i).split("\\;");
+				FichaFinanceiroPorItens obj = new FichaFinanceiroPorItens();
+				for (int c = 0; c < campos.length; c++) {					
+					
+					if (c == 0) {						
+						obj.setCodItem(campos[c]);
+					}
+					if (c == 1) {						
+						obj.setCodAntItem(campos[c]);
+					}
+					if (c == 2) {	
+						obj.setDescricao(campos[c]);
+					}
+					if (c == 3) {	
+						obj.setUnd(campos[c]);
+					}
+					if (c == 4) {	
+						obj.setStatus(campos[c]);
+					}
+					if (c == 5) {
+						if(!campos[c].isEmpty()) {
+							obj.setQtdeEi(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 6) {
+						if(!campos[c].isEmpty()) {
+							obj.setVrUnitEi(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 7) {
+						if(!campos[c].isEmpty()) {
+							obj.setVrItemEi(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					
+					
+					if (c == 9) {
+						if(!campos[c].isEmpty()) {
+							obj.setQtdeEnt(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 10) {
+						if(!campos[c].isEmpty()) {
+							obj.setVlUnitEnt(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 11) {
+						if(!campos[c].isEmpty()) {
+							obj.setVlItemEnt(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					
+					if (c == 13) {
+						if(!campos[c].isEmpty()) {
+							obj.setQtdeSai(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 14) {
+						if(!campos[c].isEmpty()) {
+							obj.setVlUnitSai(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 15) {
+						if(!campos[c].isEmpty()) {
+							obj.setVlItemSai(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					
+					
+					if (c == 17) {
+						if(!campos[c].isEmpty()) {
+							obj.setQtdeEf(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 18) {
+						if(!campos[c].isEmpty()) {
+							obj.setVrUnitEf(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+					if (c == 19) {
+						if(!campos[c].isEmpty()) {
+							obj.setVrItemEf(Double.valueOf(campos[c].replace(",", ".")));
+						}
+					}
+				}
+				
+				retorno.add(obj);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	}
+	
+	public static FichaFinanceiroPorItens fichaTotalizada(Path path, String codItem, String codAntItem) {
+		FichaFinanceiroPorItens ficha = new FichaFinanceiroPorItens();
+		Double qtdeEi   = 0.0;
+		Double vrUnitEi = 0.0;
+		Double vrItemEi = 0.0;
+		
+
+		Double qtdeEnt   = 0.0;
+		Double vlUnitEnt = 0.0;
+		Double vlItemEnt = 0.0;
+		
+
+		Double qtdeSai   = 0.0;
+		Double vlUnitSai = 0.0;
+		Double vlItemSai = 0.0;
+		
+		Double qtdeEf   = 0.0;
+		Double vrUnitEf = 0.0;
+		Double vrItemEf = 0.0;
+		// c.getCodItem().equals("4800") || c.getCodItem().equals("1564")
+	   List<FichaFinanceiroPorItens> collect = leituraTotalizadorFinanceiro(path).stream()
+	             .filter(c -> c.getCodItem().equals(codItem) || c.getCodItem().equals(codAntItem))
+	             .collect(Collectors.toList());
+	   
+	   for(FichaFinanceiroPorItens l :   collect){
+	    	
+	    	qtdeEi    += l.getQtdeEi();
+	    	vrUnitEi  += l.getVrUnitEi();
+	    	vrItemEi  += l.getVrItemEi();
+	    	
+	    	qtdeEnt   += l.getQtdeEnt();
+			vlUnitEnt += l.getVlUnitEnt();
+			vlItemEnt += l.getVlItemEnt();
+			
+			
+			qtdeSai   += l.getQtdeSai();
+			vlUnitSai += l.getVlUnitSai();
+			vlItemSai += l.getVlItemSai();
+			
+			qtdeEf   += l.getQtdeEf();
+			vrUnitEf += l.getVrUnitEf();
+			vrItemEf += l.getVrItemEf();
+			
+	    }
+	   
+	    ficha.setQtdeEi(qtdeEi);
+	    ficha.setVrUnitEi(vrUnitEi);
+	    ficha.setVrItemEi(vrItemEi);
+
+	    ficha.setQtdeEnt(qtdeEnt);
+	    ficha.setVlUnitEnt(vlUnitEnt);
+	    ficha.setVlItemEnt(vlItemEnt);
+	    
+	    ficha.setQtdeSai(qtdeSai);
+	    ficha.setVlUnitSai(vlUnitSai);
+	    ficha.setVlItemSai(vlItemSai);
+	    
+	    ficha.setQtdeEf(qtdeEf);
+	    ficha.setVrUnitEf(vrUnitEf);
+	    ficha.setVrItemEf(vrItemEf);
+	   
+		return ficha;
+	}
+	
+	public List<String> linhasTotalizadorFinanceiro(Path path) {
+		List<String> lines = null;
+		try {
+			lines = Files.readAllLines(path, StandardCharsets.ISO_8859_1).stream().skip(1).collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return lines;
+	}
+	
+	public void exportaTotalizadorFinanceiroEstoqueDaPlanilha(String caminho,Path csv1) {
+		
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(caminho)));
+		
+		
+			String linha = " ";
+
+			linha = cabecalho();
+
+			writer.write(linha);
+			writer.newLine();
+		
+		    Map<String,String> mpLinhas = new HashMap<String,String>();
+			for(String s : linhasTotalizadorFinanceiro(csv1)) {
+				String cod = "";
+				String[] campo = s.split("\\;");
+				for(int i = 0; i < campo.length; i++){
+					if(i == 1) {
+						cod = campo[i];
+						mpLinhas.put(cod, s);
+					}
+				}
+				   
+			}
+			
+	        for(int i = 0 ; i < leituraTotalizadorFinanceiro(csv1).size(); i++){
+	        	FichaFinanceiroPorItens ficha = new FichaFinanceiroPorItens();
+
+	        	if (leituraTotalizadorFinanceiro(csv1).get(i).getStatus() != null) {
+	        		
+	        		if(leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("V")) {
+	        		
+	                    System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+	  				    
+	                    ficha.setQtdeEi(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEi());
+						ficha.setVrUnitEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEi());
+						ficha.setVrItemEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEi());
+						System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());	
+		        				
+		        				
+						ficha.setQtdeEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt());
+						ficha.setVlUnitEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitEnt());
+						ficha.setVlItemEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlItemEnt());		
+		        				
+		        	
+						ficha.setQtdeSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeSai());
+						ficha.setVlUnitSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
+						ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
+
+						ficha.setQtdeEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEf());
+						ficha.setVrUnitEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEf());
+						ficha.setVrItemEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEf());
+						System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());	
+		        	   
+						
+						ficha.setCodItem(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem());
+						ficha.setCodAntItem( leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+				        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
+				        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());	
+	        		}
+
+
+                         
+	        		
+	        	}else {
+	        		
+        		if(mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != null) {
+        		 
+					   if(!mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()).equals(leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem())) {
+
+						    System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+		  				    ficha.setQtdeEi(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(),"").getQtdeEi());
+							ficha.setVrUnitEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVrUnitEi());
+							ficha.setVrItemEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVrItemEi());
+							System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());	
+			        				
+			        				
+							ficha.setQtdeEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getQtdeEnt());
+							ficha.setVlUnitEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVlUnitEnt());
+							ficha.setVlItemEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVlItemEnt());		
+			        				
+			        	
+							ficha.setQtdeSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getQtdeSai());
+							ficha.setVlUnitSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVlUnitSai());
+							ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVlUnitSai());
+			        				
+							ficha.setQtdeEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getQtdeEf());
+							ficha.setVrUnitEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "").getVrUnitEf());
+							ficha.setVrItemEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(),"").getVrItemEf());
+							System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());	
+			        	    
+							
+							
+							ficha.setCodItem(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem());
+							ficha.setCodAntItem( leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+					        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
+					        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());
+					   }
+        		}
+
+        		
+
+	        	}
+	        	
+	        	    if(!formatacaoPlanilha(ficha).contains("null;")) {
+				        linha = formatacaoPlanilha(ficha);
+						
+						writer.write(linha);
+						writer.newLine();
+	        	    }
+	        	   
+
+	        	
+
+	        }
+	        writer.close();
+			System.out.println("Exportado com Sucesso!!!");
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		
+		
+	}
 	public void exportaTotalizadorFinanceiroEstoque(String caminho, int ano, String cnpj, Long idEmp, Long idEst) {
 
 		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
