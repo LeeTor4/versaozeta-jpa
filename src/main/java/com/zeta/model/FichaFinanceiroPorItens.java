@@ -7,8 +7,6 @@ public class FichaFinanceiroPorItens {
 	private String descricao;
 	private String und;
 	
-	private String status;
-	
 	private Double qtdeEi;
 	private Double vrUnitEi;
 	private Double vrItemEi;
@@ -51,12 +49,6 @@ public class FichaFinanceiroPorItens {
 	}
 	public void setUnd(String und) {
 		this.und = und;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
 	}
 	public Double getQtdeEi() {
 		return qtdeEi;

@@ -96,9 +96,7 @@ public class LeituraCadastroProdutoDePara {
 					if (c == 2) {	
 						obj.setDescricao(campos[c]);
 					}
-					if (c == 4) {	
-						obj.setStatus(campos[c]);
-					}
+
 					
 					if (c == 5) {
 						if(!campos[c].isEmpty()) {
@@ -295,57 +293,16 @@ public class LeituraCadastroProdutoDePara {
 					mpLinhas.put(cod, s);
 					//System.out.println(cod +" => "+ s);
 				}
-			}
-			   
-			  
+			}  
 		}
 		
-
-		
 		for (int i = 0; i < leituraTotalizadorFinanceiro(csv1).size(); i++) {
-
-			
-//				if (leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("V")) {
-//
-//					System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() + "|"
-//							+ leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() + "|"
-//							+ leituraTotalizadorFinanceiro(csv1).get(i).getDescricao() + "|"
-//							+ fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(),
-//									leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt()
-//							+ "|" + fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(),
-//									leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeSai());
-//				} else {
-//					
-//					if(mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != null) {
-//						
-//						   if(!mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()).equals(leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem())
-//								   && !leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("F")) {
-//							   
-//								System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() + "|"
-//								+ leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() + "|"
-//								+ leituraTotalizadorFinanceiro(csv1).get(i).getDescricao() + "|"
-//								+ fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "")
-//										.getQtdeEnt()
-//								+ "|" + fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "")
-//										.getQtdeSai());
-//						   }
-//					}
-//
-//					   
-//					   
-////						System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() + "|"
-////								+ leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() + "|"
-////								+ leituraTotalizadorFinanceiro(csv1).get(i).getDescricao() + "|"
-////								+ fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "")
-////										.getQtdeEnt()
-////								+ "|" + fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), "")
-////										.getQtdeSai());
-//				}
 		
-						System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() + "|"
-						+ leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() + "|"
-						+ leituraTotalizadorFinanceiro(csv1).get(i).getDescricao() + "|" +
-					    + leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEnt());	
+			if(mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) == null) {
+				
+				
+				 System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+			}
 		}
 	   
 	}
