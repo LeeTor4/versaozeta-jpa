@@ -96,6 +96,9 @@ public class LeituraCadastroProdutoDePara {
 					if (c == 2) {	
 						obj.setDescricao(campos[c]);
 					}
+					if (c == 4) {	
+						System.out.println(campos[c]);
+					}
 
 					
 					if (c == 5) {
@@ -298,11 +301,11 @@ public class LeituraCadastroProdutoDePara {
 		
 		for (int i = 0; i < leituraTotalizadorFinanceiro(csv1).size(); i++) {
 		
-			if(mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) == null) {
-				
-				
-				 System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
-			}
+//			if(mpLinhas.get(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) == null) {
+//				
+//				
+//				 System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+//			}
 		}
 	   
 	}

@@ -166,11 +166,11 @@ public class ImportacaoEfdIcms {
 			String dirPlanInv                         = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\INVENTARIO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 			
 			 //exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
-			 expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 1L);
+			 //expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 1L);
 			
 			
-			 //Path csv1  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("CONTROLE_FINANCEIRO_05329222000176_2015.csv"));
-			 //expFin.exportaTotalizadorFinanceiroEstoqueDaPlanilha(dirPlanilhaFinDePara, csv1);
+			 Path csv1  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("CONTROLE_FINANCEIRO_05329222000176_2015.csv"));
+			 expFin.exportaTotalizadorFinanceiroEstoqueDaPlanilha(dirPlanilhaFinDePara, csv1);
 			
 		    //expHist.exportarHistoricoItem(dirPlanHistItem, ano, cnpj, "1389",1L,1L);
 		    //expHist.exportarHistoricoItensComLista(dirListaProds, dirPlanHistItem,  ano, cnpj, 1L, 6L);

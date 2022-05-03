@@ -118,6 +118,9 @@ public class ExportaTotalizadorFinanceiroAnual {
 					if (c == 3) {	
 						obj.setUnd(campos[c]);
 					}
+					if (c == 4) {	
+						obj.setStatus(campos[c]);
+					}
 					if (c == 5) {
 						if(!campos[c].isEmpty()) {
 							obj.setQtdeEi(Double.valueOf(campos[c].replace(",", ".")));
@@ -326,48 +329,94 @@ public class ExportaTotalizadorFinanceiroAnual {
 	        	FichaFinanceiroPorItens ficha = new FichaFinanceiroPorItens();
 	        	     
 	        	     
+	        	if(leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("V")){
+	        		
+	       	         if( lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != true) {
+	    	        	 
+	//    	        	 System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
+	//    	        			 leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()+"|"+
+	//    		        	     lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()));
+	    	         
+	                     System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
+	                  		   leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() +"|"+
+	                  		   fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt());
+	   
+	                     
+					    	    //System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+					   
+		                    System.out.println(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEi());
+		                    ficha.setQtdeEi(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEi());                   
+		                    ficha.setVrUnitEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEi());
+							ficha.setVrItemEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEi());
+							System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());	
+			        				
+			        				
+							ficha.setQtdeEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt());
+							ficha.setVlUnitEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitEnt());
+							ficha.setVlItemEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlItemEnt());		
+			        				
+			        	
+							ficha.setQtdeSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeSai());
+							ficha.setVlUnitSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
+							ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
+	
+							ficha.setQtdeEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEf());
+							ficha.setVrUnitEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEf());
+							ficha.setVrItemEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEf());
+							System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());	
+			        	   
+							
+							ficha.setCodItem(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem());
+							ficha.setCodAntItem( leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+					        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
+					        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());
+	    	         
+	    	         }
+	       	         
+	       	         
+	        	}else if(!leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("FF")){
+	        		
+	        		 //if( lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != false) {}
+	        			 
+	                     System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
+		                  		   leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() +"|"+
+		                  		   leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEnt());
+		   
+		                     
+						    	    //System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+						   
+			                    System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEi());
+			                    ficha.setQtdeEi(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEi());                   
+			                    ficha.setVrUnitEi(leituraTotalizadorFinanceiro(csv1).get(i).getVrUnitEi());
+								ficha.setVrItemEi( leituraTotalizadorFinanceiro(csv1).get(i).getVrItemEi());
+								System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());	
+				        				
+				        				
+								ficha.setQtdeEnt(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEnt());
+								ficha.setVlUnitEnt(leituraTotalizadorFinanceiro(csv1).get(i).getVlUnitEnt());
+								ficha.setVlItemEnt(leituraTotalizadorFinanceiro(csv1).get(i).getVlItemEnt());		
+				        				
+				        	
+								ficha.setQtdeSai(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeSai());
+								ficha.setVlUnitSai(leituraTotalizadorFinanceiro(csv1).get(i).getVlUnitSai());
+								ficha.setVlItemSai(leituraTotalizadorFinanceiro(csv1).get(i).getVlUnitSai());
+		
+								ficha.setQtdeEf(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEf());
+								ficha.setVrUnitEf(leituraTotalizadorFinanceiro(csv1).get(i).getVrUnitEf());
+								ficha.setVrItemEf(leituraTotalizadorFinanceiro(csv1).get(i).getVrItemEf());
+								System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());	
+				        	   
+								
+								ficha.setCodItem(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem());
+								ficha.setCodAntItem( leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
+						        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
+						        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());
+	        		 
+
+	        	}
+	        	
   				   
-	        	         if( lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != true) {
-	        	        	 
-//	        	        	 System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
-//	        	        			 leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()+"|"+
-//	        		        	     lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()));
-	        	         
-	                         System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
-	                      		   leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() +"|"+
-	                      		   fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt());
-	       
-	                         
-	  				    	    //System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()+"|"+leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
-	    				   
-	    	                    System.out.println(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEi());
-	    	                    ficha.setQtdeEi(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEi());                   
-	    	                    ficha.setVrUnitEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEi());
-	    						ficha.setVrItemEi( fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEi());
-	    						System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());	
-	    		        				
-	    		        				
-	    						ficha.setQtdeEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEnt());
-	    						ficha.setVlUnitEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitEnt());
-	    						ficha.setVlItemEnt(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlItemEnt());		
-	    		        				
-	    		        	
-	    						ficha.setQtdeSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeSai());
-	    						ficha.setVlUnitSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
-	    						ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
-	  
-	    						ficha.setQtdeEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEf());
-	    						ficha.setVrUnitEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEf());
-	    						ficha.setVrItemEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrItemEf());
-	    						System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());	
-	    		        	   
-	    						
-	    						ficha.setCodItem(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem());
-	    						ficha.setCodAntItem( leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem());
-	    				        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
-	    				        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());
-	        	         
-	        	         }
+
 	        	
 	        	
 	        	
