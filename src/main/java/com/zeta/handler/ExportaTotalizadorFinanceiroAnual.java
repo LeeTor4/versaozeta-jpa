@@ -313,10 +313,14 @@ public class ExportaTotalizadorFinanceiroAnual {
 			}
 			
 		    List<String> lsLinhas = new ArrayList<String>();
+		    List<String> lsLinhasFF = new ArrayList<String>();
 			for(String s : linhasTotalizadorFinanceiro(csv1)) {
 				String cod = "";
 				String[] campo = s.split("\\;");
 				for(int i = 0; i < campo.length; i++){
+					if(i == 0) {
+						lsLinhasFF.add(campo[i]);
+					}
 					if(i == 1) {
 						cod = campo[i];
 						lsLinhas.add(campo[i]);
@@ -358,7 +362,7 @@ public class ExportaTotalizadorFinanceiroAnual {
 			        	
 							ficha.setQtdeSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeSai());
 							ficha.setVlUnitSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
-							ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlUnitSai());
+							ficha.setVlItemSai(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVlItemSai());
 	
 							ficha.setQtdeEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getQtdeEf());
 							ficha.setVrUnitEf(fichaTotalizada(csv1, leituraTotalizadorFinanceiro(csv1).get(i).getCodItem(), leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()).getVrUnitEf());
@@ -376,7 +380,7 @@ public class ExportaTotalizadorFinanceiroAnual {
 	       	         
 	        	}else if(!leituraTotalizadorFinanceiro(csv1).get(i).getStatus().equals("FF")){
 	        		
-	        		 //if( lsLinhas.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem()) != false) {}
+	        		// if(lsLinhasFF.contains(leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem()) != true) {}
 	        			 
 	                     System.out.println(leituraTotalizadorFinanceiro(csv1).get(i).getCodItem() +"|"+
 		                  		   leituraTotalizadorFinanceiro(csv1).get(i).getCodAntItem() +"|"+
@@ -399,7 +403,7 @@ public class ExportaTotalizadorFinanceiroAnual {
 				        	
 								ficha.setQtdeSai(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeSai());
 								ficha.setVlUnitSai(leituraTotalizadorFinanceiro(csv1).get(i).getVlUnitSai());
-								ficha.setVlItemSai(leituraTotalizadorFinanceiro(csv1).get(i).getVlUnitSai());
+								ficha.setVlItemSai(leituraTotalizadorFinanceiro(csv1).get(i).getVlItemSai());
 		
 								ficha.setQtdeEf(leituraTotalizadorFinanceiro(csv1).get(i).getQtdeEf());
 								ficha.setVrUnitEf(leituraTotalizadorFinanceiro(csv1).get(i).getVrUnitEf());
@@ -412,15 +416,9 @@ public class ExportaTotalizadorFinanceiroAnual {
 						        ficha.setDescricao( leituraTotalizadorFinanceiro(csv1).get(i).getDescricao());
 						        ficha.setUnd(leituraTotalizadorFinanceiro(csv1).get(i).getUnd());
 	        		 
-
+	        		 
 	        	}
 	        	
-  				   
-
-	        	
-	        	
-	        	
-	
 
 	        	    if(!formatacaoPlanilha(ficha).contains("null;")) {
 				        linha = formatacaoPlanilha(ficha);

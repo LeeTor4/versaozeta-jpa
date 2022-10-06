@@ -22,7 +22,7 @@ public class ItemTotalizadoPorLote {
 	private String         ano;
 	private String         mes;
 	private String    operacao;
-	private int    frequencia;
+	private int     frequencia;
 	private String     codItem;
 	private Double   vlTotQtde;
 	private Double   vlTotItem;

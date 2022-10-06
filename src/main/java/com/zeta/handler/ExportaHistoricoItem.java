@@ -68,7 +68,9 @@ public class ExportaHistoricoItem {
 				 hist.setData(dtInventario(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codItem).getIdPai(), 
 						 ano, idEmp, idEst));	
 				 hist.setOperacao("INV");
-			     qtdeSaldo  = listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codItem).getQtde();
+			     
+				 qtdeSaldo  = listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codItem).getQtde();
+			    
 			     hist.setSaldoQtd(qtdeSaldo);
 			     hist.setSaldoVrUnit(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codItem).getVlUnit());
 			     hist.setSaldoVrTotal(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codItem).getVlItem());
@@ -125,7 +127,7 @@ public class ExportaHistoricoItem {
 				         writer.write(linha);
 				         writer.newLine(); 
 					}
-				 }
+			}
 
 			//SELECT * FROM tb_historico_item WHERE empresa = '05329222000680' AND codItem IN('8790','') AND YEAR(dtDoc)= '2017' ORDER BY dtDoc,codItem,operacao;
 			writer.close();	

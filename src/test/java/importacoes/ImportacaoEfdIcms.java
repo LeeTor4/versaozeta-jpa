@@ -32,10 +32,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano = "2015";
+		String ano = "2021";
 		String emp = "SELLENE";
-		String estab = "MATRIZ";
-		String cnpj  = "05329222000176";
+		String estab = "MEGADIET";
+		String cnpj  = "05329222000419";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -90,8 +90,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p12;
-		Path x = xP12;
+	    Path p = p3;
+		Path x = xP3;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -109,39 +109,47 @@ public class ImportacaoEfdIcms {
 				0L,0L,0L,
 				0L, 0L );
 		try {
-//			LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
-//			ParticipanteDao daoPart = new ParticipanteDao();
-//			ProdutoDao daoProd = new ProdutoDao();
-//			ImportaEfdIcms importa = new ImportaEfdIcms();	
-//			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 1L);
-//				
-//			List<Participante> participantes = importa.getParticipantes(leitor,1L, 1L);
-//			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 1L);
-//			produtosSped.addAll(importa.getProdutos());
-//			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
-//				if(!loteDao.listaTodos().contains(loteImportacao)){			
-//					for(Participante part : participantes){
-//						if(!daoPart.listaTodos().contains(part)) {
-//							daoPart.adiciona(part);
-//						}
-//					}
-//					for(Produto prod :  collectProdutos){					
-//						if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
-//							 daoProd.adiciona(prod);
-//							 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
-//						}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
-//								&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
-//							
-//							Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
-//					    	daoProd.remove(buscaPorCodigo);
-//					    	daoProd.atualiza(prod);
-//					    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
-//						}
-//					}
-//					loteDao.adiciona(loteImportacao);	
-//			}else {
-//				System.out.println("Lote já importado!!!");
-//			}
+			
+			
+			LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
+			ParticipanteDao daoPart = new ParticipanteDao();
+			ProdutoDao daoProd = new ProdutoDao();
+			ImportaEfdIcms importa = new ImportaEfdIcms();	
+			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
+				
+			List<Participante> participantes = importa.getParticipantes(leitor,1L, 2L);
+			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 2L);
+			produtosSped.addAll(importa.getProdutos());
+			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
+				if(!loteDao.listaTodos().contains(loteImportacao)){			
+					for(Participante part : participantes){
+						if(!daoPart.listaTodos().contains(part)) {
+							daoPart.adiciona(part);
+						}
+					}
+					for(Produto prod :  collectProdutos){					
+						if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
+							 daoProd.adiciona(prod);
+							 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
+						}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
+								&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
+							
+							Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
+					    	daoProd.remove(buscaPorCodigo);
+					    	daoProd.atualiza(prod);
+					    	System.out.println("Alterando o produto -> " + prod.getCodUtilizEstab());
+						}
+					}
+					loteDao.adiciona(loteImportacao);	
+			}else {
+				System.out.println("Lote já importado!!!");
+			}
+				
+				
+				
+				
+				
+				
 
 //			CruzamentoNotasSpedsComXMLs cruzamentos = new CruzamentoNotasSpedsComXMLs();
 //			cruzamentos.cruzamentosNotasSpedFiscalComXMLProprios(x.toString(), leitor);
@@ -165,14 +173,14 @@ public class ImportacaoEfdIcms {
 			
 			String dirPlanInv                         = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\INVENTARIO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 			
-			 //exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
-			 //expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 1L);
+			//exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+			//expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 1L);
 			
 			
-			 Path csv1  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("CONTROLE_FINANCEIRO_05329222000176_2015.csv"));
-			 expFin.exportaTotalizadorFinanceiroEstoqueDaPlanilha(dirPlanilhaFinDePara, csv1);
+			//Path csv1  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\").concat("CONTROLE_FINANCEIRO_05329222000176_2015.csv"));
+			//expFin.exportaTotalizadorFinanceiroEstoqueDaPlanilha(dirPlanilhaFinDePara, csv1);
 			
-		    //expHist.exportarHistoricoItem(dirPlanHistItem, ano, cnpj, "1389",1L,1L);
+		    //expHist.exportarHistoricoItem(dirPlanHistItem, ano, cnpj, "22293",1L,1L);
 		    //expHist.exportarHistoricoItensComLista(dirListaProds, dirPlanHistItem,  ano, cnpj, 1L, 6L);
 			
 			
