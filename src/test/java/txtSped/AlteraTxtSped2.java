@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 import org.apache.commons.collections4.map.HashedMap;
 
-public class AlteraTxtSped {
+public class AlteraTxtSped2 {
 
     public static Map<String,NumeroChave> getNumeroChaves(String p3) throws FileNotFoundException{
     
@@ -35,7 +35,7 @@ public class AlteraTxtSped {
 				    	obj.setChave(valoresEntreVirgula[0]);
 				    }
 				    if(i==1) {
-				    	obj.setNumero("|00|001|".concat(valoresEntreVirgula[1]));
+				    	obj.setNumero(valoresEntreVirgula[1]);
 				    }
 				   
 				   
@@ -46,7 +46,7 @@ public class AlteraTxtSped {
     	return retorno;
     }
     
-    public static String getLinha( List<String> lines,String num, String chave) {
+    public static String getLinha( List<String> lines,String modDoc,String num, String chave) {
     	String retorno = "";
     	for (int i = 0; i < lines.size(); i++) {
     		
@@ -55,7 +55,9 @@ public class AlteraTxtSped {
 				String[] campos = lines.get(i).split("\\|");
 
 				for (int z = 0; z < campos.length; z++) {
-
+					if (z == 5) {
+						campos[z] = modDoc;
+					}
 					if (z == 9) {
 						campos[z] = chave;
 					}
@@ -71,10 +73,10 @@ public class AlteraTxtSped {
     
 	public static void main(String[] args) throws Exception {
 		
-		String ano = "2015";
+		String ano = "2017";
 		String emp = "SELLENE";
-		String estab = "MATRIZ";
-		String cnpj  = "05329222000176";
+		String estab = "MEGADIET";
+		String cnpj  = "05329222000419";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1  = ano.concat("01_V2").concat(".txt");
@@ -99,7 +101,7 @@ public class AlteraTxtSped {
 		String anomes11 = ano.concat("11").concat(".txt");
 		String anomesV11 = ano.concat("11_V2").concat(".txt");
 		String anomes12 = ano.concat("12").concat(".txt");
-		String anomesV12 = ano.concat("12_V3").concat(".txt");
+		String anomesV12 = ano.concat("12_V2").concat(".txt");
 		
 	    Path p1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes1));
 	    Path pV1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV1));
@@ -126,10 +128,10 @@ public class AlteraTxtSped {
 	    Path p12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes12));
 	    Path pV12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV12));
 	    
-	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Matriz_201512_serie2.csv"));
-	    Path dest = pV12;
+	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Megadiet_201702.csv"));
+	    Path dest = pV2;
 	    List<String> novasLinhas =  new ArrayList<String>();   
-	    List<String> lines = Files.readAllLines(p12, StandardCharsets.ISO_8859_1);
+	    List<String> lines = Files.readAllLines(p2, StandardCharsets.ISO_8859_1);
 	    String linha = "";
 	    String chave = "";
 //	   for(int i=0; i < lines.size(); i++) {		  
@@ -170,7 +172,7 @@ public class AlteraTxtSped {
       
 		for (int i = 0; i < lines.size(); i++) {
 			novasLinhas.add(lines.get(i));
-			if (lines.get(i).contains("|00|001|")) {
+			if (lines.get(i).contains("|01|00|2|")) {
 
 				String[] campoC100 = lines.get(i).split("\\|");
 				String numDoc = "";
@@ -183,16 +185,16 @@ public class AlteraTxtSped {
 					if (c == 9) {
 	
 						if (getNumeroChaves(csv.toString())
-								.get("|00|001|".concat(numDoc)) != null) {
+								.get(numDoc) != null) {
 //							 System.out.println(getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());
 //							 campoC100[c] =
 //							 getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave();
                            
 
-						    System.out.println(getLinha(lines, "|00|001|".concat(numDoc), getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave()));
-						    String novoConteudo = getLinha(lines, numDoc, getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());	
+						    System.out.println(getLinha(lines,"55" ,numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave()));
+						    String novoConteudo = getLinha(lines,"55",numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave());	
 						    novasLinhas.remove(i);
-						    novasLinhas.add(i, novoConteudo);
+						    novasLinhas.add(i, novoConteudo.concat("|||||||"));  /*ajustes conforme layout*/
 						}
 					}
 

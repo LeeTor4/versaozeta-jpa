@@ -73,12 +73,26 @@ public class ImportaEfdIcms {
 			importacao.setSuframa(lote.getSuframa());
 			importacao.setIndPerfil(lote.getIndPerfil());
 			importacao.setIndAtiv(lote.getIndAtiv());
+			
+			
 			importacao.setHistItens(getHistoricoItensGeral(leitor, file, idEmp, idEst));
+			
+			
+			
 			importacao.setSaldoPorLote(totalizadoresGeral(
+					
+					
 					itensTotalizadosPorLoteEntrada(String.valueOf(lote.getDtIni().getYear()), 
 							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj()),
+					
+					
+					
 					itensTotalizadosPorLoteSaida(String.valueOf(lote.getDtIni().getYear()), 
 							String.valueOf(lote.getDtIni().getMonth().getValue()), lote.getCnpj())));
+			
+			
+			
+			
 			importacao.setInvDec(getInvDeclarado(leitor, idEmp, idEst));
 		}
 
