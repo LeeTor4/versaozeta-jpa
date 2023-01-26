@@ -1,78 +1,28 @@
 package txtSped;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
-import org.apache.commons.collections4.map.HashedMap;
-
-public class AlteraTxtSped2 {
-
-    public static Map<String,NumeroChave> getNumeroChaves(String p3) throws FileNotFoundException{
-    
-    	Map<String,NumeroChave> retorno = new HashedMap<String, NumeroChave>();
-	    File arquivoCSV = new File(p3);
-	    String linhaDoArquivo = new String();
-	    
-	    @SuppressWarnings("resource")
-		Scanner leitor = new Scanner(arquivoCSV);
-	    leitor.nextLine();
-		 while(leitor.hasNext()){
-			 NumeroChave obj = new NumeroChave();
-			 linhaDoArquivo = leitor.nextLine();
-			 String[] valoresEntreVirgula = linhaDoArquivo.split("\\;");	 
-			 for(int i=0;i<valoresEntreVirgula.length;i++){
-				 
-				    if(i==0){
-				    	obj.setChave(valoresEntreVirgula[0]);
-				    }
-				    if(i==1) {
-				    	obj.setNumero(valoresEntreVirgula[1]);
-				    }
-				   
-				   
-			 }
-			 retorno.put(obj.getNumero(),obj);
-		 }
-    	
-    	return retorno;
-    }
-    
-    public static String getLinha( List<String> lines,String modDoc,String num, String chave) {
+public class CopiarArqFortesComRegra {
+	
+    public static String getQtdeDeLinha(List<String> lines,int i,String reg, String qtdeLinha) {
     	String retorno = "";
-    	for (int i = 0; i < lines.size(); i++) {
-    		
-    		if (lines.get(i).contains(num.concat("|"))) {
-    			
-				String[] campos = lines.get(i).split("\\|");
-
-				for (int z = 0; z < campos.length; z++) {
-					if (z == 5) {
-						campos[z] = modDoc;
-					}
-					if (z == 9) {
-						campos[z] = chave;
-					}
-
-					retorno += campos[z] + "|";
-				}
-				//System.out.println(" => " + retorno);
-    			break;
-    		}	
-    	}	
+    	 if(lines.get(i).startsWith(reg)){
+    		 String[] campos = lines.get(i).split("\\|");
+    		 for (int z = 0; z < campos.length; z++) {
+    			 if (z == 3) {
+    				 retorno = qtdeLinha;
+    			 }
+    		 }
+    	 }
+  	
     	return retorno;
     }
-    
-	public static void main(String[] args) throws Exception {
-		
+	public static void main(String[] args) throws Exception{
 		String ano = "2017";
 		String emp = "SELLENE";
 		String estab = "MEGADIET";
@@ -134,72 +84,72 @@ public class AlteraTxtSped2 {
 	    List<String> lines = Files.readAllLines(p2, StandardCharsets.ISO_8859_1);
 	    String linha = "";
 	    String chave = "";
-//	   for(int i=0; i < lines.size(); i++) {		  
-//		   novasLinhas.add(lines.get(i));
-//		  
-//		   
-//			   if(lines.get(i).contains("|4315|")){
-//				   
-//				  String[] campos = lines.get(i).split("\\|");
-//				  
-//				  for(int z=0; z < campos.length; z++){
-//					  
-//					  if(z==9) {
-//						  campos[z] = "23150105329222000176550020000043151000140009";
-//					  }
-//					  
-//					 
-//					  linha += campos[z]+"|" ;
-//					 
-//				  }
-//				  
-//				  System.out.println(" => " + linha);			  
-//				
-//				  // String novoConteudo = lines.get(i).replace("9999", "XXXX");	
-//				   String novoConteudo = linha;	
-//				  
-//				   novasLinhas.remove(i);
-//				   novasLinhas.add(i, novoConteudo);
-//				 
-//			   }
-//
-//	   }	
-//	   
-//	   
-//	   Files.write(p2, novasLinhas, StandardOpenOption.CREATE);
- 
-		for (int i = 0; i < lines.size(); i++) {
-			novasLinhas.add(lines.get(i));
-			if (lines.get(i).contains("|01|00|2|")) {
+	    
+	    int contC100 = 0;
+	    int contC170 = 0;
+	    int contC190 = 0;
+	    for (int i = 0; i < lines.size(); i++) {
+	    	 novasLinhas.add(lines.get(i));
+	    	 
 
-				String[] campoC100 = lines.get(i).split("\\|");
-				String numDoc = "";
-				for (int c = 0; c < campoC100.length; c++) {
-					
-					if(c == 8) {
-						numDoc = campoC100[c];					
-					}
-					if (c == 9) {
-						if (getNumeroChaves(csv.toString())
-								.get(numDoc) != null) {
-//							 System.out.println(getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());
-//							 campoC100[c] =
-//							 getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave();
-                           
-						    System.out.println(getLinha(lines,"55" ,numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave()));
-						    String novoConteudo = getLinha(lines,"55",numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave());	
-						    novasLinhas.remove(i);
-						    novasLinhas.add(i, novoConteudo.concat("|||||||"));  /*ajustes conforme layout*/
-						}
-					}
-				}
-			}
+	    	 if(lines.get(i).startsWith("|C100|")){
+		    	 
+	    		 if(!lines.get(i).startsWith("|C100|1|0|")){
+	    			 contC100++;
+		    		 System.out.println(lines.get(i)); 
+		    	 }
+		    	 
+	    	 }
+	    	 
+	    	 if(lines.get(i).startsWith("|C170|")){
+		    	 if(lines.get(i).startsWith("|C170|")){
+		    		 contC170++;
+		    		 System.out.println(lines.get(i));  
+		    	 }
+	    	 }
+    	 
+	    	 if(lines.get(i).startsWith("|C190|")){
+	    		 if(!lines.get(i).substring(10, 11).equals("5") && !lines.get(i).substring(10, 11).equals("6")) {
+	    			 contC190++;
+	    			 System.out.println(lines.get(i));
+	    		 }
+	    	 }
+	    	 
+	    	 
+	    	 
+	    	//Trecho de código dos totalizadores dos registros
+	    	 if(lines.get(i).startsWith("|9900|")){
+	    		 
+	    		 if(!lines.get(i).substring(0,11).equals("|9900|C100|") && !lines.get(i).substring(0,11).equals("|9900|C170|")
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C190|") 
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C400|")
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C405|")
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C420|")
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C425|")
+	    				 && !lines.get(i).substring(0,11).equals("|9900|C490|")) {	    
+	    			 
+	    			 System.out.println(lines.get(i));
+	    		 }
+	    		 
+	    		 
+	    		 if(lines.get(i).substring(0,11).equals("|9900|C100|")) {	    			
+	    			"|9900|C100|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC100)));
+	    			 System.out.println("|9900|C100|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC100))).concat("|"));
+	    		 }
+	    		 
+	    		 if(lines.get(i).substring(0,11).equals("|9900|C170|")) {	    			
+	    			 "|9900|C170|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC170)));
+	    			 System.out.println("|9900|C170|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC170))).concat("|"));
+	    		 }
+	    		 
+	    		 if(lines.get(i).substring(0,11).equals("|9900|C190|")) {	    			
+	    			 "|9900|C190|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC190)));
+	    			 System.out.println("|9900|C190|".concat(getQtdeDeLinha(lines, i, lines.get(i).substring(0,11),String.valueOf(contC190))).concat("|"));
+	    		 }
+	    		
+	    	 }
 
-		}	
-   
-        Files.write(dest, novasLinhas, StandardOpenOption.CREATE);
+	    }
 	}
-	
+
 }
-
-

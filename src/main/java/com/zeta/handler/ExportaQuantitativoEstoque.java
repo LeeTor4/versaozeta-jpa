@@ -9,59 +9,59 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
-import com.zeta.dao.ProdutoDao;
-import com.zeta.model.ItemTotalizadoPorLote;
-import com.zeta.model.Produto;
+import com.zeta.model.InventarioDeclaradoSped;
+import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.TotalizadoresDosSaldosMensais;
 
 public class ExportaQuantitativoEstoque {
-
+	
 	public void exportaControleQuantitativos(String file, String cnpj, String ano) {
 
-		ProdutoDao daoProd = new ProdutoDao();
 		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
-		List<ItemTotalizadoPorLote> listaProdutos = dao.listaTodos().stream()
-				.filter(cgc -> cgc.getCnpj().equals(cnpj))
-				.filter(year -> year.getAno().equals(ano)).distinct().collect(Collectors.toList());
+		
+		
+		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1);
+		
+		List<ItemTotalizadoPorLoteJoinProduto> listaProdutos = dao.buscaListaItensPorAnoJoinProduto(cnpj);
+		
+		List<ItemTotalizadoPorLoteJoinProduto> listaEnt = listaProdutos.stream()
+				                                 .filter(oper -> oper.getOperacao().equals("E"))
+				                                 .filter(year -> year.getAno().equals(ano)).collect(Collectors.toList());
+		List<ItemTotalizadoPorLoteJoinProduto> listaSai = listaProdutos.stream()
+				                                 .filter(oper -> oper.getOperacao().equals("S"))
+				                                 .filter(year -> year.getAno().equals(ano)).collect(Collectors.toList());
+		
+		Map<String, Double> collect = listaProdutos.stream()
+				 .filter(year -> Integer.parseInt(year.getAno()) < Integer.parseInt(ano))
+	    		 .collect(
+            Collectors.groupingBy(ItemTotalizadoPorLoteJoinProduto::getCodItem, Collectors.summingDouble(ItemTotalizadoPorLoteJoinProduto::getVlTotQtde))
+        );
 
-		List<ItemTotalizadoPorLote> listaEnt = dao.listaTodos().stream()
-												.filter(cgc -> cgc.getCnpj().equals(cnpj))
-												.filter(year -> year.getAno().equals(ano))
-												.filter(oper -> oper.getOperacao().equals("E"))
-												.collect(Collectors.toList());
-		
-		List<ItemTotalizadoPorLote> listaSai = dao.listaTodos().stream()
-												.filter(cgc -> cgc.getCnpj().equals(cnpj))
-												.filter(year -> year.getAno().equals(ano))
-												.filter(oper -> oper.getOperacao().equals("S"))
-												.collect(Collectors.toList());
-		
-		
-		Map<String , ItemTotalizadoPorLote>   mpEntJan = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiJan = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntFev = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiFev = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntMar = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiMar = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntAbr = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiAbr = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntMai = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiMai = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntJun = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiJun = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntJul = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiJul = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntAgo = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiAgo = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntSet = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiSet = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntOut = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiOut = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntNov = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiNov = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpEntDez = new HashMap<String , ItemTotalizadoPorLote>();
-		Map<String , ItemTotalizadoPorLote>   mpSaiDez = new HashMap<String , ItemTotalizadoPorLote>();
-		for(ItemTotalizadoPorLote e : listaEnt){
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntJan = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiJan = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntFev = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiFev = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntMar = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiMar = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntAbr = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiAbr = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntMai = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiMai = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntJun = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiJun = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntJul = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiJul = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntAgo = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiAgo = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntSet = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiSet = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntOut = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiOut = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntNov = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiNov = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpEntDez = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		Map<String , ItemTotalizadoPorLoteJoinProduto>   mpSaiDez = new HashMap<String , ItemTotalizadoPorLoteJoinProduto>();
+		for(ItemTotalizadoPorLoteJoinProduto e : listaEnt){
 			switch (e.getMes()) {
 			case "1":
 				mpEntJan.put(e.getCodItem(), e);
@@ -101,12 +101,8 @@ public class ExportaQuantitativoEstoque {
 				break;
 			}
 		}
-		
-		
-		
-		
-		
-		for(ItemTotalizadoPorLote e : listaSai){
+				
+		for(ItemTotalizadoPorLoteJoinProduto e : listaSai){
 			
 			switch (e.getMes()) {
 			case "1":
@@ -149,9 +145,6 @@ public class ExportaQuantitativoEstoque {
 			
 		}
 		
-		
-		
-		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(file)));
 			String linha = " ";
@@ -161,11 +154,33 @@ public class ExportaQuantitativoEstoque {
 			writer.write(linha);
 			writer.newLine();
 
-		
-			
-			for (ItemTotalizadoPorLote lista : listaProdutos) {
+			for (ItemTotalizadoPorLoteJoinProduto lista : listaProdutos) {
 				TotalizadoresDosSaldosMensais saldos = new TotalizadoresDosSaldosMensais();
-			
+				
+				
+				Double mapToDouble = buscarInvDecSped.stream()
+						 .filter(codItem -> codItem.getCodItem().equals(lista.getCodItem()))
+						 .mapToDouble(qtde -> qtde.getQtde())
+						 .sum();
+				
+				if(mapToDouble != null) {
+					saldos.setQteInvDec(mapToDouble);
+				}
+				
+//				if(dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1,lista.getCodItem()) != null){
+//					saldos.setQteInvDec(dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1,lista.getCodItem()).getQtde());
+//				}else {
+//					saldos.setQteInvDec(0.0);
+//				}
+				
+			    if(collect.keySet() != null) {
+			    	saldos.setQteIniInv(collect.get(lista.getCodItem()));
+			    }else {
+			    	saldos.setQteIniInv(0.0);
+			    }
+				
+				saldos.setQteInvDec(0.0);
+				
 				Double qtdeEntJan = 0.0;
 				Double vlEntJan   = 0.0;
 				Double qtdeSaiJan = 0.0;				
@@ -180,7 +195,7 @@ public class ExportaQuantitativoEstoque {
                 }				
 				saldos.setQtdeEntJan(qtdeEntJan);
 				saldos.setVrEntJan(vlEntJan);
-				saldos.setQtdeSaiJan(qtdeSaiJan);
+				saldos.setQtdeSaiJan(qtdeSaiJan*(-1));
 				saldos.setVrSaiJan(vlSaiJan);
 				
 
@@ -199,7 +214,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntFev(qtdeEntFev);
 				saldos.setVrEntFev(vlEntFev);
-				saldos.setQtdeSaiFev(qtdeSaiFev);
+				saldos.setQtdeSaiFev(qtdeSaiFev*(-1));
 				saldos.setVrSaiFev(vlSaiFev);
 
 				
@@ -218,7 +233,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntMar(qtdeEntMar);
 				saldos.setVrEntMar(vrEntMar);
-				saldos.setQtdeSaiMar(qtdeSaiMar);
+				saldos.setQtdeSaiMar(qtdeSaiMar*(-1));
 				saldos.setVrSaiMar(vrSaiMar);
 
 				Double qtdeEntAbr = 0.0;	
@@ -236,7 +251,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntAbr(qtdeEntAbr);
 				saldos.setVrEntAbr(vrEntAbr);
-				saldos.setQtdeSaiAbr(qtdeSaiAbr);
+				saldos.setQtdeSaiAbr(qtdeSaiAbr*(-1));
 				saldos.setVrSaiAbr(vrSaiAbr);
 
 				Double qtdeEntMai = 0.0;	
@@ -254,7 +269,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntMai(qtdeEntMai);
 				saldos.setVrEntMai(vrEntMai);
-				saldos.setQtdeSaiMai(qtdeSaiMai);
+				saldos.setQtdeSaiMai(qtdeSaiMai*(-1));
 				saldos.setVrSaiMai(vrSaiMai);
 
 				Double qtdeEntJun = 0.0;	
@@ -272,7 +287,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntJun(qtdeEntJun);
 				saldos.setVrEntJun(vrEntJun);
-				saldos.setQtdeSaiJun(qtdeSaiJun);
+				saldos.setQtdeSaiJun(qtdeSaiJun*(-1));
 				saldos.setVrSaiJun(vrSaiJun);
 
 				Double qtdeEntJul =  0.0;	
@@ -290,7 +305,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntJul(qtdeEntJul);
 				saldos.setVrEntJul(vrEntJul);
-				saldos.setQtdeSaiJul(qtdeSaiJul);
+				saldos.setQtdeSaiJul(qtdeSaiJul*(-1));
 				saldos.setVrSaiJul(vrSaiJul);
 
 				Double qtdeEntAgo = 0.0;	
@@ -308,7 +323,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntAgo(qtdeEntAgo);
 				saldos.setVrEntAgo(vrEntAgo);
-				saldos.setQtdeSaiAgo(qtdeSaiAgo);
+				saldos.setQtdeSaiAgo(qtdeSaiAgo*(-1));
 				saldos.setVrSaiAgo(vrSaiAgo);
 
 				Double qtdeEntSet = 0.0;
@@ -326,7 +341,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntSet(qtdeEntSet);
 				saldos.setVrEntSet(vrEntSet);
-				saldos.setQtdeSaiSet(qtdeSaiSet);
+				saldos.setQtdeSaiSet(qtdeSaiSet*(-1));
 				saldos.setVrSaiSet(vrSaiSet);
 
 				Double qtdeEntOut = 0.0;
@@ -344,7 +359,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntOut(qtdeEntOut);
 				saldos.setVrEntOut(vrEntOut);
-				saldos.setQtdeSaiOut(qtdeSaiOut);
+				saldos.setQtdeSaiOut(qtdeSaiOut*(-1));
 				saldos.setVrSaiOut(vrSaiOut);
 
 				
@@ -363,7 +378,7 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntNov(qtdeEntNov);
 				saldos.setVrEntNov(vrEntNov);
-				saldos.setQtdeSaiNov(qtdeSaiNov);
+				saldos.setQtdeSaiNov(qtdeSaiNov*(-1));
 				saldos.setVrSaiNov(vrSaiNov);
 
 				Double qtdeEntDez = 0.0;
@@ -381,53 +396,18 @@ public class ExportaQuantitativoEstoque {
                 }
 				saldos.setQtdeEntDez(qtdeEntDez);
 				saldos.setVrEntDez(vrEntDez);
-				saldos.setQtdeSaiDez(qtdeSaiDez);
+				saldos.setQtdeSaiDez(qtdeSaiDez*(-1));
 				saldos.setVrSaiDez(vrSaiDez);
 
-				
-//				if( qtdeEntJan + qtdeSaiJan + 
-//					qtdeEntFev + qtdeSaiFev +
-//					qtdeEntMar + qtdeSaiMar +
-//					qtdeEntAbr + qtdeSaiAbr +
-//					qtdeEntMai + qtdeSaiMai +
-//					qtdeEntJun + qtdeSaiJun +
-//					qtdeEntJul + qtdeSaiJul +
-//					qtdeEntAgo + qtdeSaiAgo +
-//					qtdeEntSet + qtdeSaiSet +
-//					qtdeEntOut + qtdeSaiOut +
-//					qtdeEntNov + qtdeSaiNov +
-//					qtdeEntDez + qtdeSaiDez 
-//						> 0) {
-//					
-//					Produto prod = daoProd.buscaPorCodigo(lista.getCodItem());
-//					saldos.setCodItem(lista.getCodItem());
-//					saldos.setCodAntItem("");
-//					saldos.setDescricao(prod.getDescricao());
-//					saldos.setUnidMedida(prod.getUnidadedeMedidaPadrao());	
-//					linha = formatacaoPlanilha(saldos);
-//					writer.write(linha);
-//					writer.newLine();
-//				
-//				}
-				
-				Produto prod = daoProd.buscaPorCodigo(lista.getCodItem());
 				saldos.setCodItem(lista.getCodItem());
 				saldos.setCodAntItem("");
-				saldos.setDescricao(prod.getDescricao());
-				saldos.setUnidMedida(prod.getUnidadedeMedidaPadrao());	
+				saldos.setDescricao(lista.getDescricao());
+				saldos.setUnidMedida(lista.getUnidadeDeMedidaPadrao());	
+				
 				linha = formatacaoPlanilha(saldos);
 				writer.write(linha);
 				writer.newLine();
 				
-				
-//					if (!formatacaoPlanilha(saldos).contains(";0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00;0,00")) {
-//
-//						//System.out.println("linha " + formatacaoPlanilha(saldos));
-//						
-//					}
-				
-				
-
 			}
 			writer.close();
 
@@ -443,6 +423,8 @@ public class ExportaQuantitativoEstoque {
 		String linha = "";
 		// System.out.println(totaisMensais.getCodItem()+"|"+totaisMensais.getCodAntItem());
 
+		Double saldoInvIni = 0.0;
+		Double saldoInvDec = 0.0;
 		Double saldoJan = 0.0;
 		Double saldoFev = 0.0;
 		Double saldoMar = 0.0;
@@ -456,8 +438,19 @@ public class ExportaQuantitativoEstoque {
 		Double saldoNov = 0.0;
 		Double saldoDez = 0.0;
 
-		saldoJan = totaisMensais.getQteIniInv() + totaisMensais.getQtdeEntJan() - totaisMensais.getQtdeSaiJan();
-
+		if(totaisMensais.getQteIniInv() != null) {
+			saldoInvIni = totaisMensais.getQteIniInv() ;
+		}else{
+			saldoInvIni = 0.0;
+		}
+		
+		if(totaisMensais.getQteInvDec() != null) {
+			saldoInvDec = totaisMensais.getQteInvDec();
+		}else{
+			saldoInvDec = 0.0;
+		}
+		
+		saldoJan = saldoInvIni + totaisMensais.getQtdeEntJan() - totaisMensais.getQtdeSaiJan();
 		saldoFev = saldoJan + totaisMensais.getQtdeEntFev() - totaisMensais.getQtdeSaiFev();
 		saldoMar = saldoFev + totaisMensais.getQtdeEntMar() - totaisMensais.getQtdeSaiMar();
 		saldoAbr = saldoMar + totaisMensais.getQtdeEntAbr() - totaisMensais.getQtdeSaiAbr();
@@ -471,8 +464,8 @@ public class ExportaQuantitativoEstoque {
 		saldoNov = saldoOut + totaisMensais.getQtdeEntNov() - totaisMensais.getQtdeSaiNov();
 		saldoDez = saldoNov + totaisMensais.getQtdeEntDez() - totaisMensais.getQtdeSaiDez();
 
-		String invIni = String.format("%.2f", totaisMensais.getQteIniInv()); // Implementar depois
-		String invDec = String.format("%.2f", totaisMensais.getQteInvDec());
+		String invIni = String.format("%.2f", saldoInvIni); // Implementar depois
+		String invDec = String.format("%.2f", saldoInvDec);
 
 		String qteEntJan = String.format("%.2f", totaisMensais.getQtdeEntJan());
 		String vlEntJan = String.format("%.2f", totaisMensais.getVrEntJan());

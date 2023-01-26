@@ -1,6 +1,8 @@
 package crud;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +12,130 @@ import com.zeta.model.Empresa;
 import com.zeta.model.Endereco;
 import com.zeta.model.EquipamentoECF;
 import com.zeta.model.Estabelecimento;
+import com.zeta.util.UtilsEConverters;
 
 public class CadastroEmpresa {
 
 	public static void main(String[] args) throws Exception {
 
+		//cadastrarEmpresasSellene();
+		cadastrarMegafarmaSellene();
+		//cadastrarEmpresasBenelux();
+	}
+
+	private static void cadastrarEmpresasBenelux() throws Exception {
+		
+		LocalDate data = LocalDate.of(2016, Month.APRIL, 22);
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String valorFormatado = data.format(formatador);
+		
+		EmpresaDao dao = new EmpresaDao();
+		
+		Empresa empresa = new Empresa();
+		empresa.setRazaoSocial("BENELUX DISTRIBUIDORA DE ALIMENTOS LTDA");
+		empresa.setNmFantasia("BENELUX NUTRITION");
+		empresa.setCnpjBase("24653373");
+		empresa.setDtIniAtiv(UtilsEConverters.getStringParaData4(valorFormatado));
+		
+		Endereco end1 = new Endereco();
+
+		com.cnpj.dominio.Endereco ender1 = ServicoCEP.buscaEnderecoPeloCEP("60115125");
+
+		end1.setCep(ender1.getCep());
+		end1.setNmLogradouro(ender1.getLogradouro());
+		end1.setNumLogradouro("1500");
+		end1.setBairro(ender1.getBairro());
+		end1.setCodMun(ender1.getIbge().substring(2, 7));
+		end1.setNmMun(ender1.getLocalidade());
+		end1.setCodUf(ender1.getIbge().substring(0, 2));
+		end1.setUf(ender1.getUf());
+		
+		Estabelecimento matriz = new Estabelecimento("24653373000120", "BENELUX DISTRIBUIDORA DE ALIMENTOS LTDA",
+				"Matriz", end1, empresa);
+
+		empresa.adicionaEstab(matriz);
+
+		dao.adiciona(empresa);
+	}
+	
+	private static void cadastrarMegafarmaSellene() throws Exception {
+		LocalDate data = LocalDate.of(2005, Month.NOVEMBER, 03 );
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String valorFormatado = data.format(formatador);
+        
+        EmpresaDao dao = new EmpresaDao();
+
+		Empresa empresa = new Empresa();
+		empresa.setRazaoSocial("Sellene Comercio e Representações Ltda");
+		empresa.setNmFantasia("Sellene Matriz");
+		empresa.setCnpjBase("05329222");
+		empresa.setDtIniAtiv(UtilsEConverters.getStringParaData4(valorFormatado));
+		
+		
+		Endereco end1 = new Endereco();
+
+		com.cnpj.dominio.Endereco ender1 = ServicoCEP.buscaEnderecoPeloCEP("60140140");
+
+		end1.setCep(ender1.getCep());
+		end1.setNmLogradouro(ender1.getLogradouro());
+		end1.setNumLogradouro("205");
+		end1.setBairro(ender1.getBairro());
+		end1.setCodMun(ender1.getIbge().substring(2, 7));
+		end1.setNmMun(ender1.getLocalidade());
+		end1.setCodUf(ender1.getIbge().substring(0, 2));
+		end1.setUf(ender1.getUf());
+		
+		Estabelecimento matriz = new Estabelecimento("05329222000176", "Sellene Comercio e Representações Ltda",
+				"Matriz", end1, empresa);
+		
+        Endereco end6 = new Endereco();
+		com.cnpj.dominio.Endereco ender6 = ServicoCEP.buscaEnderecoPeloCEP("60115220");
+
+		end6.setCep(ender6.getCep());
+		end6.setNmLogradouro(ender6.getLogradouro());
+		end6.setNumLogradouro("195");
+		end6.setBairro(ender6.getBairro());  
+		end6.setCodMun(ender6.getIbge().substring(2, 7));
+		end6.setNmMun(ender6.getLocalidade());
+		end6.setCodUf(ender6.getIbge().substring(0, 2));
+		end6.setUf(ender6.getUf());
+		
+		
+		Estabelecimento megafarma = new Estabelecimento("05329222000680", "Sellene Comercio e Representações Ltda",
+				"Megafarma", end6, empresa);
+		
+		List<EquipamentoECF> ecfsMegafarma = new ArrayList<EquipamentoECF>();
+
+		EquipamentoECF ecf1_loja06 = new EquipamentoECF();
+		ecf1_loja06.setCodModDocFiscal("2D");
+		ecf1_loja06.setModeloEquip("ECF");
+		ecf1_loja06.setNumSerieFabECF("BE091010100011201429");
+		ecf1_loja06.setNumECF("1");
+		ecfsMegafarma.add(ecf1_loja06);
+
+		EquipamentoECF ecf2_loja06 = new EquipamentoECF();
+		ecf2_loja06.setCodModDocFiscal("2D");
+		ecf2_loja06.setModeloEquip("ECF");
+		ecf2_loja06.setNumSerieFabECF("DR0814BR000000407938");
+		ecf2_loja06.setNumECF("2");
+		ecfsMegafarma.add(ecf2_loja06);
+
+		EquipamentoECF ecf3_loja06 = new EquipamentoECF();
+		ecf3_loja06.setCodModDocFiscal("2D");
+		ecf3_loja06.setModeloEquip("ECF");
+		ecf3_loja06.setNumSerieFabECF("BE090910100010021907");
+		ecf3_loja06.setNumECF("001");
+		ecfsMegafarma.add(ecf3_loja06);
+		
+		megafarma.setEquipEcf(ecfsMegafarma);
+
+		empresa.adicionaEstab(matriz);
+		empresa.adicionaEstab(megafarma);
+
+		dao.adiciona(empresa);
+		
+	}
+	private static void cadastrarEmpresasSellene() throws Exception {
 		LocalDate agora = LocalDate.now();
 
 		EmpresaDao dao = new EmpresaDao();

@@ -14,10 +14,11 @@ import java.util.Scanner;
 
 import org.apache.commons.collections4.map.HashedMap;
 
-public class AlteraTxtSped2 {
+public class CopiarSpedFiscalComRegra {
+	
 
     public static Map<String,NumeroChave> getNumeroChaves(String p3) throws FileNotFoundException{
-    
+        
     	Map<String,NumeroChave> retorno = new HashedMap<String, NumeroChave>();
 	    File arquivoCSV = new File(p3);
 	    String linhaDoArquivo = new String();
@@ -50,29 +51,32 @@ public class AlteraTxtSped2 {
     	String retorno = "";
     	for (int i = 0; i < lines.size(); i++) {
     		
-    		if (lines.get(i).contains(num.concat("|"))) {
-    			
-				String[] campos = lines.get(i).split("\\|");
-
-				for (int z = 0; z < campos.length; z++) {
-					if (z == 5) {
-						campos[z] = modDoc;
+    		if(lines.get(i).startsWith("NFM")) {
+	    		if (lines.get(i).contains(num.concat("|"))) {
+	    			
+					String[] campos = lines.get(i).split("\\|");
+	
+					for (int z = 0; z < campos.length; z++) {
+						if (z == 3) {
+							campos[z] = modDoc;
+						}
+						if (z == 67) {
+							campos[z] = chave;
+						}
+	
+						retorno += campos[z] + "|";
 					}
-					if (z == 9) {
-						campos[z] = chave;
-					}
-
-					retorno += campos[z] + "|";
-				}
-				//System.out.println(" => " + retorno);
-    			break;
-    		}	
+					//System.out.println(" => " + retorno);
+	    			break;
+	    		}	
+    		}
+	
     	}	
     	return retorno;
     }
     
-	public static void main(String[] args) throws Exception {
-		
+    
+	public static void main(String[] args) throws Exception{
 		String ano = "2017";
 		String emp = "SELLENE";
 		String estab = "MEGADIET";
@@ -80,6 +84,9 @@ public class AlteraTxtSped2 {
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1  = ano.concat("01_V2").concat(".txt");
+		String anomesfs  = ano.concat("01_v2").concat(".fs");
+		String anomesfsV2  = ano.concat("01_v3").concat(".fs");
+		
 		String anomes2  = ano.concat("02").concat(".txt");
 		String anomesV2  = ano.concat("02_V2").concat(".txt");
 		String anomes3  = ano.concat("03").concat(".txt");
@@ -105,6 +112,10 @@ public class AlteraTxtSped2 {
 		
 	    Path p1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes1));
 	    Path pV1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV1));
+	   
+	    Path pVFOrig = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesfs));
+	    Path pVFDest = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesfsV2));
+	    
 	    Path p2 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes2));
 	    Path pV2 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV2));
 	    Path p3 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes3));
@@ -128,78 +139,69 @@ public class AlteraTxtSped2 {
 	    Path p12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes12));
 	    Path pV12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV12));
 	    
-	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Megadiet_201702.csv"));
-	    Path dest = pV2;
+	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Megadiet_201701.csv"));
+	    Path dest = pVFDest;
 	    List<String> novasLinhas =  new ArrayList<String>();   
-	    List<String> lines = Files.readAllLines(p2, StandardCharsets.ISO_8859_1);
+	    List<String> lines = Files.readAllLines(pVFOrig, StandardCharsets.ISO_8859_1);
 	    String linha = "";
 	    String chave = "";
-//	   for(int i=0; i < lines.size(); i++) {		  
-//		   novasLinhas.add(lines.get(i));
-//		  
-//		   
-//			   if(lines.get(i).contains("|4315|")){
-//				   
-//				  String[] campos = lines.get(i).split("\\|");
-//				  
-//				  for(int z=0; z < campos.length; z++){
-//					  
-//					  if(z==9) {
-//						  campos[z] = "23150105329222000176550020000043151000140009";
-//					  }
-//					  
-//					 
-//					  linha += campos[z]+"|" ;
-//					 
-//				  }
-//				  
-//				  System.out.println(" => " + linha);			  
-//				
-//				  // String novoConteudo = lines.get(i).replace("9999", "XXXX");	
-//				   String novoConteudo = linha;	
-//				  
-//				   novasLinhas.remove(i);
-//				   novasLinhas.add(i, novoConteudo);
-//				 
-//			   }
-//
-//	   }	
-//	   
-//	   
-//	   Files.write(p2, novasLinhas, StandardOpenOption.CREATE);
- 
-		for (int i = 0; i < lines.size(); i++) {
-			novasLinhas.add(lines.get(i));
-			if (lines.get(i).contains("|01|00|2|")) {
+	    
+	    int cont = 0;
+	    int tra = 0;
+	    for (int i = 0; i < lines.size(); i++) {
+	    	
+	   	     novasLinhas.add(lines.get(i));
 
-				String[] campoC100 = lines.get(i).split("\\|");
-				String numDoc = "";
-				for (int c = 0; c < campoC100.length; c++) {
-					
-					if(c == 8) {
-						numDoc = campoC100[c];					
-					}
-					if (c == 9) {
-						if (getNumeroChaves(csv.toString())
-								.get(numDoc) != null) {
-//							 System.out.println(getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave());
-//							 campoC100[c] =
-//							 getNumeroChaves(csv.toString()).get("|00|001|".concat(numDoc)).getChave();
-                           
-						    System.out.println(getLinha(lines,"55" ,numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave()));
-						    String novoConteudo = getLinha(lines,"55",numDoc, getNumeroChaves(csv.toString()).get(numDoc).getChave());	
-						    novasLinhas.remove(i);
-						    novasLinhas.add(i, novoConteudo.concat("|||||||"));  /*ajustes conforme layout*/
+	    	 if(lines.get(i).startsWith("NFM|0003|E|NF1|")) {
+	    		 cont = 0;
+	    	 }else if(lines.get(i).startsWith("NFM|0003|E|NFE|")){
+	    		 cont = -1000;	    		 
+	    	 }else {
+	    		 cont++; 
+	    	 }
+
+	    	 if(cont >= 0) { 
+	    		 tra++;
+	    		
+	    		 System.out.println(lines.get(i)); 
+	    		
+	    		 if (lines.get(i).startsWith("NFM|0003|E|NF1|")){
+
+	    		
+	    			 String[] campoC100 = lines.get(i).split("\\|");
+	 				 String numeros = "";
+	 				 for (int c = 0; c < campoC100.length; c++) {
+	 					if(c == 8) {
+							//System.out.println(campoC100[c]);
+							numeros = campoC100[c];
+							numeros = Integer.valueOf(numeros).toString();
+							//System.out.println(numeros);
 						}
-					}
-				}
-			}
+	 					if(c == 67) {
+	 						   if(getNumeroChaves(csv.toString()).get(numeros) != null) {
+	 							  //System.out.println(getNumeroChaves(csv.toString()).get(numeros).getChave());
+	 							  String novoConteudo = getLinha(lines,"NFE",numeros, getNumeroChaves(csv.toString()).get(numeros).getChave());	
+	 							  	 					
+	 							  novasLinhas.remove(i);
+	 							  novasLinhas.add(i, novoConteudo);
+	 							 
+	 						   } 
+	 						 
+						}
+	 				 }
+	    		 }
+	    		
+	    	 }
+	    	 
+	    	 
+//	    	 if (lines.get(i).startsWith("TRA|")){
+//		    	 //System.out.println("TRA|".concat(String.valueOf(tra))); 
+//			     novasLinhas.add("TRA|".concat(String.valueOf(tra)));
+//	    	 }
 
-		}	
-   
-        Files.write(dest, novasLinhas, StandardOpenOption.CREATE);
+	    }
+	   
+	     Files.write(dest, novasLinhas, StandardOpenOption.CREATE);
 	}
-	
+
 }
-
-

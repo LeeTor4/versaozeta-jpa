@@ -1,8 +1,9 @@
 package importacoes;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Map;import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import com.zeta.dao.HistoricoItensDao;
 import com.zeta.dao.InventarioDeclaradoDao;
@@ -12,8 +13,11 @@ import com.zeta.handler.ExportaRelacaoInventario;
 import com.zeta.handler.ExportaRelacaoInventario.SaldoInicialControleEstoque;
 import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
+import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.ItensInventario;
+import com.zeta.model.SaldoItemAnual;
 
 public class LeituraSaldos {
 	
@@ -56,24 +60,24 @@ public class LeituraSaldos {
 		
 		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
 
-	    Map<String, List<ItemTotalizadoPorLote>> collect = dao.listaTodos().stream()
-				.filter(cgc -> cgc.getCnpj().equals("05329222000176"))
-				.filter(year -> year.getAno().equals("2015"))
-				.filter(oper -> oper.getOperacao().equals("S"))
-				.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
-	
-	
-	    
-	    Double qtdeEnt1  = 0.0;
-		Double vlTotEnt1 = 0.0;
-	    Double vlUnitEnt = 0.0;  
-	    for(ItemTotalizadoPorLote cod : collect.get("5943")){	    	
-	    	qtdeEnt1  += cod.getVlTotQtde();
-	    	vlTotEnt1 += cod.getVlTotItem();			 
-	    }
-	    vlUnitEnt = (vlTotEnt1/qtdeEnt1);
-	    System.out.println("5943" + "|" + qtdeEnt1 + "|" + vlUnitEnt + "|" + vlTotEnt1);
-		int cont = 0;
+//	    Map<String, List<ItemTotalizadoPorLote>> collect = dao.listaTodos().stream()
+//				.filter(cgc -> cgc.getCnpj().equals("05329222000176"))
+//				.filter(year -> year.getAno().equals("2015"))
+//				.filter(oper -> oper.getOperacao().equals("S"))
+//				.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
+//	
+//	
+//	    
+//	    Double qtdeEnt1  = 0.0;
+//		Double vlTotEnt1 = 0.0;
+//	    Double vlUnitEnt = 0.0;  
+//	    for(ItemTotalizadoPorLote cod : collect.get("5943")){	    	
+//	    	qtdeEnt1  += cod.getVlTotQtde();
+//	    	vlTotEnt1 += cod.getVlTotItem();			 
+//	    }
+//	    vlUnitEnt = (vlTotEnt1/qtdeEnt1);
+//	    System.out.println("5943" + "|" + qtdeEnt1 + "|" + vlUnitEnt + "|" + vlTotEnt1);
+//		int cont = 0;
 		
 //		List<ItemTotalizadoPorLote> listaProdutos = dao.buscarListaItensPorAno("2019","05329222000761");
 //		for (ItemTotalizadoPorLote lista : listaProdutos) {
@@ -146,7 +150,80 @@ public class LeituraSaldos {
 //	    	}
 //	    	
 //	    }
+		
+//		SaldoItemAnual buscarSaldoItemPorAno = dao.buscarSaldoItemPorAno("24653373000120", "2021","32100");
+//		System.out.println(buscarSaldoItemPorAno.getAno() + " " + buscarSaldoItemPorAno.getCnpj()+ " " + buscarSaldoItemPorAno.getCodItem()
+//		     + " " + buscarSaldoItemPorAno.getVlTotQtde()+ " " + buscarSaldoItemPorAno.getVlTotItem());  
+		
+//		InventarioDeclaradoSped buscarInvDecSped = dao.buscarInvDecSped("24653373000120", 2020-1, "21541");
+//		System.out.println(buscarInvDecSped.getCnpj()+"|"+buscarInvDecSped.getAno()+"|"+ buscarInvDecSped.getCodItem()
+//		     +"|"+buscarInvDecSped.getQtde()+"|"+buscarInvDecSped.getUnd()+"|"+buscarInvDecSped.getVlUnit()+"|"+buscarInvDecSped.getVlItem());
+	    
+		
+		
+		
+		
+		//========================================================================================================================
+		
+		
 	
+		List<ItemTotalizadoPorLoteJoinProduto> lista = dao.buscaListaItensPorAnoJoinProduto("24653373000120");
+		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped("24653373000120", 2019);
+		
+		
+//	    lista.stream()
+//		        .filter(c -> Integer.parseInt(c.getAno()) == 2019)
+//		        .distinct()
+//		        .forEach(u -> System.out.println(
+//			                String.format("Item => ano: %s, CodItem: %s, Descrição: %s, Und: %s", u.getAno(), u.getCodItem(), u.getDescricao(), u.getUnidadeDeMedidaPadrao())));
+	    
+//	    lista.stream()
+//	           .filter(c -> Integer.parseInt(c.getAno()) < 2020)
+//	           .forEach(u -> System.out.println(
+//		                String.format("Item => ano: %s, CodItem: %s, Descrição: %s", u.getAno(), u.getCodItem(), u.getDescricao())));
+	
+	
+		
+//		Double qtdeEntSum = 0.0;
+//		Double qtdeSaiSum = 0.0;
+//		Double saldo = 0.0;
+//		qtdeEntSum = lista.stream()
+//					 .filter(ano -> Integer.parseInt(ano.getAno()) < 2020)
+//					 .filter(operacao -> operacao.getOperacao().equals("E"))
+//					 .filter(codItem -> codItem.getCodItem().equals("22363"))
+//					 .mapToDouble(ItemTotalizadoPorLoteJoinProduto::getVlTotQtde).sum();
+//		qtdeSaiSum = lista.stream()
+//					 .filter(ano -> Integer.parseInt(ano.getAno()) < 2020)
+//					 .filter(operacao -> operacao.getOperacao().equals("S"))
+//					 .filter(codItem -> codItem.getCodItem().equals("22363"))
+//					 .mapToDouble(ItemTotalizadoPorLoteJoinProduto::getVlTotQtde).sum();
+//		
+//		saldo = qtdeEntSum - (-qtdeSaiSum);
+//		
+//		System.out.println("22363 : " + qtdeEntSum + " - " + qtdeSaiSum + " = " + saldo);
+	
+		
+	    
+		
+		
+//	    Map<String, Double> collect = lista.stream()
+//	    		 .filter(ano -> Integer.parseInt(ano.getAno()) < 2020)
+//	    		 .collect(
+//             Collectors.groupingBy(ItemTotalizadoPorLoteJoinProduto::getCodItem, Collectors.summingDouble(ItemTotalizadoPorLoteJoinProduto::getVlTotQtde))
+//        );
+//
+//
+//       for(String key : collect.keySet()){
+//    	   System.out.println(key + " => " + collect.get(key));
+//       }
+    		   
+
+		Double mapToDouble = buscarInvDecSped.stream()
+				 .filter(codItem -> codItem.getCodItem().equals("4944"))
+				 .mapToDouble(qtde -> qtde.getQtde())
+				 .sum();
+		
+		System.out.println(mapToDouble);
 	}
 
 }
