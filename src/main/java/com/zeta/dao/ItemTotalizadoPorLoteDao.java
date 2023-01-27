@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.zeta.model.CadastroItensPorMovimentacao;
 import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
 import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
@@ -69,6 +70,27 @@ public class ItemTotalizadoPorLoteDao {
 			return singleResult;
 		}
 		
+		public List<CadastroItensPorMovimentacao> buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto(String cnpj, Integer ano){
+					
+			Query query = em.createNativeQuery("SELECT itn_tot.cnpj,  prod.codUtilizEstab as codItem,prod.descricao, prod.UnidadedeMedidaPadrao as und FROM tb_saldo_itn_tot_lote as itn_tot\r\n"
+		   		+ "join tb_produto as prod\r\n"
+		   		+ "on prod.codUtilizEstab = itn_tot.codItem\r\n"
+		   		+ "where itn_tot.cnpj = :cnpj and ano = :ano\r\n"
+		   		+ "union\r\n"
+		   		+ "SELECT lote.cnpj, prod.codUtilizEstab as codItem, prod.descricao, prod.UnidadedeMedidaPadrao as und FROM tb_invdeclarado as inv\r\n"
+		   		+ "join tb_itens_invdeclarado as itn_inv\r\n"
+		   		+ "on inv.id = itn_inv.idPai\r\n"
+		   		+ "join tb_importspedfiscal as lote\r\n"
+		   		+ "on inv.lote_id = lote.id \r\n"
+		   		+ "join tb_produto as prod\r\n"
+		   		+ "on prod.codUtilizEstab = itn_inv.codItem\r\n"
+		   		+ "where lote.cnpj = :cnpj and year(dataInv) = :ano-1","mapeamento.CadastroItensPorMovimentacao");
+		
+			query.setParameter("cnpj", cnpj);
+			query.setParameter("ano", ano);
+			List<CadastroItensPorMovimentacao> lista = query.getResultList();
+		    return lista;
+		}
 		
 		public  List<ItemTotalizadoPorLoteJoinProduto> buscaListaItensPorAnoJoinProduto(String cnpj){
 			

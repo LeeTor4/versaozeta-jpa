@@ -96,9 +96,7 @@ public class ProdutoDao {
 				
 				
 	      }
-	        
-	        
-	        
+
 //	        lista.forEach(arr -> {
 //	            String out = ((Produto) arr[0]).getCodUtilizEstab();
 //	            if (arr[1] == null) {

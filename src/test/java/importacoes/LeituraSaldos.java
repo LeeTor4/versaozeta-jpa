@@ -11,6 +11,7 @@ import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
 import com.zeta.handler.ExportaRelacaoInventario;
 import com.zeta.handler.ExportaRelacaoInventario.SaldoInicialControleEstoque;
+import com.zeta.model.CadastroItensPorMovimentacao;
 import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.InventarioDeclaradoSped;
@@ -169,7 +170,7 @@ public class LeituraSaldos {
 	
 		List<ItemTotalizadoPorLoteJoinProduto> lista = dao.buscaListaItensPorAnoJoinProduto("24653373000120");
 		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped("24653373000120", 2019);
-		
+		List<CadastroItensPorMovimentacao> lista2 = dao.buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto("24653373000120", 2020);
 		
 //	    lista.stream()
 //		        .filter(c -> Integer.parseInt(c.getAno()) == 2019)
@@ -177,6 +178,10 @@ public class LeituraSaldos {
 //		        .forEach(u -> System.out.println(
 //			                String.format("Item => ano: %s, CodItem: %s, Descrição: %s, Und: %s", u.getAno(), u.getCodItem(), u.getDescricao(), u.getUnidadeDeMedidaPadrao())));
 	    
+//		lista2.stream()
+//        .forEach(u -> System.out.println(
+//	                String.format("Item => CodItem: %s, Descrição: %s, Und: %s", u.getCodItem(), u.getDescricao(), u.getUndMed())));
+		
 //	    lista.stream()
 //	           .filter(c -> Integer.parseInt(c.getAno()) < 2020)
 //	           .forEach(u -> System.out.println(
@@ -218,12 +223,22 @@ public class LeituraSaldos {
 //       }
     		   
 
-		Double mapToDouble = buscarInvDecSped.stream()
-				 .filter(codItem -> codItem.getCodItem().equals("4944"))
-				 .mapToDouble(qtde -> qtde.getQtde())
-				 .sum();
+//		Double mapToDouble = buscarInvDecSped.stream()
+//				 .filter(codItem -> codItem.getCodItem().equals("4944"))
+//				 .mapToDouble(qtde -> qtde.getQtde())
+//				 .sum();
+//		
+//		System.out.println(mapToDouble);
 		
-		System.out.println(mapToDouble);
+		
+		buscarInvDecSped.forEach(u -> System.out.println(
+                String.format("Item => CodItem: %s, Descrição: %s, Und: %s", u.getCodItem(), u.getQtde(), u.getVlUnit())));
+		
+		
+
+//		Double mapToDouble = buscarInvDecSped.stream().filter(codItem -> codItem.getCodItem().equals("102")).mapToDouble(qtde -> qtde.getQtde()).sum();
+//		
+//		System.out.println(mapToDouble);
 	}
 
 }

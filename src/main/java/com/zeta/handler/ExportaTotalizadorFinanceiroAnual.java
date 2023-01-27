@@ -19,9 +19,12 @@ import com.zeta.dao.InventarioDeclaradoDao;
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
 import com.zeta.dao.ProdutoDao;
+import com.zeta.model.CadastroItensPorMovimentacao;
 import com.zeta.model.FichaFinanceiroPorItens;
 import com.zeta.model.InventarioDeclarado;
+import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.ItensInventario;
 import com.zeta.util.UtilsEConverters;
 
@@ -43,15 +46,24 @@ public class ExportaTotalizadorFinanceiroAnual {
 	private Double custoUnit_OV = 0.00;
 	private Double vrTotal_OV = 0.00;
 	
-	public List<CadastroItensPorMovimentacao> listaDeProdutos(ItemTotalizadoPorLoteDao dao,String ano, String cnpj, Long idEmp, Long idEst){
+	private ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+	
+	public List<CadastroItensPorMovimentacao> listaDeProdutos(ItemTotalizadoPorLoteDao dao1,String ano, String cnpj, Long idEmp, Long idEst){
+		
+		
+		List<ItemTotalizadoPorLoteJoinProduto> lista = dao.buscaListaItensPorAnoJoinProduto(cnpj);
+		
+		
 		ProdutoDao prodDao = new ProdutoDao();
 		List<CadastroItensPorMovimentacao> retorno = new ArrayList<CadastroItensPorMovimentacao>();
  		Set<String> codigos = new HashSet<String>();
 		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
 		ItensInventarioDao itemInv = new ItensInventarioDao();
 		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(Integer.valueOf(ano), idEmp, idEst);
-		List<ItemTotalizadoPorLote> listaProdutos = dao.listaTodos().stream().filter(cgc -> cgc.getCnpj().equals(cnpj))
-				.filter(year -> year.getAno().equals(String.valueOf(ano))).distinct().collect(Collectors.toList());
+		List<ItemTotalizadoPorLoteJoinProduto> listaProdutos = lista.stream()
+				.filter(cgc -> cgc.getCnpj().equals(cnpj))
+				.filter(year -> year.getAno().equals(String.valueOf(ano)))
+				.distinct().collect(Collectors.toList());
 		
 		for(InventarioDeclarado busca  : inventarios){
 			if(busca.getVlTotal() > 0) {
@@ -61,14 +73,13 @@ public class ExportaTotalizadorFinanceiroAnual {
 			}
 		}
 		
-		for(ItemTotalizadoPorLote itens : listaProdutos){
+		for(ItemTotalizadoPorLoteJoinProduto itens : listaProdutos){
 			codigos.add(itens.getCodItem());
 		}
 		
 		for(String codigo : codigos){
 			CadastroItensPorMovimentacao obj = new CadastroItensPorMovimentacao();			
 			obj.setCodItem(codigo);
-			obj.setCodAntItem("");
 			obj.setDescricao(prodDao.buscaPorCodigo(codigo).getDescricao());
 			obj.setUndMed(prodDao.buscaPorCodigo(codigo).getUnidadedeMedidaPadrao());
 			retorno.add(obj);
@@ -76,23 +87,14 @@ public class ExportaTotalizadorFinanceiroAnual {
 		return retorno;
 	}
 	
-	public Map<String,ItensInventario> listaInventario (String ano,Long  idEmp, Long idEst){
-		Map<String,ItensInventario> retorno = new HashMap<String, ItensInventario>();
-		InventarioDeclaradoDao invDec = new InventarioDeclaradoDao();
-		ItensInventarioDao itemInv = new ItensInventarioDao();
-		List<InventarioDeclarado> inventarios = invDec.buscaPorAnoEmpresaEstab(Integer.valueOf(ano), idEmp, idEst);        
-		for(InventarioDeclarado busca  : inventarios){
-			if(busca.getVlTotal() > 0) {
-				for(ItensInventario item : itemInv.buscaPorIdPai(busca.getId())){
-					retorno.put(UtilsEConverters.getRemoverZeroAEsquerda(item.getCodItem()),item);
-				}
-			}
-		}
+	public List<InventarioDeclaradoSped> listaInventario (String cnpj,Integer ano){
+		
+		List<InventarioDeclaradoSped> retorno = dao.buscarInvDecSped(cnpj, ano);
+		
 		return retorno;
 	}
 	
-	
-	
+
 	public static List<FichaFinanceiroPorItens> leituraTotalizadorFinanceiro(Path path) {
 		List<FichaFinanceiroPorItens> retorno = new ArrayList<FichaFinanceiroPorItens>();
 		try {
@@ -440,18 +442,22 @@ public class ExportaTotalizadorFinanceiroAnual {
 		
 		
 	}
+	
 	public void exportaTotalizadorFinanceiroEstoque(String caminho, int ano, String cnpj, Long idEmp, Long idEst) {
 
 		ItemTotalizadoPorLoteDao dao = new ItemTotalizadoPorLoteDao();
+		List<ItemTotalizadoPorLote> lista = dao.listaTodos();
+		List<CadastroItensPorMovimentacao> listaCadastroItensPorMovimentao = dao.buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto(cnpj, ano);
+		List<InventarioDeclaradoSped>  listaInv1 = listaInventario(cnpj, ano-1).stream().collect(Collectors.toList());
+		List<InventarioDeclaradoSped>  listaInv2 = listaInventario(cnpj, ano).stream().collect(Collectors.toList());
 		
-		
-		 Map<String, List<ItemTotalizadoPorLote>> listaEnt = dao.listaTodos().stream()
+		 Map<String, List<ItemTotalizadoPorLote>> listaEnt = lista.stream()
 					.filter(cgc -> cgc.getCnpj().equals(cnpj))
 					.filter(year -> year.getAno().equals(String.valueOf(ano)))
 					.filter(oper -> oper.getOperacao().equals("E"))
 					.collect(Collectors.groupingBy(codigo -> codigo.getCodItem()));
 
-		 Map<String, List<ItemTotalizadoPorLote>> listaSai = dao.listaTodos().stream()
+		 Map<String, List<ItemTotalizadoPorLote>> listaSai = lista.stream()
 					.filter(cgc -> cgc.getCnpj().equals(cnpj))
 					.filter(year -> year.getAno().equals(String.valueOf(ano)))
 					.filter(oper -> oper.getOperacao().equals("S"))
@@ -468,15 +474,18 @@ public class ExportaTotalizadorFinanceiroAnual {
 			writer.write(linha);
 			writer.newLine();
 		
-			for (CadastroItensPorMovimentacao codigo : listaDeProdutos(dao, String.valueOf(ano), cnpj,idEmp,idEst)) {
+			for (CadastroItensPorMovimentacao codigo : listaCadastroItensPorMovimentao) {
 				FichaFinanceiroPorItens ficha = new FichaFinanceiroPorItens();
 				
 								
-				if(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()) != null) {
-					ficha.setQtdeEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getQtde());
-					ficha.setVrUnitEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getVlUnit());
-					ficha.setVrItemEi(listaInventario(String.valueOf(Integer.valueOf(ano)-1), idEmp, idEst).get(codigo.getCodItem()).getVlItem());
+				if(listaInv1 != null) {
+					
+					ficha.setQtdeEi(listaInv1.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(qtde -> qtde.getQtde()).sum());
+					ficha.setVrUnitEi(listaInv1.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(vlUnit -> vlUnit.getVlUnit()).sum());
+					ficha.setVrItemEi(listaInv1.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(vlItem -> vlItem.getVlItem()).sum());
 					System.out.println("INV INI " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());
+				
+				
 				}else {
 					ficha.setQtdeEi(0.0);
 					ficha.setVrUnitEi(0.0);
@@ -514,18 +523,19 @@ public class ExportaTotalizadorFinanceiroAnual {
 					ficha.setVlItemSai(vlTotSai1);
 				}
 
-				if(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()) != null) {
-					ficha.setQtdeEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getQtde());
-					ficha.setVrUnitEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getVlUnit());
-					ficha.setVrItemEf(listaInventario(String.valueOf(Integer.valueOf(ano)), idEmp, idEst).get(codigo.getCodItem()).getVlItem());
+				
+				if(listaInv2 != null) {
+					ficha.setQtdeEf(listaInv2.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(qtde -> qtde.getQtde()).sum());
+					ficha.setVrUnitEf(listaInv2.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(vlUnit -> vlUnit.getVlUnit()).sum());
+					ficha.setVrItemEf(listaInv2.stream().filter(codItem -> codItem.getCodItem().equals(codigo.getCodItem())).mapToDouble(vlItem -> vlItem.getVlItem()).sum());
 					System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());
-					
 				}else {
-					ficha.setQtdeEf(0.0);
-					ficha.setVrUnitEf(0.0);
-					ficha.setVrItemEf(0.0);
-					System.out.println("INV FIN " + ficha.getQtdeEf()+"|"+ficha.getVrUnitEf()+"|"+ficha.getVrItemEf());
+					ficha.setQtdeEi(0.0);
+					ficha.setVrUnitEi(0.0);
+					ficha.setVrItemEi(0.0);
+					System.out.println("INV FIN " + ficha.getQtdeEi()+"|"+ficha.getVrUnitEi()+"|"+ficha.getVrItemEi());
 				}
+				
 
 				ficha.setCodItem(codigo.getCodItem());
 				ficha.setCodAntItem("");
@@ -862,37 +872,4 @@ public class ExportaTotalizadorFinanceiroAnual {
 
 }
 
-class CadastroItensPorMovimentacao{
-	
-	private String codItem;
-	private String codAntItem;
-	private String descricao;
-	private String undMed;
-	
-	public String getCodItem() {
-		return codItem;
-	}
-	public void setCodItem(String codItem) {
-		this.codItem = codItem;
-	}
-	public String getCodAntItem() {
-		return codAntItem;
-	}
-	public void setCodAntItem(String codAntItem) {
-		this.codAntItem = codAntItem;
-	}
-	public String getDescricao() {
-		return descricao;
-	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-	public String getUndMed() {
-		return undMed;
-	}
-	public void setUndMed(String undMed) {
-		this.undMed = undMed;
-	}
-	
-	
-}
+

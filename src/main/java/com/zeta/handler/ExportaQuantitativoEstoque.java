@@ -167,20 +167,13 @@ public class ExportaQuantitativoEstoque {
 					saldos.setQteInvDec(mapToDouble);
 				}
 				
-//				if(dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1,lista.getCodItem()) != null){
-//					saldos.setQteInvDec(dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1,lista.getCodItem()).getQtde());
-//				}else {
-//					saldos.setQteInvDec(0.0);
-//				}
-				
 			    if(collect.keySet() != null) {
 			    	saldos.setQteIniInv(collect.get(lista.getCodItem()));
 			    }else {
 			    	saldos.setQteIniInv(0.0);
 			    }
 				
-				saldos.setQteInvDec(0.0);
-				
+								
 				Double qtdeEntJan = 0.0;
 				Double vlEntJan   = 0.0;
 				Double qtdeSaiJan = 0.0;				
