@@ -46,13 +46,13 @@ import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class ImportaEfdIcms {
 
-	//private ProdutoDao prodDao = new ProdutoDao();
+	
 	private List<Produto> produtos = new ArrayList<Produto>();
 	private Set<String> listaProdutos = new LinkedHashSet<String>();
 	private List<ItemTotalizadoPorLote> itensTotalizadosSaidas = new ArrayList<ItemTotalizadoPorLote>();
 	private List<ItemTotalizadoPorLote> itensTotalizadosEntradas = new ArrayList<ItemTotalizadoPorLote>();
 	
-	public LoteImportacaoSpedFiscal getLoteImportacao(LeitorEfdIcms leitor, String file,Long idEmp, Long idEst) {
+	public LoteImportacaoSpedFiscal getLoteImportacao(LeitorEfdIcms leitor,List<Produto> collectProd, String file,Long idEmp, Long idEst) {
 		LoteImportacaoSpedFiscal importacao = new LoteImportacaoSpedFiscal();
 
 		for (Reg0000 lote : leitor.getRegs0000()) {
@@ -75,7 +75,7 @@ public class ImportaEfdIcms {
 			importacao.setIndAtiv(lote.getIndAtiv());
 			
 			
-			importacao.setHistItens(getHistoricoItensGeral(leitor, file, idEmp, idEst));
+			importacao.setHistItens(getHistoricoItensGeral(leitor,collectProd, file, idEmp, idEst));
 			
 			
 			
@@ -154,11 +154,11 @@ public class ImportaEfdIcms {
         return retorno;
 	}
 	
-	private List<HistoricoItens> getHistoricoItensGeral(LeitorEfdIcms leitor, String file, Long idEmp,
+	private List<HistoricoItens> getHistoricoItensGeral(LeitorEfdIcms leitor,List<Produto> collectProd, String file, Long idEmp,
 			Long idEst){
 		
 		List<HistoricoItens> historicoItensDocTerceiros = getHistoricoItensDocTerceiros(leitor, idEmp, idEst);
-		List<HistoricoItens> historicoItensDocProprios = getHistoricoItensDocProprios(leitor, file, idEmp, idEst);
+		List<HistoricoItens> historicoItensDocProprios = getHistoricoItensDocProprios(leitor,collectProd, file, idEmp, idEst);
 		List<HistoricoItens> historicoItensECFs = getHistoricoItensECFs(leitor, idEmp, idEst);
 		historicoItensDocProprios.addAll(historicoItensECFs);
 		historicoItensDocTerceiros.addAll(historicoItensDocProprios);
@@ -209,7 +209,7 @@ public class ImportaEfdIcms {
 		
 		return retorno;
 	}
-	private List<HistoricoItens> getHistoricoItensDocProprios(LeitorEfdIcms leitor,String file, Long idEmp,
+	private List<HistoricoItens> getHistoricoItensDocProprios(LeitorEfdIcms leitor,List<Produto> collectProd,String file, Long idEmp,
 			Long idEst){
 		List<HistoricoItens>  retorno = new ArrayList<HistoricoItens>();
 		ParseDocXML parseDocXML = new ParseDocXML();
@@ -222,9 +222,9 @@ public class ImportaEfdIcms {
 			ex2 = Executors.newCachedThreadPool();
 			ex3 = Executors.newCachedThreadPool();
 			for (DocumentoFiscalEltronico doc : parseDocXML.validaTipoDeParseNFE(f)) {  
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex1,1,11,idEmp ,idEst , retorno);
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex2,11,21, idEmp ,idEst ,retorno);
-				leituraXmlProprios(doc, leitor, parseDocXML, f, ex3,21,32,idEmp ,idEst ,  retorno);
+				leituraXmlProprios(doc, leitor,collectProd, parseDocXML, f, ex1,1,11,idEmp ,idEst , retorno);
+				leituraXmlProprios(doc, leitor,collectProd,parseDocXML, f, ex2,11,21, idEmp ,idEst ,retorno);
+				leituraXmlProprios(doc, leitor,collectProd, parseDocXML, f, ex3,21,32,idEmp ,idEst ,  retorno);
 			}
 			
 			ex1.awaitTermination(5, TimeUnit.SECONDS);
@@ -382,7 +382,7 @@ public class ImportaEfdIcms {
 		
 	}
 	
-	private void leituraXmlProprios(DocumentoFiscalEltronico doc,LeitorEfdIcms leitor, ParseDocXML parseDocXML, File f,
+	private void leituraXmlProprios(DocumentoFiscalEltronico doc,LeitorEfdIcms leitor,List<Produto> collectProd, ParseDocXML parseDocXML, File f,
 			ExecutorService ex, int pDia,int uDia, Long idEmp,Long idEst,List<HistoricoItens> retorno) {
 		if (doc.getIdent().getModeloDoc().equals("59")) {
 			
@@ -412,9 +412,9 @@ public class ImportaEfdIcms {
 								}
 							}
 							
-//							if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
-//								produtos.add(insereProdutosProprios(p, idEmp, idEst));
-//							}
+							if(!collectProd.contains(insereProdutosProprios(p, idEmp, idEst))){
+								produtos.add(insereProdutosProprios(p, idEmp, idEst));
+							}
 							//Observar se é o valor do Produto ou do Item
 							itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
 									Double.valueOf(p.getVlItem())));
@@ -436,9 +436,9 @@ public class ImportaEfdIcms {
 					retorno.add(insereNotasProprias(leitor, p, doc));
 				}
 
-//				if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
-//					produtos.add(insereProdutosProprios(p, idEmp, idEst));
-//				}	
+				if(!collectProd.contains(insereProdutosProprios(p, idEmp, idEst))){
+					produtos.add(insereProdutosProprios(p, idEmp, idEst));
+				}	
 				
 				//Rever esse trecho e extrair o metodo
 

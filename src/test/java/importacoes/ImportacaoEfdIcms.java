@@ -61,10 +61,10 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano   = "2021";
+		String ano   = "2019";
 		String emp   = "SELLENE";
-		String estab = "MEGADIET";
-		String cnpj  = "05329222000419";
+		String estab = "DEPOSITO";
+		String cnpj  = "05329222000508";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -119,8 +119,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p4;
-		Path x = xP4;
+	    Path p = p12;
+		Path x = xP12;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -145,9 +145,9 @@ public class ImportacaoEfdIcms {
 			ProdutoDao daoProd = new ProdutoDao();
 			OutrasUnidDao daoOut = new OutrasUnidDao();
 			ImportaEfdIcms importa = new ImportaEfdIcms();	
-			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
+			
 				
-			List<Participante> participantes = importa.getParticipantes(leitor,1L, 2L);
+			List<Participante> participantes = importa.getParticipantes(leitor,1L, 1L);
 			
 			List<Participante> collectPart = daoPart.listaTodos().stream()
 					.collect(Collectors.toList());	
@@ -155,10 +155,12 @@ public class ImportacaoEfdIcms {
 			List<Produto> collectProd = daoProd.listaTodos().stream()
 					.collect(Collectors.toList());	
 			
+			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor,collectProd, x.toString(), 1L, 1L);
+			
 			List<OutrasUnid> collectOutUnd = daoOut.listaTodos().stream()
 			           .collect(Collectors.toList());	
 			
-			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 2L);
+			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 1L);
 			produtosSped.addAll(importa.getProdutos());
 			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
 				if(!loteDao.listaTodos().contains(loteImportacao)){			

@@ -9,11 +9,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
+import com.zeta.model.CadastroItensPorMovimentacao;
 import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.TotalizadoresDosSaldosMensais;
 
 public class ExportaQuantitativoEstoque {
+	
+	public Map<String, Double> buscaInventarioIncial(List<InventarioDeclaradoSped> buscarInvDecSped){
+		Map<String, Double> retorno = new HashMap<String, Double>();
+		
+		for(InventarioDeclaradoSped itn :  buscarInvDecSped){
+			retorno.put(itn.getCodItem(), itn.getQtde());
+		}		
+		return retorno;
+	}
 	
 	public void exportaControleQuantitativos(String file, String cnpj, String ano) {
 
@@ -22,16 +32,19 @@ public class ExportaQuantitativoEstoque {
 		
 		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped(cnpj, Integer.parseInt(ano)-1);
 		
-		List<ItemTotalizadoPorLoteJoinProduto> listaProdutos = dao.buscaListaItensPorAnoJoinProduto(cnpj);
+		List<CadastroItensPorMovimentacao> listaProdutos = dao.buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto(cnpj, Integer.parseInt(ano));
 		
-		List<ItemTotalizadoPorLoteJoinProduto> listaEnt = listaProdutos.stream()
+		List<ItemTotalizadoPorLoteJoinProduto> listaProdutosMovimentados = dao.buscaListaItensPorAnoJoinProduto(cnpj);
+		
+		List<ItemTotalizadoPorLoteJoinProduto> listaEnt = listaProdutosMovimentados.stream()
 				                                 .filter(oper -> oper.getOperacao().equals("E"))
 				                                 .filter(year -> year.getAno().equals(ano)).collect(Collectors.toList());
-		List<ItemTotalizadoPorLoteJoinProduto> listaSai = listaProdutos.stream()
+		List<ItemTotalizadoPorLoteJoinProduto> listaSai = listaProdutosMovimentados.stream()
 				                                 .filter(oper -> oper.getOperacao().equals("S"))
 				                                 .filter(year -> year.getAno().equals(ano)).collect(Collectors.toList());
 		
-		Map<String, Double> collect = listaProdutos.stream()
+		
+		Map<String, Double> buscaInvApurado = listaProdutosMovimentados.stream()
 				 .filter(year -> Integer.parseInt(year.getAno()) < Integer.parseInt(ano))
 	    		 .collect(
             Collectors.groupingBy(ItemTotalizadoPorLoteJoinProduto::getCodItem, Collectors.summingDouble(ItemTotalizadoPorLoteJoinProduto::getVlTotQtde))
@@ -154,8 +167,18 @@ public class ExportaQuantitativoEstoque {
 			writer.write(linha);
 			writer.newLine();
 
-			for (ItemTotalizadoPorLoteJoinProduto lista : listaProdutos) {
+			for (CadastroItensPorMovimentacao lista : listaProdutos) {
 				TotalizadoresDosSaldosMensais saldos = new TotalizadoresDosSaldosMensais();
+				
+				//Esse trecho do código há a possibilidade de setar o inventario declarado como o inicial
+				//comentando e descomentando
+				
+//				if(buscaInventarioIncial(buscarInvDecSped).keySet() != null) {
+//					saldos.setQteIniInv(buscaInventarioIncial(buscarInvDecSped).get(lista.getCodItem()));
+//					
+//				}else {
+//					saldos.setQteIniInv(0.0);
+//				}
 				
 				
 				Double mapToDouble = buscarInvDecSped.stream()
@@ -166,9 +189,10 @@ public class ExportaQuantitativoEstoque {
 				if(mapToDouble != null) {
 					saldos.setQteInvDec(mapToDouble);
 				}
+								
 				
-			    if(collect.keySet() != null) {
-			    	saldos.setQteIniInv(collect.get(lista.getCodItem()));
+			    if(buscaInvApurado.keySet() != null) {
+			    	saldos.setQteIniInv(buscaInvApurado.get(lista.getCodItem()));
 			    }else {
 			    	saldos.setQteIniInv(0.0);
 			    }
@@ -395,7 +419,7 @@ public class ExportaQuantitativoEstoque {
 				saldos.setCodItem(lista.getCodItem());
 				saldos.setCodAntItem("");
 				saldos.setDescricao(lista.getDescricao());
-				saldos.setUnidMedida(lista.getUnidadeDeMedidaPadrao());	
+				saldos.setUnidMedida(lista.getUndMed());	
 				
 				linha = formatacaoPlanilha(saldos);
 				writer.write(linha);
