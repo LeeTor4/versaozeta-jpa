@@ -19,10 +19,10 @@ import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 public class XmlPropriosNaoEncontradoNoSpedFiscal {
    
 	public static void main(String[] args) throws IOException, JAXBException {
-		String ano   = "2022";
-		String emp   = "BENELUX";
-		String estab = "MATRIZ";
-		String cnpj  = "24653373000120";
+		String ano   = "2021";
+		String emp   = "SELLENE";
+		String estab = "MEGADIET";
+		String cnpj  = "05329222000419";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1_Prop = ano.concat("01_XML_PROPRIOS_NAO_ENCONTRADOS").concat(".txt");
@@ -183,12 +183,12 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p11;
-		Path xP = xP11;
-		Path xT = xT11;
-		Path destProprios = pV11_Prop;
-		Path destTerceiros = pV11_Terc;
-		Path dest_Canc = pV11_Canc;
+	    Path p = p4;
+		Path xP = xP4;
+		Path xT = xT4;
+		Path destProprios = pV4_Prop;
+		Path destTerceiros = pV4_Terc;
+		Path dest_Canc = pV4_Canc;
 	    
 		ParseDocXML xmls = new ParseDocXML();
 		List<String> chavesSpedTerceiros = new ArrayList<String>();

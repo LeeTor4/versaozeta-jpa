@@ -2,12 +2,15 @@ package importacoes;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.LoteImportacaoSpedFiscalDao;
 import com.zeta.dao.MetadadosDB;
+import com.zeta.dao.OutrasUnidDao;
 import com.zeta.dao.ParticipanteDao;
 import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.CruzamentoNotasSpedsComXMLs;
@@ -18,6 +21,7 @@ import com.zeta.handler.ExportaTotalizadorFinanceiroAnual;
 import com.zeta.handler.ExportaQuantitativoEstoque;
 import com.zeta.handler.ImportaEfdIcms;
 import com.zeta.model.LoteImportacaoSpedFiscal;
+import com.zeta.model.OutrasUnid;
 import com.zeta.model.Participante;
 import com.zeta.model.Produto;
 import com.zeta.util.JPAUtil;
@@ -25,17 +29,42 @@ import com.zeta.util.JPAUtil;
 import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class ImportacaoEfdIcms {
-
+	
+	public static Produto buscarProdutoPorCodigo(List<Produto> collectProd, String codItem) {
+		Map<String,Produto> mapProduto = new HashMap<String, Produto>();		
+		for(Produto p :  collectProd){
+			mapProduto.put(p.getCodUtilizEstab(), p);
+		}
+	    return mapProduto.get(codItem);	
+	}
+	
+	public static String produtoJoinOutUnidadeMedida(List<Produto> collectProd, List<OutrasUnid> collectOutUnd,String codItem) {
+				
+		Map<String,Produto> mapProduto = new HashMap<String, Produto>();		
+		for(Produto p :  collectProd){
+			mapProduto.put(p.getCodUtilizEstab(), p);
+		}		
+		Map<String,OutrasUnid> mapOutUndMedida = new HashMap<String, OutrasUnid>();
+		for(OutrasUnid p :  collectOutUnd){
+			mapOutUndMedida.put(p.getCodProd(), p);
+		}
+		//System.out.println(mapProduto.get(codItem).getCodUtilizEstab() +"|"+(mapOutUndMedida.get(codItem) == null ? "NULL":mapOutUndMedida.get(codItem).getUndEquivPadrao()));
+		codItem = mapProduto.get(codItem).getCodUtilizEstab() +"|"+(mapOutUndMedida.get(codItem) == null ? "NULL":mapOutUndMedida.get(codItem).getUndEquivPadrao()); 
+		return codItem;
+	}
+	
+	
+	
 	public static void main(String[] args) {
 		
 	   
 		//MetadadosDB banco = new MetadadosDB();
 		
 		
-		String ano   = "2020";
-		String emp   = "BENELUX";
-		String estab = "MATRIZ";
-		String cnpj  = "24653373000120";
+		String ano   = "2021";
+		String emp   = "SELLENE";
+		String estab = "MEGADIET";
+		String cnpj  = "05329222000419";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -90,8 +119,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p8;
-		Path x = xP8;
+	    Path p = p4;
+		Path x = xP4;
 	
 		
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
@@ -114,25 +143,38 @@ public class ImportacaoEfdIcms {
 			LoteImportacaoSpedFiscalDao loteDao = new LoteImportacaoSpedFiscalDao();
 			ParticipanteDao daoPart = new ParticipanteDao();
 			ProdutoDao daoProd = new ProdutoDao();
+			OutrasUnidDao daoOut = new OutrasUnidDao();
 			ImportaEfdIcms importa = new ImportaEfdIcms();	
 			LoteImportacaoSpedFiscal loteImportacao = importa.getLoteImportacao(leitor, x.toString(), 1L, 2L);
 				
 			List<Participante> participantes = importa.getParticipantes(leitor,1L, 2L);
+			
+			List<Participante> collectPart = daoPart.listaTodos().stream()
+					.collect(Collectors.toList());	
+			
+			List<Produto> collectProd = daoProd.listaTodos().stream()
+					.collect(Collectors.toList());	
+			
+			List<OutrasUnid> collectOutUnd = daoOut.listaTodos().stream()
+			           .collect(Collectors.toList());	
+			
 			List<Produto> produtosSped = importa.getProdutosSped(leitor,1L, 2L);
 			produtosSped.addAll(importa.getProdutos());
 			List<Produto> collectProdutos = produtosSped.stream().distinct().collect(Collectors.toList());
 				if(!loteDao.listaTodos().contains(loteImportacao)){			
 					for(Participante part : participantes){
-						if(!daoPart.listaTodos().contains(part)) {
+						if(!collectPart.contains(part)) {
 							daoPart.adiciona(part);
 						}
 					}
 					for(Produto prod :  collectProdutos){					
-						if(daoProd.buscaPorCodigo(prod.getCodUtilizEstab()) == null) {
+						if(buscarProdutoPorCodigo(collectProd,prod.getCodUtilizEstab()) == null) {
 							 daoProd.adiciona(prod);
 							 System.out.println("Cadastrando produto -> " + prod.getCodUtilizEstab());
-						}else if(importa.linha(prod).equals(daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab())) == false
-								&&  daoProd.produtoJoinOutUnidadeMedida(1L,prod.getCodUtilizEstab()).contains("NULL") == true){
+						}
+						
+						else if(importa.linha(prod).equals(produtoJoinOutUnidadeMedida(collectProd,collectOutUnd,prod.getCodUtilizEstab())) == false
+								&&  produtoJoinOutUnidadeMedida(collectProd,collectOutUnd,prod.getCodUtilizEstab()).contains("NULL") == true){
 							
 							Produto buscaPorCodigo = daoProd.buscaPorCodigo(prod.getCodUtilizEstab());
 					    	daoProd.remove(buscaPorCodigo);

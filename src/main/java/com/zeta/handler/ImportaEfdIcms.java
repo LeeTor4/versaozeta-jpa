@@ -46,7 +46,7 @@ import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class ImportaEfdIcms {
 
-	private ProdutoDao prodDao = new ProdutoDao();
+	//private ProdutoDao prodDao = new ProdutoDao();
 	private List<Produto> produtos = new ArrayList<Produto>();
 	private Set<String> listaProdutos = new LinkedHashSet<String>();
 	private List<ItemTotalizadoPorLote> itensTotalizadosSaidas = new ArrayList<ItemTotalizadoPorLote>();
@@ -412,9 +412,9 @@ public class ImportaEfdIcms {
 								}
 							}
 							
-							if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
-								produtos.add(insereProdutosProprios(p, idEmp, idEst));
-							}
+//							if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
+//								produtos.add(insereProdutosProprios(p, idEmp, idEst));
+//							}
 							//Observar se é o valor do Produto ou do Item
 							itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
 									Double.valueOf(p.getVlItem())));
@@ -436,9 +436,9 @@ public class ImportaEfdIcms {
 					retorno.add(insereNotasProprias(leitor, p, doc));
 				}
 
-				if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
-					produtos.add(insereProdutosProprios(p, idEmp, idEst));
-				}	
+//				if(!prodDao.listaTodos().contains(insereProdutosProprios(p, idEmp, idEst))){
+//					produtos.add(insereProdutosProprios(p, idEmp, idEst));
+//				}	
 				
 				//Rever esse trecho e extrair o metodo
 

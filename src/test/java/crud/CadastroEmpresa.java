@@ -18,9 +18,44 @@ public class CadastroEmpresa {
 
 	public static void main(String[] args) throws Exception {
 
-		//cadastrarEmpresasSellene();
-		cadastrarMegafarmaSellene();
-		//cadastrarEmpresasBenelux();
+		  //cadastrarEmpresasSellene();
+	     //cadastrarMegafarmaSellene();
+		// cadastrarEmpresasBenelux();
+		   cadastrarEmpresasDeposito();
+	}
+	
+	private static void cadastrarEmpresasDeposito() throws Exception {
+		LocalDate data = LocalDate.of(2009, Month.OCTOBER, 22);
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String valorFormatado = data.format(formatador);
+        
+        EmpresaDao dao = new EmpresaDao();
+
+		Empresa empresa = new Empresa();
+		empresa.setRazaoSocial("Sellene Comercio e Representações Ltda");
+		empresa.setNmFantasia("Sellene Matriz");
+		empresa.setCnpjBase("05329222");
+		empresa.setDtIniAtiv(UtilsEConverters.getStringParaData4(valorFormatado));
+		
+		Endereco end1 = new Endereco();
+
+		com.cnpj.dominio.Endereco ender1 = ServicoCEP.buscaEnderecoPeloCEP("61603005");
+
+		end1.setCep(ender1.getCep());
+		end1.setNmLogradouro(ender1.getLogradouro());
+		end1.setNumLogradouro("45");
+		end1.setBairro(ender1.getBairro());
+		end1.setCodMun(ender1.getIbge().substring(2, 7));
+		end1.setNmMun(ender1.getLocalidade());
+		end1.setCodUf(ender1.getIbge().substring(0, 2));
+		end1.setUf(ender1.getUf());
+		
+		Estabelecimento matriz = new Estabelecimento("05329222000508", "DEPOSITO CAUCAIA",
+				"Deposito", end1, empresa);
+
+		empresa.adicionaEstab(matriz);
+
+		dao.adiciona(empresa);
 	}
 
 	private static void cadastrarEmpresasBenelux() throws Exception {

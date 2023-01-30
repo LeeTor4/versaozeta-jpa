@@ -93,8 +93,6 @@ public class ProdutoDao {
 				} else {
 					out += "|" + ((OutrasUnid) arr[1]).getUndEquivPadrao();
 				}
-				
-				
 	      }
 
 //	        lista.forEach(arr -> {

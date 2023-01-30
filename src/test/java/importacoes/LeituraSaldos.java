@@ -1,5 +1,8 @@
 package importacoes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -9,6 +12,8 @@ import com.zeta.dao.HistoricoItensDao;
 import com.zeta.dao.InventarioDeclaradoDao;
 import com.zeta.dao.ItemTotalizadoPorLoteDao;
 import com.zeta.dao.ItensInventarioDao;
+import com.zeta.dao.OutrasUnidDao;
+import com.zeta.dao.ProdutoDao;
 import com.zeta.handler.ExportaRelacaoInventario;
 import com.zeta.handler.ExportaRelacaoInventario.SaldoInicialControleEstoque;
 import com.zeta.model.CadastroItensPorMovimentacao;
@@ -18,6 +23,8 @@ import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
 import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.ItensInventario;
+import com.zeta.model.OutrasUnid;
+import com.zeta.model.Produto;
 import com.zeta.model.SaldoItemAnual;
 
 public class LeituraSaldos {
@@ -168,9 +175,9 @@ public class LeituraSaldos {
 		
 		
 	
-		List<ItemTotalizadoPorLoteJoinProduto> lista = dao.buscaListaItensPorAnoJoinProduto("24653373000120");
-		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped("24653373000120", 2019);
-		List<CadastroItensPorMovimentacao> lista2 = dao.buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto("24653373000120", 2020);
+//		List<ItemTotalizadoPorLoteJoinProduto> lista = dao.buscaListaItensPorAnoJoinProduto("24653373000120");
+//		List<InventarioDeclaradoSped> buscarInvDecSped = dao.buscarInvDecSped("24653373000120", 2019);
+//		List<CadastroItensPorMovimentacao> lista2 = dao.buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto("24653373000120", 2020);
 		
 //	    lista.stream()
 //		        .filter(c -> Integer.parseInt(c.getAno()) == 2019)
@@ -231,14 +238,74 @@ public class LeituraSaldos {
 //		System.out.println(mapToDouble);
 		
 		
-		buscarInvDecSped.forEach(u -> System.out.println(
-                String.format("Item => CodItem: %s, Descrição: %s, Und: %s", u.getCodItem(), u.getQtde(), u.getVlUnit())));
+//		buscarInvDecSped.forEach(u -> System.out.println(
+//                String.format("Item => CodItem: %s, Descrição: %s, Und: %s", u.getCodItem(), u.getQtde(), u.getVlUnit())));
 		
 		
 
 //		Double mapToDouble = buscarInvDecSped.stream().filter(codItem -> codItem.getCodItem().equals("102")).mapToDouble(qtde -> qtde.getQtde()).sum();
 //		
 //		System.out.println(mapToDouble);
+		
+		
+		//======================================================================================
+		
+		
+		//36292|NULL
+		//4915|1.0
+		String codItem = "13";
+		
+		
+		OutrasUnidDao daoOut = new OutrasUnidDao();
+		List<OutrasUnid> collectOutUnd = daoOut.listaTodos().stream()
+		           .collect(Collectors.toList());	
+		
+		ProdutoDao daoProd = new ProdutoDao();
+		List<Produto> collectProd = daoProd.listaTodos().stream()
+				.collect(Collectors.toList());	
+		
+		Map<String,Produto> mapProduto = new HashMap<String, Produto>();		
+		for(Produto p :  collectProd){
+			mapProduto.put(p.getCodUtilizEstab(), p);
+		}
+		
+		Map<String,OutrasUnid> mapOutUndMedida = new HashMap<String, OutrasUnid>();
+		for(OutrasUnid p :  collectOutUnd){
+			mapOutUndMedida.put(p.getCodProd(), p);
+		}
+		
+		
+		System.out.println(mapProduto.get(codItem).getCodUtilizEstab() +"|"+(mapOutUndMedida.get(codItem) == null ? "NULL":mapOutUndMedida.get(codItem).getUndEquivPadrao()));
+			
+		//System.out.println(mapProduto.get(codItem));
+		
+		
+		
+	    
+		
+		
+	    
+		
+
+//		for(String key : mapOutUndMedida.keySet()){
+//			System.out.println(key+"|"+mapOutUndMedida.get(key).getUndEquivPadrao());
+//		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+//		if(codigos.contains("38341")) {
+//			System.out.println("Produto consta na base");
+//		}else {
+//			System.out.println("Produto não consta na base");
+//		}
+
 	}
 
 }
