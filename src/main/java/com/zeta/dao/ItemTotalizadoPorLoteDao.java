@@ -11,6 +11,7 @@ import javax.persistence.TypedQuery;
 import com.zeta.model.CadastroItensPorMovimentacao;
 import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItemTotalizadoPorLoteJoinInventarioJoinProduto;
 import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.SaldoItemAnual;
 import com.zeta.util.JPAUtil;
@@ -68,6 +69,14 @@ public class ItemTotalizadoPorLoteDao {
 			}
 			
 			return singleResult;
+		}
+		
+		public List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> ItemTotalizadoPorLoteJoinInventarioJoinProduto(){
+			
+			Query query = em.createNativeQuery("SELECT * FROM bddepositovz.tb_acumulado_mensal","mapeamento.ItemTotalizadoPorLoteJoinInventarioJoinProduto");
+
+			List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> lista = query.getResultList();
+			return lista;
 		}
 		
 		public List<CadastroItensPorMovimentacao> buscaListaItensPorAnoJoinTotalizadorJoinInvJoinProduto(String cnpj, Integer ano){

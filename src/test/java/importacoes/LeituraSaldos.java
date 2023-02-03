@@ -21,6 +21,7 @@ import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.InventarioDeclaradoSped;
 import com.zeta.model.ItemTotalizadoPorLote;
+import com.zeta.model.ItemTotalizadoPorLoteJoinInventarioJoinProduto;
 import com.zeta.model.ItemTotalizadoPorLoteJoinProduto;
 import com.zeta.model.ItensInventario;
 import com.zeta.model.OutrasUnid;
@@ -256,26 +257,26 @@ public class LeituraSaldos {
 		String codItem = "13";
 		
 		
-		OutrasUnidDao daoOut = new OutrasUnidDao();
-		List<OutrasUnid> collectOutUnd = daoOut.listaTodos().stream()
-		           .collect(Collectors.toList());	
+//		OutrasUnidDao daoOut = new OutrasUnidDao();
+//		List<OutrasUnid> collectOutUnd = daoOut.listaTodos().stream()
+//		           .collect(Collectors.toList());	
+//		
+//		ProdutoDao daoProd = new ProdutoDao();
+//		List<Produto> collectProd = daoProd.listaTodos().stream()
+//				.collect(Collectors.toList());	
+//		
+//		Map<String,Produto> mapProduto = new HashMap<String, Produto>();		
+//		for(Produto p :  collectProd){
+//			mapProduto.put(p.getCodUtilizEstab(), p);
+//		}
+//		
+//		Map<String,OutrasUnid> mapOutUndMedida = new HashMap<String, OutrasUnid>();
+//		for(OutrasUnid p :  collectOutUnd){
+//			mapOutUndMedida.put(p.getCodProd(), p);
+//		}
 		
-		ProdutoDao daoProd = new ProdutoDao();
-		List<Produto> collectProd = daoProd.listaTodos().stream()
-				.collect(Collectors.toList());	
 		
-		Map<String,Produto> mapProduto = new HashMap<String, Produto>();		
-		for(Produto p :  collectProd){
-			mapProduto.put(p.getCodUtilizEstab(), p);
-		}
-		
-		Map<String,OutrasUnid> mapOutUndMedida = new HashMap<String, OutrasUnid>();
-		for(OutrasUnid p :  collectOutUnd){
-			mapOutUndMedida.put(p.getCodProd(), p);
-		}
-		
-		
-		System.out.println(mapProduto.get(codItem).getCodUtilizEstab() +"|"+(mapOutUndMedida.get(codItem) == null ? "NULL":mapOutUndMedida.get(codItem).getUndEquivPadrao()));
+		//System.out.println(mapProduto.get(codItem).getCodUtilizEstab() +"|"+(mapOutUndMedida.get(codItem) == null ? "NULL":mapOutUndMedida.get(codItem).getUndEquivPadrao()));
 			
 		//System.out.println(mapProduto.get(codItem));
 		
@@ -306,6 +307,42 @@ public class LeituraSaldos {
 //			System.out.println("Produto não consta na base");
 //		}
 
+		//=========================================================================================
+		
+		
+	
+		List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> lista = dao.ItemTotalizadoPorLoteJoinInventarioJoinProduto();
+		
+		long count = lista.stream()
+				  .filter(cod -> cod.getCodItem().equals("10004"))
+				  .filter(year -> Integer.parseInt(year.getAno()) < 2018)
+				  .count();
+		
+//		lista.stream()
+//		  .filter(cod -> cod.getCodItem().equals("10004"))
+//		  .filter(year -> Integer.parseInt(year.getAno()) < 2019)		  
+//		  .forEach(u -> System.out.println(
+//                  String.format("Ano: %s, Cnpj: %s, CodItem: %s, Descrição: %s, Operacao: %s, Mes: %s,Saldo Acum.: %f", 
+//                		  u.getAno(), u.getCnpj(), u.getCodItem(), u.getDescricao(), u.getOperacao(), u.getMes() ,u.getSaldo_acum_qtde())));
+		
+
+		List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> collect = lista.stream()
+		  .filter(cod -> cod.getCodItem().equals("597"))
+		  .filter(year -> Integer.parseInt(year.getAno()) < 2018)
+          .collect(Collectors.toList());
+		
+        
+		for(int i = 0; i < collect.size(); i++){			
+			if(i == (collect.size()-1) ){
+				System.out.println(i + " = " + collect.get(i).getMes()+ " = " + collect.get(i).getSaldo_acum_qtde());
+			}
+		}
+		
+		//==============================================================================
+		
+		
+
+		//System.out.println(count + " = " + collect.get(lista.size()-1).getSaldo_acum_qtde());
 	}
 
 }

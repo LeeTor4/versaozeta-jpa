@@ -19,7 +19,7 @@ import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 public class XmlPropriosNaoEncontradoNoSpedFiscal {
    
 	public static void main(String[] args) throws IOException, JAXBException {
-		String ano   = "2019";
+		String ano   = "2020";
 		String emp   = "SELLENE";
 		String estab = "DEPOSITO";
 		String cnpj  = "05329222000508";
@@ -183,12 +183,12 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p1;
-		Path xP = xP1;
-		Path xT = xT1;
-		Path destProprios = pV1_Prop;
-		Path destTerceiros = pV1_Terc;
-		Path dest_Canc = pV1_Canc;
+	    Path p = p12;
+		Path xP = xP12;
+		Path xT = xT12;
+		Path destProprios = pV12_Prop;
+		Path destTerceiros = pV12_Terc;
+		Path dest_Canc = pV12_Canc;
 	    
 		ParseDocXML xmls = new ParseDocXML();
 		List<String> chavesSpedTerceiros = new ArrayList<String>();
