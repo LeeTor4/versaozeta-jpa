@@ -170,8 +170,6 @@ public class ExportaQuantitativoEstoque {
 			for (CadastroItensPorMovimentacao lista : listaProdutos) {
 				TotalizadoresDosSaldosMensais saldos = new TotalizadoresDosSaldosMensais();
 			
-		
-				
 				Double mapToDouble = buscarInvDecSped.stream()
 						 .filter(codItem -> codItem.getCodItem().equals(lista.getCodItem()))
 						 .mapToDouble(qtde -> qtde.getQtde())

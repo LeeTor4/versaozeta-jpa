@@ -19,9 +19,9 @@ public class CadastroEmpresa {
 	public static void main(String[] args) throws Exception {
 
 		  //cadastrarEmpresasSellene();
-	     //cadastrarMegafarmaSellene();
+	       cadastrarMegafarmaSellene();
 		// cadastrarEmpresasBenelux();
-		   cadastrarEmpresasDeposito();
+		  //cadastrarEmpresasDeposito();
 	}
 	
 	private static void cadastrarEmpresasDeposito() throws Exception {

@@ -28,11 +28,24 @@ public class ProdutoDao {
 		//dao.adiciona(t);
 		dao.adicionarBatch(t);
 	}
-
+	
+	public void adicionaLote(List<Produto> t) {
+		//dao.adiciona(t);
+		dao.adicionarBatchLote(t);
+	}
+	
 	public void remove(Produto t) {
 		dao.remove(t);
 	}
+	
+	public void removeLote(List<Produto> t) {
+		dao.removeLote(t);
+	}
 
+	public void atualizaLote(List<Produto> t) {
+		dao.atualizaLote(t);
+	}
+	
 	public void atualiza(Produto t) {
 		dao.atualiza(t);
 	}

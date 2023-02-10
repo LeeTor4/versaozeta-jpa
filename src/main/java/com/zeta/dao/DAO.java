@@ -52,6 +52,39 @@ public class DAO<T> {
 		   // em.close();
 		}
 	}
+	
+	public void adicionarBatchLote(List<T> lista) {
+		int entityCount = 10000_000;
+		int batchSize = 40;
+		
+		try {
+			 em.getTransaction().begin();
+		 
+		    for (int i = 0; i < entityCount; i++) {
+		        if (i > 0 && i % batchSize == 0) {
+		           
+		        	em.flush();
+		 
+		            em.clear();
+		        }
+		    }
+		    
+		    for(T t : lista) {
+		    	em.persist(t);
+		    }
+		    
+		    em.getTransaction().commit();
+		} catch (RuntimeException e) {
+		    if ( em.getTransaction().isActive()) {
+		    	 em.getTransaction().rollback();
+		    }
+		    throw e;
+		} finally {
+		   // em.close();
+		}
+	}
+	
+	
 	public void adiciona(T t) {
 		// persiste o objeto
 		em.getTransaction().begin();
@@ -65,12 +98,29 @@ public class DAO<T> {
 		em.remove(em.merge(t));	
 		em.getTransaction().commit();
 	}
+	
+	public void removeLote(List<T> lista) {
+		
+		em.getTransaction().begin();
+	    for(T t : lista) {
+		  em.remove(em.merge(t));	
+	    }
+		em.getTransaction().commit();
+	}
+	
 
 	public void atualiza(T t) {	
 		em.getTransaction().begin();
 		em.merge(t);
 		em.getTransaction().commit();
-		
+	}
+	
+	public void atualizaLote(List<T> lista) {	
+		em.getTransaction().begin();
+		for(T t : lista) {
+		   em.merge(t);
+		}		
+		em.getTransaction().commit();
 	}
 
 	public List<T> listaTodos() {

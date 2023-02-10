@@ -73,7 +73,7 @@ public class ItemTotalizadoPorLoteDao {
 		
 		public List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> ItemTotalizadoPorLoteJoinInventarioJoinProduto(){
 			
-			Query query = em.createNativeQuery("SELECT * FROM bddepositovz.tb_acumulado_mensal","mapeamento.ItemTotalizadoPorLoteJoinInventarioJoinProduto");
+			Query query = em.createNativeQuery("SELECT * FROM tb_acumulado_mensal","mapeamento.ItemTotalizadoPorLoteJoinInventarioJoinProduto");
 
 			List<ItemTotalizadoPorLoteJoinInventarioJoinProduto> lista = query.getResultList();
 			return lista;

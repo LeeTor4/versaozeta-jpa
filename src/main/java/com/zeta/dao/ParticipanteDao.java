@@ -18,10 +18,15 @@ public class ParticipanteDao {
 		this.dao = new DAO<Participante>(em, Participante.class);
 	  }
 	  
-		public void adiciona(Participante t) {
+	  public void adiciona(Participante t) {
+		//dao.adiciona(t);
+		dao.adicionarBatch(t);
+	  }
+	  
+	  public void adicionaLote(List<Participante> t) {
 			//dao.adiciona(t);
-			dao.adicionarBatch(t);
-		}
+			dao.adicionarBatchLote(t);
+	   }
 
 		public void remove(Participante t) {
 			dao.remove(t);

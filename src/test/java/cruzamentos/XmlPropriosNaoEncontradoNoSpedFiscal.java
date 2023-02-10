@@ -1,28 +1,172 @@
 package cruzamentos;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
 import com.leetor4.handler.ParseDocXML;
 import com.leetor4.model.nfe.DocumentoFiscalEltronico;
 import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
+import com.zeta.util.UnidadeFederacao;
+import com.zeta.util.UtilsEConverters;
+
+import modulos.efdicms.entidades.RegC100;
+import modulos.efdicms.manager.LeitorEfdIcms;
 
 public class XmlPropriosNaoEncontradoNoSpedFiscal {
    
+	private static String cabecalho() {
+		String linha = "";
+	    StringBuilder sb = new StringBuilder();
+	    linha = sb.append("Emitente - CNPJ")
+	    		  .append(";")
+	    		  .append("Razão Social")
+	    		  .append(";")
+	    		  .append("Chave de Acesso")
+	    		  .append(";")
+	    		  .append("UF")
+	    		  .append(";")
+	    		  .append("Data Emissão")
+	    		  .append(";")
+	    		  .append("Numero NFe")
+	    		  .append(";")
+	    		  .append("Valor NFe")
+	    		  .append(";")
+	    		  .append("ICMS NFe")
+	    		  .append(";")
+	    		  .append("Valor EFD")
+	    		  .append(";")
+	    		  .append("ICMS EFD")
+	    		  .append(";")
+	    		  .append("DIFERENÇA")
+	    		  .toString();
+		return linha;
+	}
+	
+	private static void exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(String file,Map<String, NfeRecebidas> mpNFeRecebidas,
+			Map<String, RegC100> mpC100EfdIcms) {
+		
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(new File(file)));
+			
+			String linha = " ";
+
+			linha = cabecalho();
+
+			writer.write(linha);
+			writer.newLine();
+			
+			for(String key : mpNFeRecebidas.keySet()){
+				PlanilhaDeNFeDeclaradasComValorDifEFD plan = new PlanilhaDeNFeDeclaradasComValorDifEFD();
+					
+				Double res = 0.0;
+				if(mpC100EfdIcms.get(key) != null) {
+					res = mpNFeRecebidas.get(key).getVlDoc() - mpC100EfdIcms.get(key).getVlDoc();
+				}
+
+				if(res != 0.0) {
+					
+					plan.setCnpj(mpNFeRecebidas.get(key).getCnpj());
+					plan.setRazaoSocial(mpNFeRecebidas.get(key).getRazaoSocial());
+					plan.setChaveAcesso(mpNFeRecebidas.get(key).getChaveAcesso());
+					plan.setUf(mpNFeRecebidas.get(key).getUf());
+					plan.setDtEmissao(mpNFeRecebidas.get(key).getDtEmissao());
+					plan.setNumDoc(mpNFeRecebidas.get(key).getNumDoc());
+					plan.setVlDoc(mpNFeRecebidas.get(key).getVlDoc());
+					plan.setVlIcms(mpNFeRecebidas.get(key).getVlIcms());
+					
+					if(mpC100EfdIcms.get(key) != null) {
+						plan.setVlDocEfd(mpC100EfdIcms.get(key).getVlDoc());
+					}else {
+						plan.setVlDocEfd(0.0);
+					}
+					
+					if(mpC100EfdIcms.get(key) != null) {
+						plan.setVlIcmsEfd(mpC100EfdIcms.get(key).getVlIcms());
+					}else {
+						plan.setVlIcmsEfd(0.0);
+					}
+					
+					plan.setVlDiferenca(res);
+					
+					linha = formatacaoPlanilha(plan);
+					writer.write(linha);
+					writer.newLine();
+				}
+				
+
+				
+				
+
+			}
+
+			writer.close();
+			System.out.println("Exportado com Sucesso!!!");
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		}
+
+	}
+	
+	private static String formatacaoPlanilha(PlanilhaDeNFeDeclaradasComValorDifEFD plan) {
+		String linha = "";
+
+		String vlDoc  =  String.format("%.2f", plan.getVlDoc());
+		String vlIcms =  String.format("%.2f", plan.getVlIcms());
+		
+		String vlDocEfd  =  String.format("%.2f", plan.getVlDocEfd());
+		String vlIcmsEfd    =  String.format("%.2f", plan.getVlIcmsEfd());
+		
+		String vlDiferenca    =  String.format("%.2f", plan.getVlDiferenca());
+		 
+		linha  = UtilsEConverters.mascaraCnpj(plan.getCnpj());
+		linha += ";";
+		linha += plan.getRazaoSocial();
+		linha += ";";
+		linha += UtilsEConverters.mascaraChaveNfe(plan.getChaveAcesso());
+		linha += ";";
+		linha += plan.getUf();
+		linha += ";";
+		linha += UtilsEConverters.getDataParaString2(plan.getDtEmissao());
+		linha += ";";
+		linha += plan.getNumDoc();
+		linha += ";";
+		linha += vlDoc.replace(".",",");
+		linha += ";";
+		linha += vlIcms.replace(".",",");
+		linha += ";";
+		linha += vlDocEfd.replace(".",",");
+		linha += ";";
+		linha += vlIcmsEfd.replace(".",",");
+		linha += ";";
+		linha += vlDiferenca.replace(".",",");
+		linha += ";";
+		
+		return linha;
+	}
+	
+	
 	public static void main(String[] args) throws IOException, JAXBException {
-		String ano   = "2020";
+		String ano   = "2021";
 		String emp   = "SELLENE";
-		String estab = "DEPOSITO";
-		String cnpj  = "05329222000508";
+		String estab = "MEGAFARMA";
+		String cnpj  = "05329222000680";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1_Prop = ano.concat("01_XML_PROPRIOS_NAO_ENCONTRADOS").concat(".txt");
@@ -190,6 +334,12 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 		Path destTerceiros = pV12_Terc;
 		Path dest_Canc = pV12_Canc;
 	    
+		LeitorEfdIcms leitor = new LeitorEfdIcms();
+		leitor.leitorSpedFiscal(p,0L,
+				0L,0L,0L,
+				0L, 0L );
+		
+		
 		ParseDocXML xmls = new ParseDocXML();
 		List<String> chavesSpedTerceiros = new ArrayList<String>();
 		List<String> chavesSpedProprios = new ArrayList<String>();
@@ -201,6 +351,10 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	    List<String> linhasNotasProprias =  new ArrayList<String>();  
 	    List<String> linhasNotasTerceiros =  new ArrayList<String>();  
 	    List<String> lines = Files.readAllLines(p, StandardCharsets.ISO_8859_1); //Aqui seta o Path do Sped
+	    
+	    Map<String, RegC100> mpC100EfdIcms       = new HashMap<String, RegC100>();
+	    Map<String, NfeRecebidas> mpNFeRecebidas = new HashMap<String, NfeRecebidas>();
+	    
 	    
 	    for (int i = 0; i < lines.size(); i++) {
 	    	if(lines.get(i).startsWith("|C100|0|1|")){
@@ -235,6 +389,18 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	    
 	    for(DocumentoFiscalEltronico doc : validaTipoDeParseNfeT){
 	    	chavesXmlsTerceiros.add(doc.getIdent().getChaveeletronica());
+	    	
+	    	NfeRecebidas nfe = new NfeRecebidas();
+	    	nfe.setCnpj(doc.getEmitente().getCnpj());
+	    	nfe.setRazaoSocial(doc.getEmitente().getNome());
+	    	nfe.setChaveAcesso(doc.getIdent().getChaveeletronica());
+	    	nfe.setUf(UnidadeFederacao.fromCodigo(doc.getIdent().getCodigoUF()).sigla());
+	    	nfe.setDtEmissao(UtilsEConverters.getStringParaData(doc.getIdent().getDataEmissao()));
+	    	nfe.setNumDoc(doc.getIdent().getNumDoc());
+	    	nfe.setVlDoc(Double.parseDouble(doc.getTotal().getIcmsTot().getVlNF()));
+	    	nfe.setVlIcms(Double.parseDouble(doc.getTotal().getIcmsTot().getVlIcms()));
+	    	
+	    	mpNFeRecebidas.put(nfe.getChaveAcesso(), nfe);
 	    }
 	   
 	    chavesSpedProprios.removeAll(chavesXmlsProprios);	
@@ -244,17 +410,174 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	    chavesSpedTerceiros.forEach(xml -> linhasNotasTerceiros.add(xml));
 	    
 	    
-	    if(!linhasNotasProprias.isEmpty()) {
-	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
-	    }
-	    
-	    if(!linhasNotasTerceiros.isEmpty()) {
-	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
-	    }
-	   
-	    if(!chavesCanceladas.isEmpty()) {
-	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
-	    }
-
+//	    if(!linhasNotasProprias.isEmpty()) {
+//	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
+//	    }
+//	    
+//	    if(!linhasNotasTerceiros.isEmpty()) {
+//	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
+//	    }
+//	   
+//	    if(!chavesCanceladas.isEmpty()) {
+//	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
+//	    }
+//	    
+//		for (RegC100 nota : leitor.getRegsC100()) {
+//			mpC100EfdIcms.put(nota.getChvNfe(), nota);
+//		}
+		
+		//String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+		//exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(dirPlanilha,mpNFeRecebidas,mpC100EfdIcms);
+		
+		
 	}
+}
+
+class PlanilhaDeNFeDeclaradasComValorDifEFD{
+	
+	private String cnpj;
+	private String razaoSocial;
+	private String chaveAcesso;
+	private String uf;
+	private LocalDate dtEmissao;
+	private String numDoc;
+	private Double vlDoc;
+	private Double vlIcms;
+	private Double vlDocEfd;
+	private Double vlIcmsEfd;
+	private Double vlDiferenca;
+	
+	public String getCnpj() {
+		return cnpj;
+	}
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	public String getChaveAcesso() {
+		return chaveAcesso;
+	}
+	public void setChaveAcesso(String chaveAcesso) {
+		this.chaveAcesso = chaveAcesso;
+	}
+	public String getUf() {
+		return uf;
+	}
+	public void setUf(String uf) {
+		this.uf = uf;
+	}
+	public LocalDate getDtEmissao() {
+		return dtEmissao;
+	}
+	public void setDtEmissao(LocalDate dtEmissao) {
+		this.dtEmissao = dtEmissao;
+	}
+	public String getNumDoc() {
+		return numDoc;
+	}
+	public void setNumDoc(String numDoc) {
+		this.numDoc = numDoc;
+	}
+	public Double getVlDoc() {
+		return vlDoc;
+	}
+	public void setVlDoc(Double vlDoc) {
+		this.vlDoc = vlDoc;
+	}
+	public Double getVlIcms() {
+		return vlIcms;
+	}
+	public void setVlIcms(Double vlIcms) {
+		this.vlIcms = vlIcms;
+	}
+	public Double getVlDocEfd() {
+		return vlDocEfd;
+	}
+	public void setVlDocEfd(Double vlDocEfd) {
+		this.vlDocEfd = vlDocEfd;
+	}
+	public Double getVlIcmsEfd() {
+		return vlIcmsEfd;
+	}
+	public void setVlIcmsEfd(Double vlIcmsEfd) {
+		this.vlIcmsEfd = vlIcmsEfd;
+	}
+	public Double getVlDiferenca() {
+		return vlDiferenca;
+	}
+	public void setVlDiferenca(Double vlDiferenca) {
+		this.vlDiferenca = vlDiferenca;
+	}
+	
+	
+	
+}
+
+class NfeRecebidas{
+	
+	private String cnpj;
+	private String razaoSocial;
+	private String chaveAcesso;
+	private String uf;
+	private LocalDate dtEmissao;
+	private String numDoc;
+	private Double vlDoc;
+	private Double vlIcms;
+	
+	
+	public String getCnpj() {
+		return cnpj;
+	}
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	public String getChaveAcesso() {
+		return chaveAcesso;
+	}
+	public void setChaveAcesso(String chaveAcesso) {
+		this.chaveAcesso = chaveAcesso;
+	}
+	public String getUf() {
+		return uf;
+	}
+	public void setUf(String uf) {
+		this.uf = uf;
+	}
+	public LocalDate getDtEmissao() {
+		return dtEmissao;
+	}
+	public void setDtEmissao(LocalDate dtEmissao) {
+		this.dtEmissao = dtEmissao;
+	}
+	public String getNumDoc() {
+		return numDoc;
+	}
+	public void setNumDoc(String numDoc) {
+		this.numDoc = numDoc;
+	}
+	public Double getVlDoc() {
+		return vlDoc;
+	}
+	public void setVlDoc(Double vlDoc) {
+		this.vlDoc = vlDoc;
+	}
+	public Double getVlIcms() {
+		return vlIcms;
+	}
+	public void setVlIcms(Double vlIcms) {
+		this.vlIcms = vlIcms;
+	}
+	
+	
 }

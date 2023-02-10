@@ -12,6 +12,8 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.swing.text.MaskFormatter;
+
 public class UtilsEConverters {
 
 	private static DateTimeFormatter formatter = 
@@ -101,5 +103,29 @@ public class UtilsEConverters {
         sb.replace(0, i, "");
   
         return sb.toString();  // return in String
+	}
+	
+	public static String mascaraCnpj(String cnpj) {
+	    try {
+	        MaskFormatter mask = new MaskFormatter("##.###.###/####-##");
+	        mask.setValueContainsLiteralCharacters(false);
+	        System.out.println("CNPJ : " + mask.valueToString(cnpj));
+	        cnpj =  mask.valueToString(cnpj);
+	    } catch (Exception ex) {
+	       
+	    }
+	    return cnpj;
+	}
+	
+	public static String mascaraChaveNfe(String chave) {
+	    try {
+	        MaskFormatter mask = new MaskFormatter("##-####-##############-##-###-#########-#########-#");
+	        mask.setValueContainsLiteralCharacters(false);
+	        System.out.println("CNPJ : " + mask.valueToString(chave));
+	        chave =  mask.valueToString(chave);
+	    } catch (Exception ex) {
+	       
+	    }
+	    return chave;
 	}
 }

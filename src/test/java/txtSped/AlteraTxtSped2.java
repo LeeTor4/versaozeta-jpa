@@ -129,7 +129,7 @@ public class AlteraTxtSped2 {
 	    Path pV12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV12));
 	    
 	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Megadiet_201702.csv"));
-	    Path dest = pV2;
+	    Path dest = pV1;
 	    List<String> novasLinhas =  new ArrayList<String>();   
 	    List<String> lines = Files.readAllLines(p2, StandardCharsets.ISO_8859_1);
 	    String linha = "";
