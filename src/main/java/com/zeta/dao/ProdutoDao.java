@@ -73,9 +73,6 @@ public class ProdutoDao {
 		}catch (NoResultException e) {
 			//System.out.println("Produto não encontrado : " + e.getMessage()); 
 		}
-		
-       
-       
 		return singleResult;
 	}
 	

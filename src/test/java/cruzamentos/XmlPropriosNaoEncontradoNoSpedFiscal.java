@@ -163,7 +163,7 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	
 	
 	public static void main(String[] args) throws IOException, JAXBException {
-		String ano   = "2021";
+		String ano   = "2022";
 		String emp   = "SELLENE";
 		String estab = "MEGAFARMA";
 		String cnpj  = "05329222000680";
@@ -327,12 +327,12 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p12;
-		Path xP = xP12;
-		Path xT = xT12;
-		Path destProprios = pV12_Prop;
-		Path destTerceiros = pV12_Terc;
-		Path dest_Canc = pV12_Canc;
+	    Path p = p2;
+		Path xP = xP2;
+		Path xT = xT2;
+		Path destProprios = pV2_Prop;
+		Path destTerceiros = pV2_Terc;
+		Path dest_Canc = pV2_Canc;
 	    
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
 		leitor.leitorSpedFiscal(p,0L,
@@ -410,21 +410,21 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	    chavesSpedTerceiros.forEach(xml -> linhasNotasTerceiros.add(xml));
 	    
 	    
-//	    if(!linhasNotasProprias.isEmpty()) {
-//	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
-//	    }
-//	    
-//	    if(!linhasNotasTerceiros.isEmpty()) {
-//	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
-//	    }
-//	   
-//	    if(!chavesCanceladas.isEmpty()) {
-//	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
-//	    }
-//	    
-//		for (RegC100 nota : leitor.getRegsC100()) {
-//			mpC100EfdIcms.put(nota.getChvNfe(), nota);
-//		}
+	    if(!linhasNotasProprias.isEmpty()) {
+	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
+	    }
+	    
+	    if(!linhasNotasTerceiros.isEmpty()) {
+	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
+	    }
+	   
+	    if(!chavesCanceladas.isEmpty()) {
+	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
+	    }
+	    
+		for (RegC100 nota : leitor.getRegsC100()) {
+			mpC100EfdIcms.put(nota.getChvNfe(), nota);
+		}
 		
 		//String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 		//exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(dirPlanilha,mpNFeRecebidas,mpC100EfdIcms);

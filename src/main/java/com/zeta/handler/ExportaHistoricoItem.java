@@ -266,7 +266,6 @@ public class ExportaHistoricoItem {
 						  
 						    if(i==0){
 						    	 prod.setCodigo(valoresEntreVirgula[0]);
-						    	
 						    }
 						    if(i==1) {
 						    	 prod.setCodAntItem(valoresEntreVirgula[1]);
