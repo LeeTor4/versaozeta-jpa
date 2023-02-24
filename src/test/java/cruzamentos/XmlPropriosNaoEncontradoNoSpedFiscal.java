@@ -105,6 +105,7 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 					plan.setVlDiferenca(res);
 					
 					linha = formatacaoPlanilha(plan);
+					
 					writer.write(linha);
 					writer.newLine();
 				}
@@ -163,10 +164,10 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	
 	
 	public static void main(String[] args) throws IOException, JAXBException {
-		String ano   = "2022";
+		String ano   = "2023";
 		String emp   = "SELLENE";
-		String estab = "MEGAFARMA";
-		String cnpj  = "05329222000680";
+		String estab = "MATRIZ";
+		String cnpj  = "05329222000176";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1_Prop = ano.concat("01_XML_PROPRIOS_NAO_ENCONTRADOS").concat(".txt");
@@ -327,13 +328,13 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p2;
-		Path xP = xP2;
-		Path xT = xT2;
-		Path destProprios = pV2_Prop;
-		Path destTerceiros = pV2_Terc;
-		Path dest_Canc = pV2_Canc;
-	    
+	    Path p = p1;
+		Path xP = xP1;
+		Path xT = xT1;
+		Path destProprios = pV1_Prop;
+		Path destTerceiros = pV1_Terc;
+		Path dest_Canc = pV1_Canc;
+	   
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
 		leitor.leitorSpedFiscal(p,0L,
 				0L,0L,0L,
@@ -410,24 +411,24 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	    chavesSpedTerceiros.forEach(xml -> linhasNotasTerceiros.add(xml));
 	    
 	    
-	    if(!linhasNotasProprias.isEmpty()) {
-	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
-	    }
-	    
-	    if(!linhasNotasTerceiros.isEmpty()) {
-	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
-	    }
-	   
-	    if(!chavesCanceladas.isEmpty()) {
-	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
-	    }
-	    
-		for (RegC100 nota : leitor.getRegsC100()) {
-			mpC100EfdIcms.put(nota.getChvNfe(), nota);
-		}
+//	    if(!linhasNotasProprias.isEmpty()) {
+//	    	 Files.write(destProprios, linhasNotasProprias, StandardOpenOption.CREATE);
+//	    }
+//	    
+//	    if(!linhasNotasTerceiros.isEmpty()) {
+//	    	 Files.write(destTerceiros, linhasNotasTerceiros, StandardOpenOption.CREATE);
+//	    }
+//	   
+//	    if(!chavesCanceladas.isEmpty()) {
+//	    	 Files.write(dest_Canc, chavesCanceladas, StandardOpenOption.CREATE);
+//	    }
+//	    
+//		for (RegC100 nota : leitor.getRegsC100()) {
+//			mpC100EfdIcms.put(nota.getChvNfe(), nota);
+//		}
 		
-		//String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
-		//exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(dirPlanilha,mpNFeRecebidas,mpC100EfdIcms);
+		String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
+		exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(dirPlanilha,mpNFeRecebidas,mpC100EfdIcms);
 		
 		
 	}

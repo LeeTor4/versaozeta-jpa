@@ -1,6 +1,8 @@
 package com.zeta.util;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.Instant;
@@ -9,10 +11,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 
 import javax.swing.text.MaskFormatter;
+
+import com.zeta.model.Cfop;
 
 public class UtilsEConverters {
 
@@ -127,5 +134,29 @@ public class UtilsEConverters {
 	       
 	    }
 	    return chave;
+	}
+	
+	public static List<Cfop> lerRelacaoCfop(String caminho) {
+		List<Cfop> retorno = new ArrayList<Cfop>();
+		File arquivoCSV = new File(caminho);
+		String linhaDoArquivo = new String();
+		
+		try {
+			@SuppressWarnings("resource")
+			Scanner leitor = new Scanner(arquivoCSV);
+			leitor.nextLine();
+			while (leitor.hasNext()) {
+				linhaDoArquivo = leitor.nextLine();
+				String[] valoresEntreVirgula = linhaDoArquivo.split("\\;");
+				//System.out.println(valoresEntreVirgula[0]+"|"+valoresEntreVirgula[1]+"|"+valoresEntreVirgula[2]+"|"+valoresEntreVirgula[3]+"|"+valoresEntreVirgula[4]);
+				retorno.add(new Cfop(valoresEntreVirgula[0],valoresEntreVirgula[1],valoresEntreVirgula[2],valoresEntreVirgula[3],valoresEntreVirgula[4]));
+			}
+
+		} catch (FileNotFoundException e) {
+
+			e.printStackTrace();
+		}
+		
+		return retorno;
 	}
 }

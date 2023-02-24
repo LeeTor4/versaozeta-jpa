@@ -23,6 +23,7 @@ import com.leetor4.model.nfe.DocumentoFiscalEltronico;
 import com.leetor4.model.nfe.Produtos;
 import com.zeta.dao.EquipamentoEcfDao;
 import com.zeta.dao.ProdutoDao;
+import com.zeta.model.Cfop;
 import com.zeta.model.HistoricoItens;
 import com.zeta.model.InventarioDeclarado;
 import com.zeta.model.ItemTotalizadoPorLote;
@@ -174,8 +175,8 @@ public class ImportaEfdIcms {
 					retorno.add(insereNotasTerceiros(leitor, nota, pNF));
 					
 					//Rever esse metodo para extrair daqui
-					if((pNF.getCfop().startsWith("1") && !pNF.getCfop().equals("1556")
-							&& !pNF.getCfop().equals("1551")) || (pNF.getCfop().startsWith("2") && !pNF.getCfop().equals("2556") && !pNF.getCfop().equals("2551"))){
+					if((pNF.getCfop().startsWith("1") && codigosCfopsQueMovimentamEstoque().contains(pNF.getCfop()))
+					|| (pNF.getCfop().startsWith("2") && codigosCfopsQueMovimentamEstoque().contains(pNF.getCfop()))){
 						itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",pNF.getCodItem(),pNF.getQtd(), 
 								pNF.getVlItem()));
 					}
@@ -457,13 +458,14 @@ public class ImportaEfdIcms {
 					if(insereNotasProprias(leitor, p, doc).getCodSitDoc().equals("00")) {
 						
 						//itensTotalizados.add(totalizador);
-						if((p.getCfop().startsWith("5") && !p.getCfop().equals("5929")) || (p.getCfop().startsWith("6") && !p.getCfop().equals("6929"))){
+						if((p.getCfop().startsWith("5") && codigosCfopsQueMovimentamEstoque().contains(p.getCfop())) 
+						|| (p.getCfop().startsWith("6") && codigosCfopsQueMovimentamEstoque().contains(p.getCfop()))){
 												
 								itensTotalizadosSaidas.add(new ItemTotalizadoPorLote("S",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
 										vlItem));
 						
-						}else if((p.getCfop().startsWith("1") && !p.getCfop().equals("1556")
-								&& !p.getCfop().equals("1551")) || (p.getCfop().startsWith("2") && !p.getCfop().equals("2556") && !p.getCfop().equals("2551"))){
+						}else if((p.getCfop().startsWith("1") && codigosCfopsQueMovimentamEstoque().contains(p.getCfop())) 
+							  || (p.getCfop().startsWith("2") && codigosCfopsQueMovimentamEstoque().contains(p.getCfop()))){
 								itensTotalizadosEntradas.add(new ItemTotalizadoPorLote("E",p.getCodItem(),Double.valueOf(p.getQtdComercial()), 
 										vlItem));
 						}
@@ -879,4 +881,15 @@ public class ImportaEfdIcms {
 			return retorno;
 		}
 
+		private List<String> codigosCfopsQueMovimentamEstoque(){
+			String caminhoCfop = "src\\main\\resources\\utils\\rel_cfop_v1.csv";	
+			List<String> retorno = new ArrayList<String>();
+			List<Cfop> lerRelacaoCfopQueMovimentaEstoque = UtilsEConverters.lerRelacaoCfop(caminhoCfop).stream()
+					   .filter(c -> c.getMovimentaEstoque().equals("S"))
+					   .collect(Collectors.toList());
+			for(Cfop cfop : lerRelacaoCfopQueMovimentaEstoque){
+				retorno.add(cfop.getCodigo());
+			}
+			return retorno;
+		}
 }
