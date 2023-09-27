@@ -35,6 +35,8 @@ public class Participante implements Serializable{
 	private String num;
 	private String compl;
 	private String bairro;
+	private String ativPrincipal;
+	private String  naturezaJuridica;
 	
 	
 	public Long getId() {
@@ -120,6 +122,19 @@ public class Participante implements Serializable{
 	}
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
+	}
+	
+	public String getAtivPrincipal() {
+		return ativPrincipal;
+	}
+	public void setAtivPrincipal(String ativPrincipal) {
+		this.ativPrincipal = ativPrincipal;
+	}
+	public String getNaturezaJuridica() {
+		return naturezaJuridica;
+	}
+	public void setNaturezaJuridica(String naturezaJuridica) {
+		this.naturezaJuridica = naturezaJuridica;
 	}
 	@Override
 	public int hashCode() {

@@ -59,7 +59,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 1401;Compra para industrialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 1403;Compra para comercialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 1406;Compra de bem para o ativo imobilizado cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;N
-1407;Compra de mercadoria para uso ou consumo cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;S
+1407;Compra de mercadoria para uso ou consumo cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;N
 1408;Transferência para industrialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 1409;Transferência para comercialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 1410;Devolução de venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributária;1012009;;S
@@ -82,11 +82,11 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 1506;Entrada decorrente de devolução de mercadorias, adquiridas ou recebidas de terceiros, remetidas para formação de lote de exportação;1092018;;N
 1506;Entrada decorrente de devolução simbólica de mercadorias, adquiridas ou recebidas de terceiros, remetidas para formação de lote de exportação.;1012009;31082018;N
 1551;Compra de bem para o ativo imobilizado;1012009;;N
-1552;Transferência de bem do ativo imobilizado;1012009;;N
+1552;Transferência de bem do ativo imobilizado;1012009;;S
 1553;Devolução de venda de bem do ativo imobilizado;1012009;;S
 1554;Retorno de bem do ativo imobilizado remetido para uso fora do estabelecimento;1012009;;N
 1555;Entrada de bem do ativo imobilizado de terceiro, remetido para uso no estabelecimento;1012009;;N
-1556;Compra de material para uso ou consumo;1012009;;S
+1556;Compra de material para uso ou consumo;1012009;;N
 1557;Transferência de material para uso ou consumo;1012009;;N
 1601;Recebimento, por transferência, de crédito de ICMS;1012009;;N
 1602;Recebimento, por transferência, de saldo credor de ICMS de outro estabelecimento da mesma empresa, para compensação de saldo devedor de ICMS;1012009;;N
@@ -107,8 +107,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 1901;Entrada para industrialização por encomenda;1012009;;N
 1902;Retorno de mercadoria remetida para industrialização por encomenda;1012009;;N
 1903;Entrada de mercadoria remetida para industrialização e não aplicada no referido processo;1012009;;N
-1904;Retorno de remessa para venda fora do estabelecimento;1012009;31052022;N
-1904;Retorno de remessa para venda fora do estabelecimento, ou qualquer entrada e retorno de remessa efetuada pelo MEI com exceção dos classificados nos códigos 1.202, 1.503, 1.504, 1.505 e 1.506;1062022;;N
+1904;Retorno de remessa para venda fora do estabelecimento;1012009;31052022;S
 1905;Entrada de mercadoria recebida para depósito em depósito fechado ou armazém geral;1012009;;S
 1906;Retorno de mercadoria remetida para depósito fechado ou armazém geral;1012009;;S
 1907;Retorno simbólico de mercadoria remetida para depósito fechado ou armazém geral;1012009;;N
@@ -116,11 +115,11 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 1908;Entrada de bem por conta de contrato de comodato ou locação;1122019;;N
 1909;Retorno de bem remetido por conta de contrato de comodato;1012009;30112019;N
 1909;Retorno de bem remetido por conta de contrato de comodato ou locação;1122019;;N
-1910;Entrada de bonificação, doação ou brinde;1012009;;N
+1910;Entrada de bonificação, doação ou brinde;1012009;;S
 1911;Entrada de amostra grátis;1012009;;N
 1912;Entrada de mercadoria ou bem recebido para demonstração;1012009;;N
 1913;Retorno de mercadoria ou bem remetido para demonstração;1012009;;N
-1914;Retorno de mercadoria ou bem remetido para exposição ou feira;1012009;;N
+1914;Retorno de mercadoria ou bem remetido para exposição ou feira;1012009;;S
 1915;Entrada de mercadoria ou bem recebido para conserto ou reparo;1012009;;N
 1916;Retorno de mercadoria ou bem remetido para conserto ou reparo;1012009;;N
 1917;Entrada de mercadoria recebida em consignação mercantil ou industrial;1012009;;N
@@ -132,7 +131,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 1923;Entrada de mercadoria recebida do vendedor remetente, em venda à ordem;1012009;;N
 1924;Entrada para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente;1012009;;N
 1925;Retorno de mercadoria remetida para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente;1012009;;N
-1926;Lançamento efetuado a título de reclassificação de mercadoria decorrente de formação de kit ou de sua desagregação;1012009;;N
+1926;Lançamento efetuado a título de reclassificação de mercadoria decorrente de formação de kit ou de sua desagregação;1012009;;S
 1931;Lançamento efetuado pelo tomador do serviço de transporte quando a responsabilidade de retenção do imposto for atribuída ao remetente ou alienante da mercadoria, pelo serviço de transporte realizado por transportador autônomo ou por transportador não inscrito na unidade da Federação onde iniciado o serviço. (Ajuste SINIEF 03/04);1012009;;N
 1932;Aquisição de serviço de transporte iniciado em unidade da Federação diversa daquela onde inscrito o prestador. (ajuste sinief 03/04);1012009;;N
 1933;Aquisição de serviço tributado pelo ISSQN.(ajuste sinief 03/04);1012009;;N
@@ -197,7 +196,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 2401;Compra para industrialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 2403;Compra para comercialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 2406;Compra de bem para o ativo imobilizado cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;N
-2407;Compra de mercadoria para uso ou consumo cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;S
+2407;Compra de mercadoria para uso ou consumo cuja mercadoria está sujeita ao regime de substituição tributária;1012009;;N
 2408;Transferência para industrialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 2409;Transferência para comercialização em operação com mercadoria sujeita ao regime de substituição tributária;1012009;;S
 2410;Devolução de venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributária;1012009;;S
@@ -222,7 +221,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 2553;Devolução de venda de bem do ativo imobilizado;1012009;;S
 2554;Retorno de bem do ativo imobilizado remetido para uso fora do estabelecimento;1012009;;N
 2555;Entrada de bem do ativo imobilizado de terceiro, remetido para uso no estabelecimento;1012009;;N
-2556;Compra de material para uso ou consumo;1012009;;S
+2556;Compra de material para uso ou consumo;1012009;;N
 2557;Transferência de material para uso ou consumo;1012009;;N
 2603;Ressarcimento de ICMS retido por substituição tributária;1012009;;N
 2651;Compra de combustível ou lubrificante para industrialização subseqüente;1012009;;S
@@ -248,14 +247,14 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 2908;Entrada de bem por conta de contrato de comodato ou locação;1122019;;N
 2909;Retorno de bem remetido por conta de contrato de comodato;1012009;30112019;N
 2909;Retorno de bem remetido por conta de contrato de comodato ou locação;1122019;;N
-2910;Entrada de bonificação, doação ou brinde;1012009;;N
+2910;Entrada de bonificação, doação ou brinde;1012009;;S
 2911;Entrada de amostra grátis;1012009;;N
 2912;Entrada de mercadoria ou bem recebido para demonstração;1012009;;N
 2913;Retorno de mercadoria ou bem remetido para demonstração;1012009;;N
 2914;Retorno de mercadoria ou bem remetido para exposição ou feira;1012009;;N
 2915;Entrada de mercadoria ou bem recebido para conserto ou reparo;1012009;;N
 2916;Retorno de mercadoria ou bem remetido para conserto ou reparo;1012009;;N
-2917;Entrada de mercadoria recebida em consignação mercantil ou industrial;1012009;;N
+2917;Entrada de mercadoria recebida em consignação mercantil ou industrial;1012009;;S
 2918;Devolução de mercadoria remetida em consignação mercantil ou industrial;1012009;;S
 2919;Devolução simbólica de mercadoria vendida ou utilizada em processo industrial, remetida anteriormente em consignação mercantil ou industrial;1012009;;S
 2920;Entrada de vasilhame ou sacaria;1012009;;N
@@ -427,24 +426,24 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 5667;Venda de combustível ou lubrificante a consumidor ou usuário final estabelecido em outra unidade da Federação;1012009;;S
 5901;Remessa para industrialização por encomenda;1012009;;N
 5902;Retorno de mercadoria utilizada na industrialização por encomenda;1012009;;N
-5903;Retorno de mercadoria recebida para industrialização e não aplicada no referido processo;1012009;;N
+5903;Retorno de mercadoria recebida para industrialização e não aplicada no referido processo;1012009;;S
 5904;Remessa para venda fora do estabelecimento;1012009;31052022;S
 5904;Remessa para venda fora do estabelecimento, ou qualquer remessa efetuada pelo MEI com exceção das classificadas nos códigos 5.502 e 5.505;1062022;;S
 5905;Remessa para depósito fechado ou armazém geral;1012009;;S
 5906;Retorno de mercadoria depositada em depósito fechado ou armazém geral;1012009;;S
-5907;Retorno simbólico de mercadoria depositada em depósito fechado ou armazém geral;1012009;;N
+5907;Retorno simbólico de mercadoria depositada em depósito fechado ou armazém geral;1012009;;S
 5908;Remessa de bem por conta de contrato de comodato;1012009;30112019;N
 5908;Remessa de bem por conta de contrato de comodato ou locação;1122019;;N
 5909;Retorno de bem recebido por conta de contrato de comodato;1012009;30112019;N
 5909;Retorno de bem recebido por conta de contrato de comodato ou locação;;;N
-5910;Remessa em bonificação, doação ou brinde;1012009;;N
+5910;Remessa em bonificação, doação ou brinde;1012009;;S
 5911;Remessa de amostra grátis;1012009;;N
 5912;Remessa de mercadoria ou bem para demonstração;1012009;;N
 5913;Retorno de mercadoria ou bem recebido para demonstração;1012009;;N
-5914;Remessa de mercadoria ou bem para exposição ou feira;1012009;;N
+5914;Remessa de mercadoria ou bem para exposição ou feira;1012009;;S
 5915;Remessa de mercadoria ou bem para conserto ou reparo;1012009;;N
 5916;Retorno de mercadoria ou bem recebido para conserto ou reparo;1012009;;N
-5917;Remessa de mercadoria em consignação mercantil ou industrial;1012009;;N
+5917;Remessa de mercadoria em consignação mercantil ou industrial;1012009;;S
 5918;Devolução de mercadoria recebida em consignação mercantil ou industrial;1012009;;S
 5919;Devolução simbólica de mercadoria vendida ou utilizada em processo industrial, recebida anteriormente em consignação mercantil ou industrial;1012009;;S
 5920;Remessa de vasilhame ou sacaria;1012009;;N
@@ -454,8 +453,8 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 5923;Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem ou em operações com armazém geral ou depósito fechado;1072010;;N
 5924;Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente;1012009;;N
 5925;Retorno de mercadoria recebida para industrialização por conta e ordem do adquirente da mercadoria, quando aquela não transitar pelo estabelecimento do adquirente;1012009;;N
-5926;Lançamento efetuado a título de reclassificação de mercadoria decorrente de formação de kit ou de sua desagregação;1012009;;N
-5927;Lançamento efetuado a título de baixa de estoque decorrente de perda, roubo ou deterioração;1012009;;N
+5926;Lançamento efetuado a título de reclassificação de mercadoria decorrente de formação de kit ou de sua desagregação;1012009;;S
+5927;Lançamento efetuado a título de baixa de estoque decorrente de perda, roubo ou deterioração;1012009;;S
 5928;Lançamento efetuado a título de baixa de estoque decorrente do encerramento da atividade da empresa;1012009;;N
 5929;Lançamento efetuado em decorrência de emissão de documento fiscal relativo a operação ou prestação também acobertada por documento fiscal do varejo;1022020;;N
 5929;Lançamento efetuado em decorrência de emissão de documento fiscal relativo a operação ou prestação também registrada em equipamento Emissor de Cupom Fiscal - ECF;1012009;31012020;N
@@ -593,7 +592,6 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 6906;Retorno de mercadoria depositada em depósito fechado ou armazém geral;1012009;;N
 6907;Retorno simbólico de mercadoria depositada em depósito fechado ou armazém geral;1012009;;N
 6908;Remessa de bem por conta de contrato de comodato;1012009;30112019;N
-6908;Remessa de bem por conta de contrato de comodato ou locação;1122019;;N
 6909;Retorno de bem recebido por conta de contrato de comodato;1012009;30112019;N
 6909;Retorno de bem recebido por conta de contrato de comodato ou locação;1122019;;N
 6910;Remessa em bonificação, doação ou brinde;1012009;;N
@@ -603,7 +601,7 @@ CFOP; DESC_CFOP; DT_INI; DT_FIM;MOV_ESTOQUE
 6914;Remessa de mercadoria ou bem para exposição ou feira;1012009;;N
 6915;Remessa de mercadoria ou bem para conserto ou reparo;1012009;;N
 6916;Retorno de mercadoria ou bem recebido para conserto ou reparo;1012009;;N
-6917;Remessa de mercadoria em consignação mercantil ou industrial;1012009;;N
+6917;Remessa de mercadoria em consignação mercantil ou industrial;1012009;;S
 6918;Devolução de mercadoria recebida em consignação mercantil ou industrial;1012009;;S
 6919;Devolução simbólica de mercadoria vendida ou utilizada em processo industrial, recebida anteriormente em consignação mercantil ou industrial;1012009;;S
 6920;Remessa de vasilhame ou sacaria;1012009;;N

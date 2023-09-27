@@ -19,6 +19,7 @@ public class DAO<T> {
 	private EntityManager em = JPAUtil.getEntityManager();
 	
 	public DAO(EntityManager em, Class<T> classe) {
+	
         this.em = em;
         this.classe = classe;
     }
@@ -87,6 +88,7 @@ public class DAO<T> {
 	
 	public void adiciona(T t) {
 		// persiste o objeto
+		
 		em.getTransaction().begin();
 		em.persist(t);		
 		em.getTransaction().commit();
@@ -129,7 +131,6 @@ public class DAO<T> {
 		query.select(query.from(classe));
 
 		List<T> lista = em.createQuery(query).getResultList();
-
 	
 		return lista;
 	}

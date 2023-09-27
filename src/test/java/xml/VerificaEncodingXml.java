@@ -2,15 +2,21 @@ package xml;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Stream;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -24,9 +30,74 @@ public class VerificaEncodingXml {
 	        return xmlReader.getEncoding().equalsIgnoreCase("UTF-8");
 	 }
 	 
-	
+	 static void copyFile(File src, File dst, String cnpj) throws IOException {
+			InputStream in = new FileInputStream(src);
+			
+			if(src.getName().toString().contains(cnpj)){
+				if(src.getName().toString().endsWith("-nfe.xml") || src.getName().toString().startsWith("ADCFe")) {
+					OutputStream out = new FileOutputStream(dst);  // Transferindo bytes de entrada para saída
+					byte[] buf = new byte[1024];
+					int len;
+					while ((len = in.read(buf)) > 0) {	
+						out.write(buf, 0, len);
+					}
+					in.close();
+					out.close();
+					
+				}
+				
+			}
+
+		}
 	 
-	    public static void main(String[] args) throws IOException {
+	 public static void copyDirectory(File srcDir, File dstDir, String cnpj) throws IOException {
+			if (srcDir.isDirectory()) {
+				if (!dstDir.exists()) {
+					dstDir.mkdir();
+				}
+				String[] children = srcDir.list();
+				for (int i = 0; i < children.length; i++) {
+					copyDirectory(new File(srcDir, children[i]), new File(dstDir, children[i]), cnpj);
+				}
+				
+				progresso(children.length);
+			} else {
+				// Este método está implementado na dica – Copiando um arquivo utilizando o Java
+				copyFile(srcDir, dstDir, cnpj);
+				
+			}
+			
+			
+	    }
+	 
+	 public static void progresso(int maximo) {
+		 final SwingProgressBarExample it = new SwingProgressBarExample();
+		    JFrame frame = new JFrame("Progress Bar Example");
+		    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		    frame.setContentPane(it);
+		    frame.pack();
+		    frame.setVisible(true);
+		    
+		    for (int i = 0; i <= maximo; i++) {
+		    	
+		    	final int percent = i;
+		    	
+				try {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							it.updateBar((percent*100)/100);
+						}
+					});
+					java.lang.Thread.sleep(100);
+					
+				} catch (InterruptedException e) {
+
+				}
+		    }
+		  
+	 }
+	    
+	 public static void main(String[] args) throws IOException {
 	    	
 	    	String ano = "2021";
 			String emp = "SELLENE";
@@ -116,23 +187,66 @@ public class VerificaEncodingXml {
 //		    }
 		    
 		    
-		    Path xml = Paths.get("C:\\Users\\chico\\Downloads\\txt-xml\\23210905329222000419550010000265451000265454-nfe.xml");
-		    Path txt = Paths.get("C:\\Users\\chico\\Downloads\\txt-xml\\SpedEFD-05329222000419-063882345-Remessa de arquivo original-ago2021.txt");
-		    VerificaEncodingXml reader = new VerificaEncodingXml();
-	        try {	            
-	        	InputStream strm = new FileInputStream(xml.toString());
-	        	
-	            if(reader.isUTF8(strm)){
-	                System.out.println("O documento é UTF-8");
-	            }else{
-	                System.out.println("O documento não é UTF-8");
-	            }
-	            	            
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        } 
+//		    Path xml = Paths.get("C:\\Users\\chico\\Downloads\\txt-xml\\23210905329222000419550010000265451000265454-nfe.xml");
+//		    Path txt = Paths.get("C:\\Users\\chico\\Downloads\\txt-xml\\SpedEFD-05329222000419-063882345-Remessa de arquivo original-ago2021.txt");
+//		    VerificaEncodingXml reader = new VerificaEncodingXml();
+//	        try {	            
+//	        	InputStream strm = new FileInputStream(xml.toString());
+//	        	
+//	            if(reader.isUTF8(strm)){
+//	                System.out.println("O documento é UTF-8");
+//	            }else{
+//	                System.out.println("O documento não é UTF-8");
+//	            }
+//	            	            
+//	        } catch (Exception e) {
+//	            e.printStackTrace();
+//	        } 
+		    
+		    String codUf = "23";
+		    String ano1 = "21";
+		    String mes = "06";
+		    String cnpj1 = "05329222000680";
+		    Path dir = Paths.get("C:\\Users\\chico\\Downloads\\txt-xml");
+//		    try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir, codUf.concat(ano1).concat(mes).concat(cnpj1).concat("*.xml"))){    
+//		    	for(Path path : stream) {
+//		    		System.out.println(path.getFileName());
+//		    	}
+//		    }
+		    
+		    //|0000|015|0|01062021|30062021|SELLENE COMERCIO E REPRESENTAÇÕES LTDA|05329222000419||CE|063882345|2304400|||B|1|
+		    try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.txt")){    
+		    	String retorno = "";
+		    	for(Path path : stream) {
+		    		try {
+		    			List<String> lines = Files.readAllLines(path, Charset.forName("ISO-8859-1"));
+		    			
+		    			for (String line : lines) {
+		    				if(line.startsWith("|0000|")) {
+		    					System.out.println(line);
+		    					System.out.println(line.substring(85,87)
+		    							  .concat("|")
+		    							  .concat(line.substring(18,20)
+		    							  .concat(line.substring(14,16)
+		    							  .concat("|")
+		    							  .concat(line.substring(69,83)))));
+		    				}
+		    				
+		    			}
+
+		    		} catch (IOException e) {
+		    			e.printStackTrace();
+		    		}
+		    	}
+		    }
+		    //System.out.println(codUf.concat(ano1).concat(mes).concat(cnpj1));    
+		    
+		    
+		    Path dirOrigem = Paths.get("E:\\XML");
+		    Path dirDestino = Paths.get("E:\\xml-servidor");
+		    copyDirectory(dirOrigem.toFile(), dirDestino.toFile(),"05329222000419");
 		    
 		    
 		    
-	    }
+	}
 }

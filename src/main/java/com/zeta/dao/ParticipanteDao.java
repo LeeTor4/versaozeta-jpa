@@ -19,8 +19,8 @@ public class ParticipanteDao {
 	  }
 	  
 	  public void adiciona(Participante t) {
-		//dao.adiciona(t);
-		dao.adicionarBatch(t);
+		 dao.adiciona(t);
+		//dao.adicionarBatch(t);
 	  }
 	  
 	  public void adicionaLote(List<Participante> t) {

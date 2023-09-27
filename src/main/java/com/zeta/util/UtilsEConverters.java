@@ -112,6 +112,18 @@ public class UtilsEConverters {
         return sb.toString();  // return in String
 	}
 	
+	public static String mascaraCep(String cep) {
+	    try {
+	        MaskFormatter mask = new MaskFormatter("#####-###");
+	        mask.setValueContainsLiteralCharacters(false);
+	        System.out.println("CEP : " + mask.valueToString(cep));
+	        cep =  mask.valueToString(cep);
+	    } catch (Exception ex) {
+	       
+	    }
+	    return cep;
+	}
+	
 	public static String mascaraCnpj(String cnpj) {
 	    try {
 	        MaskFormatter mask = new MaskFormatter("##.###.###/####-##");
