@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,16 +74,7 @@ public class UtilsEConverters {
 		return from;
 	}
 	
-	public static String convertParaNumeroDecimalBrasil(String formato) {
-		String padrao = "###,###.##"; 
-        DecimalFormat df = new DecimalFormat(padrao);
-        DecimalFormatSymbols dfs = new DecimalFormatSymbols(new Locale("pt","Brazil"));
-        dfs.setDecimalSeparator(',');
-        dfs.setGroupingSeparator('.');
-        df = new DecimalFormat(padrao, dfs);
-        
-        return df.format(formato);
-	}
+
 	
 	public static LocalDate getSQLParaLocalDate(Date dateToConvert) {	
 		 LocalDate localDate = null;
@@ -111,7 +103,18 @@ public class UtilsEConverters {
   
         return sb.toString();  // return in String
 	}
-	
+	public static String valorFormatadoPadrao(String pValorReal) {
+		Double valorReal = Double.parseDouble(pValorReal);
+		Locale localeBR = new Locale("pt","BR");
+		NumberFormat dinheiro = NumberFormat.getNumberInstance(localeBR);
+        return dinheiro.format(Math.round(valorReal));
+	}
+	public static String valorFormatadoReal(String pValorReal) {
+		Double valorReal = Double.parseDouble(pValorReal);
+		Locale localeBR = new Locale("pt","BR");
+		NumberFormat dinheiro = NumberFormat.getCurrencyInstance(localeBR);
+        return dinheiro.format(valorReal);
+	}
 	public static String mascaraCep(String cep) {
 	    try {
 	        MaskFormatter mask = new MaskFormatter("#####-###");
