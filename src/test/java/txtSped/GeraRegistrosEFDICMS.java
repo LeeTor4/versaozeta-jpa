@@ -93,6 +93,7 @@ public class GeraRegistrosEFDICMS {
 		}
 	 }
 	 
+	
 	 public static void geraRegistroH010(List<EntidadeCsv> lista, String caminhoOrig, String caminhoDest) {
 		 try {
 			PrintWriter pw = new PrintWriter(caminhoDest);
@@ -130,14 +131,47 @@ public class GeraRegistrosEFDICMS {
 		}
 	 }
 	 
-	 
+	 public static void geraRegistroK200(List<EntidadeCsv> lista, String caminhoOrig, String caminhoDest) {
+		 
+		 try {
+			PrintWriter pw = new PrintWriter(caminhoDest);
+		
+			for(EntidadeCsv ent : getRelacaoInv(caminhoOrig)){
+				
+				pw.printf("%1s","|");
+				pw.printf("%-4s","K200");
+				pw.printf("%1s","|");
+				pw.printf("%1s","31012019");
+				pw.printf("%1s","|");
+				pw.printf("%-7s",ent.getCodigo());
+				pw.printf("%1s","|");
+				pw.printf("%1s",ent.getQtde());
+				pw.printf("%1s","|");
+				pw.printf("%1s","0"); //IND_EST
+				pw.printf("%1s","|");
+				pw.printf("%s",""); // COD_PART
+				//pw.printf("%1s","|");
+				pw.printf("%1s\n","|");
+			}
+		 
+			pw.close();
+		    System.out.println("Exportado com Sucesso!!");
+		    
+		 } catch (FileNotFoundException e) {
+			
+			e.printStackTrace();
+		}
+		 
+	 }
 	public static void main(String[] args) throws FileNotFoundException {
 		
-		String path = "C:\\Users\\chico\\Downloads\\Advance_inv31122022.csv";
-		String pathDest = "E:\\Advance_registroH010.txt";
+		String path = "C:\\Users\\chico\\Downloads\\Orved_k28022019.csv";
+		String pathDest0200 = "E:\\Orved_registro0200_28022019.txt";
+		String pathDestk200 = "E:\\Orved_registroK200_28022019.txt";
 		getRelacaoInv(path);
-	    //geraRegistro0200(getRelacaoInv(path), path, pathDest);
-	      geraRegistroH010(getRelacaoInv(path), path, pathDest);
+	    //geraRegistro0200(getRelacaoInv(path), path, pathDest0200);
+	    //geraRegistroH010(getRelacaoInv(path), path, pathDest);
+	      geraRegistroK200(getRelacaoInv(path), path, pathDestk200);
 	
 	
 	}

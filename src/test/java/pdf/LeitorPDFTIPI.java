@@ -26,7 +26,7 @@ public class LeitorPDFTIPI {
 		
 		
 		List<String> novasLinhas =  new ArrayList<String>();   
-		File file = new File("C:\\Users\\chico\\Downloads\\NCM_ TIPI2012.pdf");
+		File file = new File("C:\\Users\\chico\\Downloads\\INV_202308.pdf");
 		File fileNcm = new File("C:\\Users\\chico\\Downloads\\NCMS.txt");
 	    Path pV12 = Paths.get("C:\\Users\\chico\\Downloads\\NCMsEncontradas.txt");
 		Path dest = pV12;
@@ -53,14 +53,21 @@ public class LeitorPDFTIPI {
 
                  
                  for (String line : lines) {
+                	 
+                	 
+                	 if(line.length() > 40) {
+                          //System.out.println(line + " =>  " + line.length()); 
+                    	   System.out.println(line.substring(0,5)+ "|"+ line.substring(6,line.length()-1));
+                	 }
+
                 	  
-                     for (String lineNCM : linesNCMS) {
-                    	 //System.out.println(line + " =>  " + line.length());
-                    	 if(line.contains(lineNCM)) {
-                    		 System.out.println(line + " =>  " + line.length());
-                    		 novasLinhas.add(line);
-                    	 } 
-                     }
+//                     for (String lineNCM : linesNCMS) {
+//                    	 //System.out.println(line + " =>  " + line.length());
+//                    	 if(line.contains(lineNCM)) {
+//                    		 System.out.println(line + " =>  " + line.length());
+//                    		 novasLinhas.add(line);
+//                    	 } 
+//                     }
                      
 
                  }

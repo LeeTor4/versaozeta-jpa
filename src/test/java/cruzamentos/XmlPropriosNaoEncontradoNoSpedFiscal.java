@@ -165,9 +165,9 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 	
 	public static void main(String[] args) throws IOException, JAXBException {
 		String ano   = "2023";
-		String emp   = "ORVED";
+		String emp   = "SELLENE";
 		String estab = "MATRIZ";
-		String cnpj  = "01629886000108";
+		String cnpj  = "05329222000176";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomesV1_Prop = ano.concat("01_XML_PROPRIOS_NAO_ENCONTRADOS").concat(".txt");
@@ -328,12 +328,12 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p2;
-		Path xP = xP2;
-		Path xT = xT2;
-		Path destProprios = pV2_Prop;
-		Path destTerceiros = pV2_Terc;
-		Path dest_Canc = pV2_Canc;
+	    Path p = p10;
+		Path xP = xP10;
+		Path xT = xT10;
+		Path destProprios = pV10_Prop;
+		Path destTerceiros = pV10_Terc;
+		Path dest_Canc = pV10_Canc;
 	   
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
 		leitor.leitorSpedFiscal(p,0L,
@@ -427,7 +427,7 @@ public class XmlPropriosNaoEncontradoNoSpedFiscal {
 			mpC100EfdIcms.put(nota.getChvNfe(), nota);
 		}
 		
-		  String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat("02").concat(".csv"));
+		  String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\NFeRecebidasDecComVlDifEfd_".concat(cnpj).concat("_").concat(ano).concat("10").concat(".csv"));
 		  exportaNFeRecebidasDeclaradasComValoresDiferentesDaEfd(dirPlanilha,mpNFeRecebidas,mpC100EfdIcms);
 		
 		

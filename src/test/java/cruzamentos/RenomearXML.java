@@ -19,9 +19,9 @@ public class RenomearXML {
 	public static void main(String[] args) throws IOException, JAXBException {
 
 		ParseDocXML xmls = new ParseDocXML();
-		String mes = "set";
+		String mes = "jun";
 
-		File folder = new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2014\\XML\\Terceiros\\".concat(mes).concat("\\"));
+		File folder = new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2016\\XML\\Terceiros\\".concat(mes).concat("\\"));
 		//File folder = new File("E:\\XML"); // Pasta do seu xml
 		List<DocumentoFiscalEltronico> validaTipoDeParseNFE = xmls.validaTipoDeParseNFE(folder);
 
@@ -30,9 +30,9 @@ public class RenomearXML {
 		for (int i = 0; i < validaTipoDeParseNFE.size(); i++) {
 			if (listOfFiles[i].isFile()) {// Checa se é arquivo, você pode checar se tem .xml no nome
 
-				File f = new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2014\\XML\\Terceiros\\".concat(mes).concat("\\") + listOfFiles[i].getName());
+				File f = new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2016\\XML\\Terceiros\\".concat(mes).concat("\\") + listOfFiles[i].getName());
 
-				f.renameTo(new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2014\\XML\\Terceiros\\".concat(mes).concat("\\") + validaTipoDeParseNFE.get(i).getIdent().getChaveeletronica() + ".xml"));
+				f.renameTo(new File("E:\\EMPRESAS\\SELLENE\\MATRIZ\\SPED\\2016\\XML\\Terceiros\\".concat(mes).concat("\\") + validaTipoDeParseNFE.get(i).getIdent().getChaveeletronica() + ".xml"));
 			}
 		}
 		

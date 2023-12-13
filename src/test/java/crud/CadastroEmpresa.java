@@ -82,7 +82,7 @@ public class CadastroEmpresa {
 			List<String> cnpjs = new ArrayList<String>();
 			Map<String,RelacaoDosParticipantes> mpRelacaoParticipantes = new HashMap<String,RelacaoDosParticipantes>();
 		
-		    for(int i = 2100; i < 2260; i++) {
+		    for(int i = 0; i < 361; i++) {
 		    	cnpjs.add(participantes.get(i).getCnpj());
 		    	mpRelacaoParticipantes.put(UtilsEConverters.mascaraCnpj(participantes.get(i).getCnpj()),participantes.get(i));
 		    }
@@ -105,6 +105,13 @@ public class CadastroEmpresa {
     	        plan.setId(mpRelacaoParticipantes.get(ent.getCnpj()).getId());
     	        plan.setCodigo(mpRelacaoParticipantes.get(ent.getCnpj()).getCodigo());
 		        plan.setNome(ent.getNome());
+		        plan.setLogradouro(ent.getLogradouro());
+		        plan.setNumero(ent.getNumero());
+		        plan.setComplemento(ent.getComplemento());
+		        plan.setBairro(ent.getBairro());
+		        plan.setCep(ent.getCep());
+		        plan.setMunicipio(ent.getMunicipio());
+		        plan.setUf(ent.getUf());
 		        plan.setCnpj(ent.getCnpj());
 		        plan.setCodatividadePrincipal(ent.getCodigoAtivPrincipal());
 		        plan.setAtividadePrincipal(ent.getAtividadePrincipal());
@@ -145,6 +152,20 @@ public class CadastroEmpresa {
 	    		  .append(";")
 	    		  .append("NOME")
 	    		  .append(";")
+	    		  .append("LOGRADOURO")
+	    		  .append(";")
+	    		  .append("NUMERO")
+	    		  .append(";")
+	    		  .append("COMPLEMENTO")
+	    		  .append(";")
+	    		  .append("BAIRRO")
+	    		  .append(";")
+	    		  .append("CEP")
+	    		  .append(";")
+	    		  .append("MUNICIPIO")
+	    		  .append(";")
+	    		  .append("UF")
+	    		  .append(";")
 	    		  .append("CNPJ")
 	    		  .append(";")
 	    		  .append("COD_ATIV_PRINCIPAL")
@@ -154,6 +175,8 @@ public class CadastroEmpresa {
 	    		  .append("NATUREZA_JURIDICA")
 	    		  .append(";")
 	    		  .append("PORTE")
+	    		  .append(";")
+	    		  .append("SITUAÇÃO")
 	    		  .append(";")
 	    		  .append("STATUS")
 	    		  .toString();
@@ -170,6 +193,20 @@ public class CadastroEmpresa {
 		linha += ";";
 		linha += "".concat(plan.getNome());
 		linha += ";";
+		linha += "".concat(plan.getLogradouro());
+		linha += ";";
+		linha += "".concat(plan.getNumero());
+		linha += ";";
+		linha += "".concat(plan.getComplemento());
+		linha += ";";
+		linha += "".concat(plan.getBairro());
+		linha += ";";
+		linha += "".concat(plan.getCep());
+		linha += ";";
+		linha += "".concat(plan.getMunicipio());
+		linha += ";";
+		linha += "".concat(plan.getUf());
+		linha += ";";
 		linha += plan.getCnpj();
 		linha += ";";
 		linha += plan.getCodatividadePrincipal();
@@ -179,6 +216,8 @@ public class CadastroEmpresa {
 		linha += plan.getNaturezaJuridica();
 		linha += ";";
 		linha += plan.getPorte();
+		linha += ";";
+		linha += plan.getSituacao();
 		linha += ";";
 		linha += plan.getStatus();
 		linha += ";";
@@ -227,7 +266,7 @@ public class CadastroEmpresa {
 		    
 		    
 		    String caminho = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\Grupo_Sellene_Participantes_base".concat(".csv"));
-		    String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("\\RelacaoParticipantesCompleta".concat(".csv"));
+		    String dirPlanilha   = "E:\\EMPRESAS".concat("\\").concat("SELLENE").concat("\\").concat("\\RelacaoParticipantesCompleta_restante_v1".concat(".csv"));
 		    lerRelacaoParticipantes(caminho);
 		    exportarPlanilhaParticipantesCompleta(dirPlanilha, lerRelacaoParticipantes(caminho));
 		    

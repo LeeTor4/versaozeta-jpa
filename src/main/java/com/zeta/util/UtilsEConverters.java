@@ -36,7 +36,7 @@ public class UtilsEConverters {
 			  DateTimeFormatter.ofPattern("yyyyMMdd");
 	
 	private static DateTimeFormatter formatter4 = 
-			  DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			  DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
     public static String getDataParaString2(LocalDate data) {
 		
@@ -74,6 +74,14 @@ public class UtilsEConverters {
 		return from;
 	}
 	
+	public static LocalDate getStringParaData5(String data) {
+		
+		TemporalAccessor parse = formatter4.parse(data);
+		LocalDate from = LocalDate.from(parse);
+		//System.out.println(from);
+		return from;
+	}
+	
 
 	
 	public static LocalDate getSQLParaLocalDate(Date dateToConvert) {	
@@ -105,9 +113,9 @@ public class UtilsEConverters {
 	}
 	public static String valorFormatadoPadrao(String pValorReal) {
 		Double valorReal = Double.parseDouble(pValorReal);
-		Locale localeBR = new Locale("pt","BR");
-		NumberFormat dinheiro = NumberFormat.getNumberInstance(localeBR);
-        return dinheiro.format(Math.round(valorReal));
+		DecimalFormat dinheiro = new DecimalFormat();  
+		dinheiro.applyPattern("#,##0.00");  
+        return dinheiro.format(valorReal);
 	}
 	public static String valorFormatadoReal(String pValorReal) {
 		Double valorReal = Double.parseDouble(pValorReal);
@@ -125,6 +133,18 @@ public class UtilsEConverters {
 	       
 	    }
 	    return cep;
+	}
+	
+	public static String mascaraCpf(String cpf) {
+	    try {
+	        MaskFormatter mask = new MaskFormatter("###.###.###-##");
+	        mask.setValueContainsLiteralCharacters(false);
+	        System.out.println("CPF : " + mask.valueToString(cpf));
+	        cpf =  mask.valueToString(cpf);
+	    } catch (Exception ex) {
+	       
+	    }
+	    return cpf;
 	}
 	
 	public static String mascaraCnpj(String cnpj) {

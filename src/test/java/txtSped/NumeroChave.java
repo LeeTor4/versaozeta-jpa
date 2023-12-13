@@ -2,21 +2,24 @@ package txtSped;
 
 public class NumeroChave {
 
-	private String chave;
-	private String numero;
-	
-	
-	public String getChave() {
-		return chave;
-	}
-	public void setChave(String chave) {
-		this.chave = chave;
-	}
 	public String getNumero() {
-		return numero;
+		// TODO Auto-generated method stub
+		return null;
 	}
-	public void setNumero(String numero) {
-		this.numero = numero;
+
+	public void setChave(String string) {
+		// TODO Auto-generated method stub
+		
 	}
-	
+
+	public void setNumero(String concat) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public String getChave() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

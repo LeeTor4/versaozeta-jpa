@@ -68,9 +68,9 @@ public class ImportacaoEfdIcms {
 		//MetadadosDB banco = new MetadadosDB();
 		
 		String ano   = "2022";
-		String emp   = "SELLENE";
+		String emp   = "BENELUX";
 		String estab = "MATRIZ";
-		String cnpj  = "05329222000176";
+		String cnpj  = "24653373000120";
 		
 		String anomes1  = ano.concat("01").concat(".txt");
 		String anomes2  = ano.concat("02").concat(".txt");
@@ -126,8 +126,8 @@ public class ImportacaoEfdIcms {
 	    
 
 	    //Verificar de criar a pasta de Proprios e Terceiros dentro da Pasta do XML
-	    Path p = p1;
-		Path x = xP1;
+	    Path p = p9;
+		Path x = xP9;
 			
 		LeitorEfdIcms leitor = new LeitorEfdIcms();
 	
@@ -237,7 +237,7 @@ public class ImportacaoEfdIcms {
 			
 			String dirPlanInv                         = "E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\INVENTARIO_".concat(cnpj).concat("_").concat(ano).concat(".csv"));
 			
-		       exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
+		     //exp.exportaControleQuantitativos(dirPlanilha,cnpj,ano);
 		     //expFin.exportaTotalizadorFinanceiroEstoque(dirPlanilhaFin,Integer.valueOf(ano), cnpj,1L, 2L);
 			
 			
