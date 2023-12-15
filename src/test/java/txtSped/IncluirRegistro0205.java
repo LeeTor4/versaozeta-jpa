@@ -21,12 +21,48 @@ public class IncluirRegistro0205 {
 		  List<String> novasLinhas =  new ArrayList<String>();   
 			for (int i = 0; i < lines.size(); i++) {
 				if (lines.get(i).startsWith("|")) {
-					
-					novasLinhas.add(lines.get(i));					
+					novasLinhas.add(lines.get(i));	
+				}
+				if (!lines.get(i).startsWith("|")) {
+					novasLinhas.remove(lines.get(i));	
 				}
 			}
 			System.out.println("Assinatura removida com sucesso!!!");
 			return novasLinhas;
+	}
+	
+	public static List<String> removerRegistro0205(List<String> lines) throws FileNotFoundException {
+		List<String> novasLinhas = new ArrayList<String>();
+		int cont = 0;
+		for (int i = 0; i < lines.size(); i++) {
+			novasLinhas.add(lines.get(i));
+			if (lines.get(i).startsWith("|0205|")) {
+				cont++;
+				novasLinhas.remove(lines.get(i));
+			}
+
+			// Bloco final 0990
+			if (lines.get(i).startsWith("|0990|")) {
+
+				String[] campo0990 = lines.get(i).split("\\|");
+				for (int c = 0; c < campo0990.length; c++) {
+					if (c == 2) {
+						int totalizador09900 = Integer.parseInt(campo0990[c]);
+						int res = totalizador09900 - cont;
+						String novoConteudo = "|0990|".concat(String.valueOf(res)).concat("|");
+						
+						novasLinhas.add("|0990|".concat(String.valueOf(((i+1)-cont))).concat("|")); /* ajustes conforme layout */
+						novasLinhas.remove(((i+1)-cont)-1);
+						//System.out.println(i + " = " + cont + " = " + ((i+1)-cont)+ " = " + res);
+					}
+				}
+			}
+			
+           
+		}
+		 
+		 System.out.println("Registro removido com sucesso!!!");
+		 return novasLinhas;
 	}
 	 public static List<String> geraArquivoAtualizado0205(List<String> lines,String file) throws FileNotFoundException{
 		    List<String> novasLinhas =  new ArrayList<String>();   
@@ -55,14 +91,14 @@ public class IncluirRegistro0205 {
 									indiceReg0200(mpIndiceReg0200(lines), codItem);
 									String novoConteudo = 
 											getLinhaReg0200(getCoditoDePara(file).get(codItem).getCodigoPara(),
-													mpRegistro0200(lines).get(codItem).getDESCR_ITEM(), 
-													mpRegistro0200(lines).get(codItem).getCOD_BARRA(),
-													mpRegistro0200(lines).get(codItem).getCOD_ANT_ITEM(),
-													mpRegistro0200(lines).get(codItem).getUNID_INV(),
-													mpRegistro0200(lines).get(codItem).getTIPO_ITEM(),
-													mpRegistro0200(lines).get(codItem).getCOD_NCM(),
-													mpRegistro0200(lines).get(codItem).getEX_IPI(),
-													mpRegistro0200(lines).get(codItem).getCOD_GEN(),
+													(mpRegistro0200(lines).get(codItem).getDESCR_ITEM()==null?"":mpRegistro0200(lines).get(codItem).getDESCR_ITEM()), 
+													(mpRegistro0200(lines).get(codItem).getCOD_BARRA()==null?"":mpRegistro0200(lines).get(codItem).getCOD_BARRA()),
+													(mpRegistro0200(lines).get(codItem).getCOD_ANT_ITEM()==null?"":mpRegistro0200(lines).get(codItem).getCOD_ANT_ITEM()),
+													(mpRegistro0200(lines).get(codItem).getUNID_INV()==null?"":mpRegistro0200(lines).get(codItem).getUNID_INV()),
+													(mpRegistro0200(lines).get(codItem).getTIPO_ITEM()==null?"":mpRegistro0200(lines).get(codItem).getTIPO_ITEM()),
+													(mpRegistro0200(lines).get(codItem).getCOD_NCM()==null?"":mpRegistro0200(lines).get(codItem).getCOD_NCM()),
+													(mpRegistro0200(lines).get(codItem).getEX_IPI()==null?"":mpRegistro0200(lines).get(codItem).getEX_IPI()),
+													(mpRegistro0200(lines).get(codItem).getCOD_GEN()==null?"":mpRegistro0200(lines).get(codItem).getCOD_GEN()),
 													(mpRegistro0200(lines).get(codItem).getCOD_LST()==null?"":mpRegistro0200(lines).get(codItem).getCOD_LST()),
 													(mpRegistro0200(lines).get(codItem).getALIQ_ICMS()==null?"":mpRegistro0200(lines).get(codItem).getALIQ_ICMS()),
 													(mpRegistro0200(lines).get(codItem).getCEST()==null?"":mpRegistro0200(lines).get(codItem).getCEST()));
@@ -81,7 +117,8 @@ public class IncluirRegistro0205 {
 								 
 								//String novoConteudo2 = getLinhaReg0205(getCoditoDePara(file).get(codItem).getCodigoDeMatriz());
 								//novasLinhas.add(indiceReg0200(mpIndiceReg0200(lines), codItem),novoConteudo2.concat("|"));  /*ajustes conforme layout*/
-								//System.out.println((indiceReg0200(mpIndiceReg0200(lines), codItem)) + " = " + i + " = " + cont + " = " + codItem + "= " + getCoditoDePara(file).get(codItem).getCodigoDeMatriz());
+								System.out.println((indiceReg0200(mpIndiceReg0200(lines), codItem)) + " = " + i + " = " + cont + " = " + codItem + "= " + getCoditoDePara(file).get(codItem).getCodigoDeMatriz()
+										+ "= " + lines.get(i));
 
 							}
 							 
@@ -453,7 +490,6 @@ public class IncluirRegistro0205 {
 				for (int c = 0; c < campo9999.length; c++) {
 					if(c == 1) {
 						retorno.put(campo9999[c], i);
-						System.out.println("Chave " + campo9999[c]);
 					}
 				}
     			
@@ -476,27 +512,37 @@ public class IncluirRegistro0205 {
 		String anomesV2  = ano.concat("02_reg0205").concat(".txt");
 		String anomes2SA  = ano.concat("02_semassinatura").concat(".txt");
 		String anomes3  = ano.concat("03").concat(".txt");
-		String anomesV3  = ano.concat("03_V2").concat(".txt");
-		String anomes3SA  = ano.concat("01_semassinatura").concat(".txt");
+		String anomesV3  = ano.concat("03_reg0205").concat(".txt");
+		String anomes3SA  = ano.concat("03_semassinatura").concat(".txt");
 		String anomes4  = ano.concat("04").concat(".txt");
-		String anomesV4  = ano.concat("04_V2").concat(".txt");
-		String anomes4SA  = ano.concat("01_semassinatura").concat(".txt");
+		String anomesV4  = ano.concat("04_reg0205").concat(".txt");
+		String anomes4SA  = ano.concat("04_semassinatura").concat(".txt");
 		String anomes5  = ano.concat("05").concat(".txt");
-		String anomesV5  = ano.concat("05_V2").concat(".txt");
+		String anomesV5  = ano.concat("05_reg0205").concat(".txt");
+		String anomes5SA  = ano.concat("05_semassinatura").concat(".txt");
 		String anomes6  = ano.concat("06").concat(".txt");
-		String anomesV6  = ano.concat("06_V2").concat(".txt");
+		String anomesV6  = ano.concat("06_reg0205").concat(".txt");
+		String anomes6SA  = ano.concat("06_semassinatura").concat(".txt");
 		String anomes7  = ano.concat("07").concat(".txt");
-		String anomesV7  = ano.concat("07_V2").concat(".txt");
+		String anomesV7  = ano.concat("07_reg0205").concat(".txt");
+		String anomes7SA  = ano.concat("07_semassinatura").concat(".txt");
 		String anomes8  = ano.concat("08").concat(".txt");
-		String anomesV8  = ano.concat("08_V2").concat(".txt");
+		String anomesV8  = ano.concat("08_reg0205").concat(".txt");
+		String anomes8SA  = ano.concat("08_semassinatura").concat(".txt");
 		String anomes9  = ano.concat("09").concat(".txt");
-		String anomesV9  = ano.concat("09_V2").concat(".txt");
+		String anomesV9  = ano.concat("09_reg0205").concat(".txt");
+		String anomes9SA  = ano.concat("09_semassinatura").concat(".txt");
 		String anomes10 = ano.concat("10").concat(".txt");
-		String anomesV10 = ano.concat("10_V2").concat(".txt");
+		String anomesV10 = ano.concat("10_reg0205").concat(".txt");
+		String anomes10SA  = ano.concat("10_semassinatura").concat(".txt");
 		String anomes11 = ano.concat("11").concat(".txt");
-		String anomesV11 = ano.concat("11_V2").concat(".txt");
+		String anomesV11 = ano.concat("11_reg0205").concat(".txt");
+		String anomes11SA  = ano.concat("11_semassinatura").concat(".txt");
 		String anomes12 = ano.concat("12").concat(".txt");
-		String anomesV12 = ano.concat("12_V2").concat(".txt");
+		String anomesV12 = ano.concat("12_reg0205").concat(".txt");
+		String anomes12SA  = ano.concat("12_semassinatura").concat(".txt");
+		
+	
 		
 	    Path p1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes1));
 	    Path pV1 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV1));
@@ -506,30 +552,43 @@ public class IncluirRegistro0205 {
 	    Path pV2SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes2SA));
 	    Path p3 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes3));
 	    Path pV3 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV3));
+	    Path pV3SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes3SA));
 	    Path p4 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes4));
 	    Path pV4 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV4));
+	    Path pV4SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes4SA));
 	    Path p5 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes5));
 	    Path pV5 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV5));
+	    Path pV5SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes5SA));
 	    Path p6 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes6));
 	    Path pV6 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV6));
+	    Path pV6SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes6SA));
 	    Path p7 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes7));
 	    Path pV7 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV7));
+	    Path pV7SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes7SA));
 	    Path p8 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes8));
 	    Path pV8 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV8));
+	    Path pV8SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes8SA));
 	    Path p9 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes9));
 	    Path pV9 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV9));
+	    Path pV9SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes9SA));
 	    Path p10 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes10));
 	    Path pV10 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV10));
+	    Path pV10SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes10SA));
 	    Path p11 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes11));
 	    Path pV11 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV11));
+	    Path pV11SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes11SA));
 	    Path p12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes12));
 	    Path pV12 = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomesV12));
+	    Path pV12SA = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat(anomes12SA));
 	    
 	    Path csv  = Paths.get("E:\\EMPRESAS".concat("\\").concat(emp).concat("\\").concat(estab).concat("\\SPED").concat("\\").concat(ano).concat("\\").concat("Megadiet_201702.csv"));
-	    Path dest = pV1; //Setar aqui
-	    Path dest2 = pV1SA;//Setar aqui
-	   
-	    List<String> lines = Files.readAllLines(p2, StandardCharsets.ISO_8859_1);//Seta o arquivo origem sped
+	    Path dest  = pV7; //Setar aqui
+	    Path dest2 = pV7SA;//Setar aqui	   
+	    Path p     = p7;//Seta o arquivo origem sped	 
+	    List<String> lines = Files.readAllLines(p, StandardCharsets.ISO_8859_1);
+	    
+	    
+	    
 	    String linha = "";
 	    String chave = "";
 	
